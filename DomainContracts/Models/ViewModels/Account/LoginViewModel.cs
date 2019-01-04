@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Domain.Contracts.Models.ViewModels.Account
+﻿namespace Domain.Contracts.Models.ViewModels.Account
 {
     public class LoginViewModel
     {
@@ -11,5 +7,7 @@ namespace Domain.Contracts.Models.ViewModels.Account
         public string Password { get; set; }
 
         public bool RememberMe { get; set; }
+        
+        public string ReturnUrl { get; set; }
     }
 }
