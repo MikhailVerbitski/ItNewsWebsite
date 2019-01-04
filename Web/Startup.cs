@@ -9,6 +9,7 @@ using AutoMapper;
 using Data.Implementation;
 using Data.Contracts.Models.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Web
 {
@@ -31,6 +32,13 @@ namespace Web
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(a => 
+                {
+                    a.LoginPath = new PathString("/Account/Login");
+                    a.AccessDeniedPath = new PathString("/Account/Login");
+                });
 
             services.AddDefaultIdentity<ApplicationUserEntity>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()

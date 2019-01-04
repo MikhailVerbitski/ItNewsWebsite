@@ -29,22 +29,21 @@ namespace SocialNetwork.Controllers
         {
             if (ModelState.IsValid)
             {
-                //ApplicationUserEntity userEntity = 
+                ApplicationUserEntity userEntity = new ApplicationUserEntity(); // to add a service
+                var result = await userManager.CreateAsync(userEntity, model.Password);
 
-                //var result = await userManager.CreateAsync(userEntity, model.Password);
-
-                //if (result.Succeeded)
-                //{
+                if (result.Succeeded)
+                {
                 //    //
                 //    return RedirectToAction("Login");
-                //}
-                //else
-                //{
+                }
+                else
+                {
                 //    foreach (var error in result.Errors)
                 //    {
                 //        ModelState.AddModelError(string.Empty, error.Description);
                 //    }
-                //}
+                }
             }
             return View(model);
         }
@@ -59,10 +58,10 @@ namespace SocialNetwork.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result =
-                    await signInManager.PasswordSignInAsync(model.Login, model.Password, model.RememberMe, false);
+                var result = await signInManager.PasswordSignInAsync(model.Login, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
+                    
                     //if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                     //{
                     //    return Redirect(model.ReturnUrl);

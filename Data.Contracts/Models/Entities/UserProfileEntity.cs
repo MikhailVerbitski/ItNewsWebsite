@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Data.Contracts.Models.Entities
 {
-    public class UserProfile
+    public class UserProfileEntity
     {
         public int Id { get; set; }
 

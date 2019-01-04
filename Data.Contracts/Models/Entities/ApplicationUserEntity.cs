@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Data.Contracts.Models.Entities
 {
@@ -11,9 +13,13 @@ namespace Data.Contracts.Models.Entities
 
         public int CountOfLikes { get; set; } // CountLikes
 
-        public UserProfile UserProfile { get; set; } // UserProfile
+        public UserProfileEntity UserProfile { get; set; } // UserProfile
 
-        // Access level (reader, writer, admin)
-        // Avatar
+        public string Avatar { get; set; } // Avatar
+        
+        public int? RoleId { get; set; }
+
+        public RoleEntity Role { get; set; } // Access level (reader, writer, admin)
+
     }
 }

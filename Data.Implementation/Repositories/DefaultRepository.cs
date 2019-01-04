@@ -6,25 +6,20 @@ using System.Linq.Expressions;
 
 namespace Data.Implementation.Repositories
 {
-    public class Repository<T> where T : class
+    public class DefaultRepository<T> where T : class
     {
         protected ApplicationDbContext context;
         protected DbSet<T> entities;
 
-        public Repository(ApplicationDbContext context)
+        public DefaultRepository(ApplicationDbContext context)
         {
-            this.GetContext(context);
+            this.context = context;
             entities = context
                 .GetType()
                 .GetProperties()
                 .Where(a => a.PropertyType == typeof(DbSet<T>))
                 .Single()
                 .GetValue(context) as DbSet<T>;
-        }
-
-        public void GetContext(ApplicationDbContext context)
-        {
-            this.context = context;
         }
 
         public virtual T Create(T entity)

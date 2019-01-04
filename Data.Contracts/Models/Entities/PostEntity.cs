@@ -23,6 +23,6 @@ namespace Data.Contracts.Models.Entities
 
         public IEnumerable<TagEntity> Tags { get; set; } // Tags
 
-        // Images
+        public IEnumerable<string> Images { get; set; } // Images
     }
 }
