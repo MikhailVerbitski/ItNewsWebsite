@@ -29,7 +29,12 @@ namespace SocialNetwork.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUserEntity userEntity = new ApplicationUserEntity(); // to add a service
+                ApplicationUserEntity userEntity = new ApplicationUserEntity(); // to obtain from the service
+
+                RoleEntity userRole = new RoleEntity(); // to obtain from the service
+                userEntity.Role = userRole;
+                // update user
+
                 var result = await userManager.CreateAsync(userEntity, model.Password);
 
                 if (result.Succeeded)

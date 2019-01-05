@@ -8,21 +8,27 @@ namespace Data.Contracts.Models.Entities
 
         public string Header { get; set; }  // Name
 
-        public SectionEntity Section { get; set; } // Section (раздел)
+        public int? SectionId { get; set; }
 
-        public long SumOfAssessment { get; set; } // Rating
-        public int CountOfAssessment { get; set; } // Rating
+        public virtual SectionEntity Section { get; set; } // Section (раздел)
 
-        public IEnumerable<CommentEntity> Comments { get; set; } // Comments
+        public long SumOfScore { get; set; } // Rating
+        public int CountOfScore { get; set; } // Rating
 
-        public ApplicationUserEntity ApplicationUser { get; set; } // Author
+        public virtual IEnumerable<CommentEntity> Comments { get; set; } // Comments
+
+        public int? UserProfileId { get; set; }
+
+        public virtual UserProfileEntity UserProfile { get; set; } // Author
 
         public string Content { get; set; } // Content
 
         public string BriefDesctiption { get; set; } // Brief description (краткое описание)
 
-        public IEnumerable<TagEntity> Tags { get; set; } // Tags
+        public virtual IEnumerable<PostTagEntity> Tags { get; set; } // Tags
 
-        public IEnumerable<string> Images { get; set; } // Images
+        public virtual IEnumerable<ImageEntity> Images { get; set; } // Images
+
+        public virtual IEnumerable<PostRatingEntity> PostRatings { get; set; }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Data.Contracts.Models.Entities
 {
@@ -8,10 +6,10 @@ namespace Data.Contracts.Models.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<ApplicationUserEntity> Users { get; set; }
+        public virtual IEnumerable<ApplicationUserEntity> ApplicationUsers { get; set; }
         public RoleEntity()
         {
-            Users = new List<ApplicationUserEntity>();
+            ApplicationUsers = new List<ApplicationUserEntity>();
         }
     }
 }

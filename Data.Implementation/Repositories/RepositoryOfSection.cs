@@ -2,16 +2,11 @@
 
 namespace Data.Implementation.Repositories
 {
-    class RepositoryOfSection
+    public class RepositoryOfSection : DefaultRepository<SectionEntity>
     {
-        private readonly ApplicationDbContext context;
-        private readonly DefaultRepository<SectionEntity> defaultRepository;
-
-        public RepositoryOfSection(ApplicationDbContext context)
+        public RepositoryOfSection(ApplicationDbContext context) : base(context)
         {
             this.context = context;
-
-            defaultRepository = new DefaultRepository<SectionEntity>(context);
         }
     }
 }

@@ -2,16 +2,11 @@
 
 namespace Data.Implementation.Repositories
 {
-    public class RepositoryOfComment
+    public class RepositoryOfComment : DefaultRepository<CommentEntity>
     {
-        private readonly ApplicationDbContext context;
-        private readonly DefaultRepository<CommentEntity> defaultRepository;
-
-        public RepositoryOfComment(ApplicationDbContext context)
+        public RepositoryOfComment(ApplicationDbContext context) : base(context)
         {
             this.context = context;
-
-            defaultRepository = new DefaultRepository<CommentEntity>(context);
         }
     }
 }

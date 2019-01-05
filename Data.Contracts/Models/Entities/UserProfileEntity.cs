@@ -7,10 +7,12 @@ namespace Data.Contracts.Models.Entities
         public int Id { get; set; }
 
         public string ApplicationUserId { get; set; }
-        public ApplicationUserEntity ApplicationUser { get; set; }
+        public virtual ApplicationUserEntity ApplicationUser { get; set; }
 
-        public IEnumerable<PostEntity> Posts { get; set; } //Posts
+        public virtual IEnumerable<PostEntity> Posts { get; set; } //Posts
 
-        public IEnumerable<CommentEntity> Comments { get; set; } //Comments
+        public virtual IEnumerable<CommentEntity> Comments { get; set; } //Comments
+
+        public virtual IEnumerable<PostRatingEntity> PostRatings { get; set; }
     }
 }

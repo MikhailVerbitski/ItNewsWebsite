@@ -8,7 +8,7 @@ namespace Data.Contracts.Models.Entities
 
         public string Name { get; set; } // Name
 
-        public IEnumerable<PostEntity> Posts { get; set; } // Posts
+        public virtual IEnumerable<PostTagEntity> Posts { get; set; } // Posts
 
         public long CountOfUsage { get; set; } // Count of Usage
     }

@@ -2,16 +2,11 @@
 
 namespace Data.Implementation.Repositories
 {
-    class RepositoryOfUserProfile
+    public class RepositoryOfUserProfile : DefaultRepository<UserProfileEntity>
     {
-        private readonly ApplicationDbContext context;
-        private readonly DefaultRepository<UserProfileEntity> defaultRepository;
-
-        public RepositoryOfUserProfile(ApplicationDbContext context)
+        public RepositoryOfUserProfile(ApplicationDbContext context) : base(context)
         {
             this.context = context;
-
-            defaultRepository = new DefaultRepository<UserProfileEntity>(context);
         }
     }
 }

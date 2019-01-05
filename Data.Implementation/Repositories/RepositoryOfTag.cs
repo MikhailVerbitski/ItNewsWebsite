@@ -2,16 +2,12 @@
 
 namespace Data.Implementation.Repositories
 {
-    public class RepositoryOfTag
+    public class RepositoryOfTag : DefaultRepository<TagEntity>
     {
-        private readonly ApplicationDbContext context;
-        private readonly DefaultRepository<TagEntity> defaultRepository;
-
-        public RepositoryOfTag(ApplicationDbContext context)
+        public RepositoryOfTag(ApplicationDbContext context) : base(context)
         {
             this.context = context;
-
-            defaultRepository = new DefaultRepository<TagEntity>(context);
         }
+
     }
 }

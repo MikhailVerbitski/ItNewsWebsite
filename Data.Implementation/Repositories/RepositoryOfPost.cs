@@ -2,16 +2,40 @@
 
 namespace Data.Implementation.Repositories
 {
-    public class RepositoryOfPost
+    public class RepositoryOfPost : DefaultRepository<PostEntity>
     {
-        private readonly ApplicationDbContext context;
-        private readonly DefaultRepository<PostEntity> defaultRepository;
-
-        public RepositoryOfPost(ApplicationDbContext context)
+        public RepositoryOfPost(ApplicationDbContext context) : base(context)
         {
             this.context = context;
+        }
 
-            defaultRepository = new DefaultRepository<PostEntity>(context);
+        public override PostEntity Create(PostEntity entity)
+        {
+            RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
+
+            var section = entity.Section;
+            if(section == null)
+            {
+                section = repositoryOfSection.Read(a => a.Id == entity.SectionId);
+            }
+            section.CountOfUsage++;
+            repositoryOfSection.Update(section);
+
+            return base.Create(entity);
+        }
+        public override void Delete(PostEntity entity)
+        {
+            RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
+
+            var section = entity.Section;
+            if (section == null)
+            {
+                section = repositoryOfSection.Read(a => a.Id == entity.SectionId);
+            }
+            section.CountOfUsage--;
+            repositoryOfSection.Update(section);
+
+            base.Delete(entity);
         }
     }
 }

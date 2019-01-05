@@ -1,4 +1,6 @@
-﻿namespace Data.Contracts.Models.Entities
+﻿using System.Collections.Generic;
+
+namespace Data.Contracts.Models.Entities
 {
     public class SectionEntity
     {
@@ -7,5 +9,7 @@
         public string Name { get; set; }
 
         public int CountOfUsage { get; set; }
+
+        public IEnumerable<PostEntity> Posts { get; set; }
     }
 }

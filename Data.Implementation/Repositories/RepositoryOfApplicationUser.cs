@@ -2,16 +2,27 @@
 
 namespace Data.Implementation.Repositories
 {
-    public class RepositoryOfApplicationUser
+    public class RepositoryOfApplicationUser : DefaultRepository<ApplicationUserEntity>
     {
-        private readonly ApplicationDbContext context;
-        private readonly DefaultRepository<ApplicationUserEntity> defaultRepository;
 
-        public RepositoryOfApplicationUser(ApplicationDbContext context)
+        public RepositoryOfApplicationUser(ApplicationDbContext context) : base(context)
         {
             this.context = context;
+        }
 
-            defaultRepository = new DefaultRepository<ApplicationUserEntity>(context);
+        public override ApplicationUserEntity Create(ApplicationUserEntity entity)
+        {
+            var ApplicationUser = base.Create(entity);
+
+            RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            var UserProfile = repositoryOfUserProfile.Read(a => a.Id == ApplicationUser.UserProfileId);
+            if(UserProfile.ApplicationUserId == null)
+            {
+                UserProfile.ApplicationUserId = ApplicationUser.Id;
+            }
+            repositoryOfUserProfile.Update(UserProfile);
+
+            return ApplicationUser;
         }
     }
 }
