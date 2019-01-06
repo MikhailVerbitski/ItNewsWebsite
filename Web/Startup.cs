@@ -10,6 +10,7 @@ using Data.Implementation;
 using Data.Contracts.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Infrastructure.AutomapperProfiles;
 
 namespace Web
 {
@@ -55,7 +56,9 @@ namespace Web
 
             var mappingConfig = new MapperConfiguration(a =>
             {
-                //AutomapperProfiles
+                a.AddProfile(new AutomapperCommentProfile());
+                a.AddProfile(new AutomapperPostProfile());
+                a.AddProfile(new AutomapperUserProfile());
             });
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
