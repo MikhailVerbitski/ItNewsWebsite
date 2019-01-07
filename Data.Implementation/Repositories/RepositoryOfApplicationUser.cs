@@ -16,11 +16,13 @@ namespace Data.Implementation.Repositories
 
             RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context);
             var UserProfile = repositoryOfUserProfile.Read(a => a.Id == ApplicationUser.UserProfileId);
-            if(UserProfile.ApplicationUserId == null)
+            if(UserProfile == null)
             {
-                UserProfile.ApplicationUserId = ApplicationUser.Id;
+                UserProfile = new UserProfileEntity() { ApplicationUserId = ApplicationUser.Id };
+                UserProfile = repositoryOfUserProfile.Create(UserProfile);
+                ApplicationUser.UserProfileId = UserProfile.Id;
             }
-            repositoryOfUserProfile.Update(UserProfile);
+            this.Update(ApplicationUser);
 
             return ApplicationUser;
         }

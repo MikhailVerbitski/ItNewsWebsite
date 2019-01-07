@@ -15,6 +15,8 @@ namespace Data.Contracts.Models.Entities
         public long SumOfScore { get; set; } // Rating
         public int CountOfScore { get; set; } // Rating
 
+        public bool? IsFinished { get; set; }
+
         public virtual IEnumerable<CommentEntity> Comments { get; set; } // Comments
 
         public int? UserProfileId { get; set; }

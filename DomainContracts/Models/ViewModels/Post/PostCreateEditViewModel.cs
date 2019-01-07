@@ -12,14 +12,14 @@ namespace Domain.Contracts.Models.ViewModels.Post
         public int? SectionId { get; set; }
 
         public string Section { get; set; }
-
-        public UserMiniViewModel AuthorUserMiniViewModel { get; set; }
+        
+        public int UserProfileId { get; set; }
 
         public string Content { get; set; }
 
         public string BriefDesctiption { get; set; }
 
-        public IEnumerable<string> Tags { get; set; }
+        public string Tags { get; set; }
 
         public IEnumerable<string> Images { get; set; }
     }

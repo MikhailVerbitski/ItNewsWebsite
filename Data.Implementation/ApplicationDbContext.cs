@@ -1,6 +1,7 @@
 ﻿using Data.Contracts.Models.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Data.Implementation
 {
@@ -24,13 +25,21 @@ namespace Data.Implementation
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            string adminRoleName = "admin";
-            string userRoleName = "user";
-
-            RoleEntity adminRole = new RoleEntity { Id = 1, Name = adminRoleName };
-            RoleEntity userRole = new RoleEntity { Id = 2, Name = userRoleName };
-
+            RoleEntity adminRole = new RoleEntity { Id = 1, Name = "admin" };
+            RoleEntity userRole = new RoleEntity { Id = 2, Name = "user" };
             builder.Entity<RoleEntity>().HasData(new RoleEntity[] { adminRole, userRole });
+
+
+            var sectionsName = new string[] { "Java", "C#", "C++", "Algorithms", "Machine Learning" };
+            var sections = Enumerable
+                .Range(0, sectionsName.Length)
+                .Select(a => new SectionEntity()
+                {
+                    Id = a + 1,
+                    Name = sectionsName[a]
+                })
+            .ToArray();
+            builder.Entity<SectionEntity>().HasData(sections);
 
 
             var ApplicationUser = builder.Entity<ApplicationUserEntity>();

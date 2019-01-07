@@ -14,19 +14,22 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
                 .ForMember(a => a.SectionId, a => a.MapFrom(b => b.SectionId))
+                .ForMember(a => a.UserProfileId, a => a.MapFrom(b => b.UserProfileId))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<PostEntity, PostMiniViewModel>()
                 .ForMember(a => a.PostId, a => a.MapFrom(b => b.Id))
                 .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
-                .ForMember(a => a.Score, a => a.MapFrom(b => b.SumOfScore / b.CountOfScore))
+                .ForMember(a => a.Score, a => a.MapFrom(b => (b.CountOfScore == 0) ? 0 : b.SumOfScore / b.CountOfScore))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<PostEntity, PostViewModel>()
                 .ForMember(a => a.PostId, a => a.MapFrom(b => b.Id))
                 .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
-                .ForMember(a => a.Score, a => a.MapFrom(b => b.SumOfScore / b.CountOfScore))
+                .ForMember(a => a.Section, a => a.MapFrom(b => (b.Section != null) ? b.Section.Name : null))
+                .ForMember(a => a.SectionId, a => a.MapFrom(b => b.SectionId))
+                .ForMember(a => a.Score, a => a.MapFrom(b => (b.CountOfScore == 0) ? 0 : b.SumOfScore / b.CountOfScore))
                 .ForAllOtherMembers(a => a.Ignore());
 
             CreateMap<PostCreateEditViewModel, PostEntity>()
@@ -35,6 +38,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
                 .ForMember(a => a.SectionId, a => a.MapFrom(b => b.SectionId))
+                .ForMember(a => a.UserProfileId, a => a.MapFrom(b => b.UserProfileId))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<PostMiniViewModel, PostEntity>()
                 .ForMember(a => a.Id, a => a.MapFrom(b => b.PostId))

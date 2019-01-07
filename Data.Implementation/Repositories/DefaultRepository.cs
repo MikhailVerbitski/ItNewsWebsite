@@ -14,12 +14,7 @@ namespace Data.Implementation.Repositories
         public DefaultRepository(ApplicationDbContext context)
         {
             this.context = context;
-            entities = context
-                .GetType()
-                .GetProperties()
-                .Where(a => a.PropertyType == typeof(DbSet<T>))
-                .Single()
-                .GetValue(context) as DbSet<T>;
+            entities = context.Set<T>();
         }
 
         public virtual T Create(T entity)
@@ -44,13 +39,34 @@ namespace Data.Implementation.Repositories
             List<string> includelist = new List<string>();
             foreach (var item in properties)
             {
-                MemberExpression body = item.Body as MemberExpression;
+                Expression memberExpression = (item.Body is UnaryExpression)
+                    ? (item.Body as UnaryExpression).Operand
+                    : item.Body;
+
+                MemberExpression body = memberExpression as MemberExpression;
                 if (body == null)
                     throw new ArgumentException("The body must be a member expression");
                 includelist.Add(body.Member.Name);
             }
+
+            // if the entity is stored locally, you may experience upgrade issues
+            if (entities.Local.All(a => !a.Equals(entity)))
+            {
+                var property = typeof(T).GetProperties().SingleOrDefault(a => a.Name == "Id");
+                if(property != null)
+                {
+                    var id = property.GetValue(entity);
+                    var modEntity = entities.Local.SingleOrDefault(a => property.GetValue(a).Equals(id));
+                    if(modEntity != null)
+                    {
+                        context.Entry(modEntity).State = EntityState.Detached;
+                    }
+                }
+            }
+
             entities.Attach(entity);
             var entry = context.Entry(entity);
+
             foreach (var item in includelist)
             {
                 entry.Property(item).IsModified = true;

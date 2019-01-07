@@ -9,7 +9,9 @@ namespace Domain.Contracts.Models.ViewModels.Post
 
         public string Header { get; set; }
 
-        public virtual string Section { get; set; }
+        public int SectionId { get; set; }
+
+        public string Section { get; set; }
 
         public int Score { get; set; }
 

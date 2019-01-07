@@ -6,11 +6,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
+using FluentValidation;
 using Data.Implementation;
 using Data.Contracts.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Infrastructure.AutomapperProfiles;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+using FluentValidation.AspNetCore;
+using Domain.Contracts.Validators.ViewModels.Account;
 
 namespace Web
 {
@@ -34,25 +39,22 @@ namespace Web
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(a => 
-                {
-                    a.LoginPath = new PathString("/Account/Login");
-                    a.AccessDeniedPath = new PathString("/Account/Login");
-                });
+            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                //.AddCookie(a => 
+                //{
+                //    a.LoginPath = new PathString("/Account/Login");
+                //    a.AccessDeniedPath = new PathString("/Account/Login");
+                //});
 
-            services.AddDefaultIdentity<ApplicationUserEntity>()
+            services.AddIdentity<ApplicationUserEntity, IdentityRole>(a => 
+            {
+                a.Password.RequireNonAlphanumeric = false;
+                a.Password.RequireLowercase = false;
+                a.Password.RequireUppercase = false;
+                a.Password.RequireDigit = false;
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-            //services.AddIdentity<ApplicationUserEntity, IdentityRole>(opts =>
-            //{
-            //    opts.Password.RequireNonAlphanumeric = false;
-            //    opts.Password.RequireLowercase = false;
-            //    opts.Password.RequireUppercase = false;
-            //    opts.Password.RequireDigit = false;
-            //})
-            //.AddEntityFrameworkStores<ApplicationDbContext>()
-            //.AddDefaultTokenProviders();
 
             var mappingConfig = new MapperConfiguration(a =>
             {
@@ -62,8 +64,14 @@ namespace Web
             });
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            
+            services.AddMvc()
+                .AddFluentValidation(a => 
+                {
+                    a.RegisterValidatorsFromAssemblyContaining<LoginValidator>();
+                    a.RegisterValidatorsFromAssemblyContaining<RegisterValidator>();
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -81,12 +89,17 @@ namespace Web
             app.UseHttpsRedirection();
             app.UseCookiePolicy();
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "Images")),
+                RequestPath = "/Images"
+            });
             app.UseAuthentication();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Default}/{action=Index}/{id?}");
+                    template: "{controller=ForTests}/{action=Index}/{id?}");
             });
         }
     }

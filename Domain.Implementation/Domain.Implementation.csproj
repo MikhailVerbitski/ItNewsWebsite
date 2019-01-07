@@ -12,8 +12,4 @@
     <ProjectReference Include="..\DomainContracts\Domain.Contracts.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>
