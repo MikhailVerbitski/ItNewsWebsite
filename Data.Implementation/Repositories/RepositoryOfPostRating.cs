@@ -43,7 +43,7 @@ namespace Data.Implementation.Repositories
             base.Delete(entity);
         }
 
-        public override void Update(PostRatingEntity entity, params Expression<Func<PostRatingEntity, object>>[] properties)
+        public override void Update(PostRatingEntity entity)
         {
             RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context);
             RepositoryOfPostRating repositoryOfPostRating = new RepositoryOfPostRating(context);
@@ -59,7 +59,7 @@ namespace Data.Implementation.Repositories
             Post.SumOfScore += entity.Score;
             repositoryOfPost.Update(Post);
 
-            base.Update(entity, properties);
+            base.Update(entity);
         }
     }
 }

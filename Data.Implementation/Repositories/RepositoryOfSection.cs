@@ -5,8 +5,6 @@ namespace Data.Implementation.Repositories
     public class RepositoryOfSection : DefaultRepository<SectionEntity>
     {
         public RepositoryOfSection(ApplicationDbContext context) : base(context)
-        {
-            this.context = context;
-        }
+        { }
     }
 }

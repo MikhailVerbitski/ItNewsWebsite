@@ -6,9 +6,7 @@ namespace Data.Implementation.Repositories
     {
 
         public RepositoryOfApplicationUser(ApplicationDbContext context) : base(context)
-        {
-            this.context = context;
-        }
+        { }
 
         public override ApplicationUserEntity Create(ApplicationUserEntity entity)
         {

@@ -4,6 +4,7 @@ using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Domain.Contracts.Models.ViewModels.Account;
 using Domain.Implementation.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,14 +21,15 @@ namespace SocialNetwork.Controllers
         public AccountController(
             ApplicationDbContext context, 
             UserManager<ApplicationUserEntity> userManager, 
-            SignInManager<ApplicationUserEntity> signInManager, 
+            SignInManager<ApplicationUserEntity> signInManager,
+            IHostingEnvironment hostingEnvironment,
             IMapper mapper)
         {
             this.mapper = mapper;
             this.userManager = userManager;
             this.signInManager = signInManager;
 
-            serviceOfUser = new ServiceOfUser(context, mapper);
+            serviceOfUser = new ServiceOfUser(context, mapper, hostingEnvironment);
         }
 
         [HttpGet]

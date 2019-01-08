@@ -7,9 +7,7 @@ namespace Data.Implementation.Repositories
     public class RepositoryOfPost : DefaultRepository<PostEntity>
     {
         public RepositoryOfPost(ApplicationDbContext context) : base(context)
-        {
-            this.context = context;
-        }
+        { }
 
         public override PostEntity Create(PostEntity entity)
         {
@@ -29,7 +27,7 @@ namespace Data.Implementation.Repositories
             return base.Create(entity);
         }
 
-        public override void Update(PostEntity entity, params Expression<Func<PostEntity, object>>[] properties)
+        public override void Update(PostEntity entity)
         {
             var lastPost = this.Read(a => a.Id == entity.Id, a => a.Section);
             RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
@@ -70,7 +68,7 @@ namespace Data.Implementation.Repositories
                 repositoryOfSection.Update(lastPost.Section);
             }
 
-            base.Update(entity, properties);
+            base.Update(entity);
         }
 
         public override void Delete(PostEntity entity)

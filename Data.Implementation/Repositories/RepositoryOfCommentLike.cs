@@ -7,9 +7,7 @@ namespace Data.Implementation.Repositories
     public class RepositoryOfCommentLike : DefaultRepository<CommentLikeEntity>
     {
         public RepositoryOfCommentLike(ApplicationDbContext context) : base(context)
-        {
-
-        }
+        { }
 
         public override CommentLikeEntity Create(CommentLikeEntity entity)
         {

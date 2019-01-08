@@ -5,8 +5,6 @@ namespace Data.Implementation.Repositories
     public class RepositoryOfComment : DefaultRepository<CommentEntity>
     {
         public RepositoryOfComment(ApplicationDbContext context) : base(context)
-        {
-            this.context = context;
-        }
+        { }
     }
 }

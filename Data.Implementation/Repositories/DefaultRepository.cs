@@ -34,43 +34,18 @@ namespace Data.Implementation.Repositories
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
             return (keySelector != null) ? dbQuery.Where(keySelector) : dbQuery;
         }
-        public virtual void Update(T entity, params Expression<Func<T, object>>[] properties)
+        public virtual void Update(T entity)
         {
-            List<string> includelist = new List<string>();
-            foreach (var item in properties)
+            var property = typeof(T).GetProperties().SingleOrDefault(a => a.Name == "Id");
+            if (property == null)
             {
-                Expression memberExpression = (item.Body is UnaryExpression)
-                    ? (item.Body as UnaryExpression).Operand
-                    : item.Body;
-
-                MemberExpression body = memberExpression as MemberExpression;
-                if (body == null)
-                    throw new ArgumentException("The body must be a member expression");
-                includelist.Add(body.Member.Name);
+                property = typeof(T).GetProperties().Where(a => a.Name.Contains("id") || a.Name.Contains("Id")).First();
             }
+            var id = property.GetValue(entity);
 
-            // if the entity is stored locally, you may experience upgrade issues
-            if (entities.Local.All(a => !a.Equals(entity)))
-            {
-                var property = typeof(T).GetProperties().SingleOrDefault(a => a.Name == "Id");
-                if(property != null)
-                {
-                    var id = property.GetValue(entity);
-                    var modEntity = entities.Local.SingleOrDefault(a => property.GetValue(a).Equals(id));
-                    if(modEntity != null)
-                    {
-                        context.Entry(modEntity).State = EntityState.Detached;
-                    }
-                }
-            }
+            var oldEntity = entities.Find(id);
+            context.Entry(oldEntity).CurrentValues.SetValues(entity);
 
-            entities.Attach(entity);
-            var entry = context.Entry(entity);
-
-            foreach (var item in includelist)
-            {
-                entry.Property(item).IsModified = true;
-            }
             context.SaveChanges();
         }
         public virtual void Delete(T entity)

@@ -2,13 +2,13 @@
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Domain.Contracts.Models.ViewModels.Post;
+using Domain.Contracts.Models.ViewModels.User;
 using Domain.Implementation.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Web.Controllers
@@ -23,6 +23,8 @@ namespace Web.Controllers
         private readonly ServiceOfPost serviceOfPost;
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfSection serviceOfSection;
+        private readonly ServiceOfRole serviceOfRole;
+        private readonly ServiceOfUser serviceOfUser;
 
         public ForTestsController(
             UserManager<ApplicationUserEntity> userManager, 
@@ -35,8 +37,10 @@ namespace Web.Controllers
             this.hostingEnvironment = hostingEnvironment;
 
             serviceOfPost = new ServiceOfPost(context, mapper, hostingEnvironment);
-            serviceOfImage = new ServiceOfImage(hostingEnvironment);
+            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfSection = new ServiceOfSection(context, mapper);
+            serviceOfRole = new ServiceOfRole(context);
+            serviceOfUser = new ServiceOfUser(context, mapper, hostingEnvironment);
         }
 
         public IActionResult Index()
@@ -51,17 +55,11 @@ namespace Web.Controllers
             return View(postCreateEditViewModel);
         }
         [HttpPost]
-        public IActionResult CreatePost(PostCreateEditViewModel postCreateEditViewModel)
+        public IActionResult CreatePost(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
         {
             serviceOfPost.CreateFinished(postCreateEditViewModel);
+            serviceOfPost.AddImage(postCreateEditViewModel.PostId, images);
             return View();
-        }
-
-
-        public IActionResult CreateImage(int postId, IEnumerable<IFormFile> images)
-        {
-            var paths = images.Select(a => serviceOfImage.Create("Posts", postId.ToString(), a));
-            return Content(paths.Count().ToString());
         }
 
         public IActionResult ListPostsViewModel()
@@ -84,6 +82,19 @@ namespace Web.Controllers
         {
             var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User), false);
             return View(posts);
+        }
+
+        public IActionResult EditUser()
+        {
+            ViewData["Roles"] = serviceOfRole.GetSelectListItem();
+            var userEditViewModel = serviceOfUser.GetUserEditViewModel(userManager.GetUserId(User));
+            return View(userEditViewModel);
+        }
+        [HttpPost]
+        public IActionResult EditUser(UserEditViewModel userEditViewModel)
+        {
+            serviceOfUser.EditUser(userEditViewModel);
+            return View();
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Domain.Implementation.Services
             repositoryOfPostTag = new RepositoryOfPostTag(context);
             repositoryOfSection = new RepositoryOfSection(context);
 
-            serviceOfImage = new ServiceOfImage(hostingEnvironment);
+            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
         }
 
         public PostCreateEditViewModel CreateNotFinished(string applicationUserId)
@@ -82,19 +82,24 @@ namespace Domain.Implementation.Services
             postEntity.Tags = postTagEntities;
             postEntity.IsFinished = true;
             
-            repositoryOfPost.Update(postEntity,
-                a => a.Content,
-                a => a.BriefDesctiption,
-                a => a.Header,
-                a => a.IsFinished,
-                a => a.SectionId 
-                );
+            repositoryOfPost.Update(postEntity);
             if(isReturnViewModel)
             {
                 var postViewModel = mapper.Map<PostEntity, PostViewModel>(postEntity);
                 return postViewModel;
             }
             return null;
+        }
+
+        public void AddImage(int postId, params IFormFile[] images)
+        {
+            if(images.Length == 0)
+            {
+                return;
+            }
+            var imageEntities = images
+                .Select(a => serviceOfImage.CreateImageForPost(postId, a))
+                .ToList();
         }
 
         public IEnumerable<TPostViewModel> Get<TPostViewModel>(string ApplicationUserId = null, bool postIsFinished = true) where TPostViewModel : class
