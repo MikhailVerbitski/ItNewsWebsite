@@ -44,7 +44,10 @@ namespace Data.Implementation.Repositories
             var id = property.GetValue(entity);
 
             var oldEntity = entities.Find(id);
-            context.Entry(oldEntity).CurrentValues.SetValues(entity);
+
+            var entry = context.Entry(oldEntity);
+            entry.State = EntityState.Detached;
+            entry.CurrentValues.SetValues(entity);
 
             context.SaveChanges();
         }

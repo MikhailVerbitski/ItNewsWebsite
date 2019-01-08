@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
+using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
 using Domain.Implementation.Services;
@@ -60,6 +61,23 @@ namespace Web.Controllers
             serviceOfPost.CreateFinished(postCreateEditViewModel);
             serviceOfPost.AddImage(postCreateEditViewModel.PostId, images);
             return View();
+        }
+
+
+        public IActionResult PostViewModel(int postId)
+        {
+            var postViewModel = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), postId);
+            return View(postViewModel);
+        }
+        public IActionResult PutEstimate(int postId, byte score)
+        {
+            serviceOfPost.RatingPost(userManager.GetUserId(User), postId, score);
+            return RedirectToAction("PostViewModel", new { postId = postId });
+        }
+
+        public IActionResult CreateComment(CommentViewModel commentViewModel)
+        {
+            return RedirectToAction("PostViewModel", new { postId = commentViewModel.PostId });
         }
 
         public IActionResult ListPostsViewModel()

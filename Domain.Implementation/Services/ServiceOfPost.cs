@@ -109,7 +109,11 @@ namespace Domain.Implementation.Services
             if (ApplicationUserId != null)
             {
                 applicationUser = repositoryOfApplicationUser.Read(a => a.Id == ApplicationUserId);
-                posts = repositoryOfPost.ReadMany(a => a.UserProfileId == applicationUser.UserProfileId , a => a.Comments, a => a.Tags, a => a.Section, a => a.UserProfile);
+                posts = repositoryOfPost.ReadMany(a => a.UserProfileId == applicationUser.UserProfileId, 
+                    a => a.Tags, 
+                    a => a.Comments, 
+                    a => a.Section, 
+                    a => a.UserProfile);
             }
             else
             {
@@ -122,6 +126,7 @@ namespace Domain.Implementation.Services
 
             var propertyTags = typeof(TPostViewModel).GetProperty("Tags");
             var propertyUserMiniViewModel = typeof(TPostViewModel).GetProperty("AuthorUserMiniViewModel");
+
             foreach (var item in posts)
             {
                 var postViewModel = mapper.Map<PostEntity, TPostViewModel>(item);
@@ -144,21 +149,49 @@ namespace Domain.Implementation.Services
             return postsViewModels;
         }
 
-        public TPostViewModel Get<TPostViewModel>(int postId) where TPostViewModel : class
+        public TPostViewModel Get<TPostViewModel>(string applicationUserId, int postId) where TPostViewModel : class
         {
-            var postEntity = repositoryOfPost.Read(a => a.Id == postId);
-            TPostViewModel postViewModel;
+            ApplicationUserEntity applicationUser = null;
+
+            var postEntity = repositoryOfPost.Read(a => a.Id == postId, 
+                a => a.Tags, 
+                a => a.Comments, 
+                a => a.Section, 
+                a => a.UserProfile);
+            TPostViewModel postViewModel = mapper.Map<PostEntity, TPostViewModel>(postEntity);
             var propertyTags = typeof(TPostViewModel).GetProperty("Tags");
+            var propertyUserScore = typeof(TPostViewModel).GetProperty("UserScore");
+            var propertyUserMiniViewModel = typeof(TPostViewModel).GetProperty("AuthorUserMiniViewModel");
+
             if (propertyTags != null)
             {
                 var tags = postEntity.Tags.Select(a => repositoryOfTag.Read(b => b.Id == a.TagId).Name);
-                postViewModel = mapper.Map<PostEntity, TPostViewModel>(postEntity);
                 propertyTags.SetValue(postViewModel, tags);
             }
-            else
+
+            if(propertyUserScore != null)
             {
-                postViewModel = mapper.Map<PostEntity, TPostViewModel>(postEntity);
+                if(applicationUser == null)
+                {
+                    applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
+                }
+                var postRating = repositoryOfPostRating.Read(a => a.UserProfileId == applicationUser.UserProfileId);
+                if(postRating != null)
+                {
+                    propertyUserScore.SetValue(postViewModel, postRating.Score);
+                }
             }
+
+            if (propertyUserMiniViewModel != null)
+            {
+                if (applicationUser == null)
+                {
+                    applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
+                }
+                UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUser);
+                propertyUserMiniViewModel.SetValue(postViewModel, userMiniViewModel);
+            }
+
             return postViewModel;
         }
 
@@ -171,26 +204,32 @@ namespace Domain.Implementation.Services
             return postViewModel;
         }
 
-        private TPostViewModel RatingPost<TPostViewModel>(string applicationUserId, int postId, byte score) 
-            where TPostViewModel : class
+        public void RatingPost(string applicationUserId, int postId, byte score) 
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            var postRating = new PostRatingEntity()
-            {
-                PostId = postId,
-                UserProfileId = applicationUser.UserProfileId,
-                Score = score
-            };
-            var postRatingEntity = repositoryOfPostRating.Create(postRating);
+            var lastPostRating = repositoryOfPostRating.Read(a => a.PostId == postId && a.UserProfileId == applicationUser.UserProfileId);
 
-            if(typeof(TPostViewModel) == null)
+            if (lastPostRating == null)
             {
-                return null;
+                var postRating = new PostRatingEntity()
+                {
+                    PostId = postId,
+                    UserProfileId = applicationUser.UserProfileId,
+                    Score = score
+                };
+                repositoryOfPostRating.Create(postRating);
             }
-
-            var postEntity = repositoryOfPost.Read(a => a.Id == postRatingEntity.PostId);
-            var postViewModel = mapper.Map<PostEntity, TPostViewModel>(postEntity);
-            return postViewModel;
+            else
+            {
+                var updatePostRating = new PostRatingEntity()
+                {
+                    Id = lastPostRating.Id,
+                    UserProfileId = lastPostRating.UserProfileId,
+                    PostId = lastPostRating.PostId,
+                    Score = score
+                };
+                repositoryOfPostRating.Update(updatePostRating);
+            }
         }
 
         private void Delete<TPostViewModel>(TPostViewModel postViewModel)

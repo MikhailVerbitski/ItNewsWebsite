@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using Data.Contracts.Models.Entities;
+﻿using Data.Contracts.Models.Entities;
 
 namespace Data.Implementation.Repositories
 {

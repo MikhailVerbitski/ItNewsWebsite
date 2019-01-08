@@ -13,7 +13,9 @@ namespace Domain.Contracts.Models.ViewModels.Post
 
         public string Section { get; set; }
 
-        public int Score { get; set; }
+        public double Score { get; set; }
+
+        public byte? UserScore { get; set; } 
 
         public virtual UserMiniViewModel AuthorUserMiniViewModel { get; set; }
 

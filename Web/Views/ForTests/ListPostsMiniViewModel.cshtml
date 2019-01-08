@@ -12,7 +12,7 @@
     @await Html.PartialAsync("UserMini_PartialView", item.AuthorUserMiniViewModel)
     <div class="container">
         <div class="row">
-            <h2>@Html.DisplayFor(modelItem => item.Header) - @Html.DisplayFor(modelItem => item.Score)</h2>
+            <a asp-action="PostViewModel" asp-all-route-data='new Dictionary<string,string>{ { "postId", item.PostId.ToString() } }'><h2>@Html.DisplayFor(modelItem => item.Header) - @Html.DisplayFor(modelItem => item.Score)</h2></a>
         </div>
         <div class="row">
             @Html.DisplayFor(modelItem => item.BriefDesctiption)

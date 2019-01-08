@@ -16,5 +16,7 @@ namespace Domain.Contracts.Models.ViewModels.Comment
         public virtual IEnumerable<UserMiniViewModel> Likes { get; set; }
 
         public int? PostId { get; set; }
+
+        public bool IsUserLiked { get; set; }
     }
 }

@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Domain.Contracts.Models.ViewModels.Comment.CommentViewModel>
+
+
+@foreach (var item in Model) {
+    <div class="container">
+        <div class="row">
+            @item.AuthorUserMiniViewModel
+        </div>
+        <div>
+            @item.Content
+        </div>
+        <div>
+            Likes - @item.CountOfLikes
+            @if(item.IsUserLiked)
+            {
+                @Html.ActionLink("Dislike", "DislikeComment", "ForTests", new { commentId = item.CommentId }, new { @class = "btn btn-info", role = "button" })
+            }
+            else
+            {
+                @Html.ActionLink("Like", "LikeComment", "ForTests", new { commentId = item.CommentId }, new { @class = "btn btn-info", role = "button" })
+            }
+        </div>
+    </div>
+}
