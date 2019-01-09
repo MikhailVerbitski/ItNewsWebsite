@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace Web.Controllers
 {
@@ -65,7 +64,6 @@ namespace Web.Controllers
             return View();
         }
 
-
         public IActionResult PostViewModel(int postId)
         {
             var postViewModel = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), postId);
@@ -98,23 +96,23 @@ namespace Web.Controllers
 
         public IActionResult ListPostsViewModel()
         {
-            var posts = serviceOfPost.Get<PostViewModel>(null);
+            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User));
             return View(posts);
         }
         public IActionResult ListNotFinishedPostsViewModel()
         {
-            var posts = serviceOfPost.Get<PostViewModel>(null, false);
+            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), false);
             return View(posts);
         }
 
         public IActionResult ListPostsMiniViewModel()
         {
-            var posts = serviceOfPost.Get<PostMiniViewModel>(null);
+            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User));
             return View(posts);
         }
         public IActionResult ListNotFinishedPostsMiniViewModel()
         {
-            var posts = serviceOfPost.Get<PostMiniViewModel>(null, false);
+            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User), false);
             return View(posts);
         }
 

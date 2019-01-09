@@ -22,26 +22,21 @@ namespace Domain.Implementation.Services
         public string LoadImage(string folder, string name, IFormFile image, bool isRewrite = false)
         {
             var extension = Path.GetExtension(image.FileName);
-
             int addition = 0;
             while(!isRewrite && File.Exists(Path.Combine(hostingEnvironment.ContentRootPath, "Images", folder, $"{name}_{addition}{extension}")))
             {
                 addition++;
             }
-
             var fileName = isRewrite ? $"{name}{extension}" : $"{name}_{addition}{extension}";
             var filePath = Path.Combine(hostingEnvironment.ContentRootPath, "Images", folder, fileName);
-
             if(!Directory.Exists(Path.Combine(hostingEnvironment.ContentRootPath, "Images", folder)))
             {
                 Directory.CreateDirectory(Path.Combine(hostingEnvironment.ContentRootPath, "Images", folder));
             }
-
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 image.CopyToAsync(stream).Wait();
             }
-
             string result = $"/Images/{folder}/{fileName}";
             return result;
         }

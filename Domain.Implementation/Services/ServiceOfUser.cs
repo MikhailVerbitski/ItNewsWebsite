@@ -64,9 +64,6 @@ namespace Domain.Implementation.Services
                 applicationUser.Avatar = pathAvatar;
                 repositoryOfApplicationUser.Update(applicationUser);
             }
-
-            var test = repositoryOfApplicationUser.Read(a => a.Id == applicationUser.Id);
-
             return applicationUser;
         }
 
@@ -87,7 +84,6 @@ namespace Domain.Implementation.Services
             {
                 rng.GetBytes(salt);
             }
-            // derive a 256-bit subkey (use HMACSHA1 with 10,000 iterations)
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: password,
                 salt: salt,

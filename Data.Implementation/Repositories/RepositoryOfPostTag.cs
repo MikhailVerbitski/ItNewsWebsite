@@ -20,7 +20,6 @@ namespace Data.Implementation.Repositories
             repositoryOfTag.Update(Tag);
 
             entity.Tag = null;
-
             return base.Create(entity);
         }
 

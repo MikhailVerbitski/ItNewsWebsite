@@ -87,7 +87,7 @@ namespace SocialNetwork.Controllers
                     }
                     else
                     {
-                        return RedirectToAction("Index", "News");
+                        return RedirectToAction("Index", "ForTests");
                     }
                 }
                 else
