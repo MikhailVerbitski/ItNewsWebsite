@@ -1,4 +1,4 @@
-﻿@model Domain.Contracts.Models.ViewModels.Comment.CommentViewModel
+﻿@model Domain.Contracts.Models.ViewModels.Comment.CommentCreateEditViewModel
 
 <div class="row">
     <div class="col-md-4">
@@ -7,7 +7,6 @@
 
             <input asp-for="CommentId" type="hidden" class="form-control" />
             <input asp-for="PostId" type="hidden" class="form-control" />
-            <input asp-for="CountOfLikes" type="hidden" class="form-control" />
 
             <div class="form-group">
                 <label asp-for="Content" class="control-label"></label>
@@ -20,4 +19,3 @@
         </form>
     </div>
 </div>
-

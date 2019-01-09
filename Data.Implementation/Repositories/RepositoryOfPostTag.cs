@@ -19,6 +19,8 @@ namespace Data.Implementation.Repositories
             Tag.CountOfUsage++;
             repositoryOfTag.Update(Tag);
 
+            entity.Tag = null;
+
             return base.Create(entity);
         }
 

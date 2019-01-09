@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections;
+using System.Threading.Tasks;
 using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
@@ -17,7 +19,8 @@ namespace SocialNetwork.Controllers
         private readonly SignInManager<ApplicationUserEntity> signInManager;
 
         private readonly ServiceOfUser serviceOfUser;
-        
+        private readonly ServiceOfImage serviceOfImage;
+
         public AccountController(
             ApplicationDbContext context, 
             UserManager<ApplicationUserEntity> userManager, 
@@ -29,6 +32,7 @@ namespace SocialNetwork.Controllers
             this.userManager = userManager;
             this.signInManager = signInManager;
 
+            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfUser = new ServiceOfUser(context, mapper, hostingEnvironment);
         }
 
@@ -42,19 +46,13 @@ namespace SocialNetwork.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUserEntity userEntity = mapper.Map<RegisterViewModel, ApplicationUserEntity>(model); 
-                // to obtain from the service
-
-                //RoleEntity userRole = new RoleEntity(); // to obtain from the service
-                //userEntity.Role = userRole;
-                // update user
+                ApplicationUserEntity userEntity = mapper.Map<RegisterViewModel, ApplicationUserEntity>(model);
 
                 var result = await userManager.CreateAsync(userEntity, model.Password);
 
                 if (result.Succeeded)
                 {
                     userEntity = serviceOfUser.GetApplicationUser(model);
-                    //
                     return RedirectToAction("Login");
                 }
                 else

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using Data.Contracts.Models.Entities;
+﻿using Data.Contracts.Models.Entities;
 
 namespace Data.Implementation.Repositories
 {
@@ -15,26 +13,17 @@ namespace Data.Implementation.Repositories
             RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context);
             RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
 
-            var Comment = entity.Comment;
-            if(Comment == null)
+            var comment = entity.Comment;
+            if(comment == null)
             {
-                Comment = repositoryOfComment.Read(a => a.Id == entity.CommentId);
+                comment = repositoryOfComment.Read(a => a.Id == entity.CommentId);
             }
-            Comment.CountOfLikes++;
-            repositoryOfComment.Update(Comment);
-
-            var UserProfile = entity.UserProfile;
-            if (UserProfile == null)
-            {
-                UserProfile = repositoryOfUserProfile.Read(a => a.Id == entity.UserProfileId, a => a.ApplicationUser);
-            }
-            var ApplicationUser = UserProfile.ApplicationUser;
-            if (ApplicationUser == null)
-            {
-                ApplicationUser = repositoryOfApplicationUser.Read(a => a.Id == UserProfile.ApplicationUserId);
-            }
-            ApplicationUser.CountOfLikes++;
-            repositoryOfApplicationUser.Update(ApplicationUser);
+            comment.CountOfLikes++;
+            repositoryOfComment.Update(comment);
+            
+            var ApplicationUserOfComment = repositoryOfApplicationUser.Read(a => a.UserProfileId == comment.UserProfileId);
+            ApplicationUserOfComment.CountOfLikes++;
+            repositoryOfApplicationUser.Update(ApplicationUserOfComment);
 
             return base.Create(entity);
         }
@@ -42,19 +31,19 @@ namespace Data.Implementation.Repositories
         {
             RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
 
-            var UserProfile = entity.UserProfile;
-            if (UserProfile == null)
+            var comment = entity.Comment;
+            if (comment == null)
             {
-                UserProfile = repositoryOfUserProfile.Read(a => a.Id == entity.UserProfileId, a => a.ApplicationUser);
+                comment = repositoryOfComment.Read(a => a.Id == entity.CommentId);
             }
-            var ApplicationUser = UserProfile.ApplicationUser;
-            if (ApplicationUser == null)
-            {
-                ApplicationUser = repositoryOfApplicationUser.Read(a => a.Id == UserProfile.ApplicationUserId);
-            }
-            ApplicationUser.CountOfLikes--;
-            repositoryOfApplicationUser.Update(ApplicationUser);
+            comment.CountOfLikes--;
+            repositoryOfComment.Update(comment);
+            
+            var ApplicationUserOfComment = repositoryOfApplicationUser.Read(a => a.UserProfileId == comment.UserProfileId);
+            ApplicationUserOfComment.CountOfLikes--;
+            repositoryOfApplicationUser.Update(ApplicationUserOfComment);
 
             base.Delete(entity);
         }

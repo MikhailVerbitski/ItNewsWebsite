@@ -42,12 +42,18 @@ namespace Data.Implementation.Repositories
                 property = typeof(T).GetProperties().Where(a => a.Name.Contains("id") || a.Name.Contains("Id")).First();
             }
             var id = property.GetValue(entity);
+            var localEntity = entities.Local.SingleOrDefault(a => property.GetValue(a).Equals(id));
+            if (localEntity != null)
+            {
+                var localEntityEntry = context.Entry(localEntity);
+                localEntityEntry.State = EntityState.Detached;
+                context.SaveChanges();
+            }
 
-            var oldEntity = entities.Find(id);
-
-            var entry = context.Entry(oldEntity);
-            entry.State = EntityState.Detached;
-            entry.CurrentValues.SetValues(entity);
+            entities.Attach(entity);
+            var entry = context.Entry(entity);
+            entry.State = EntityState.Modified;
+            //entry.CurrentValues.SetValues(entity);
 
             context.SaveChanges();
         }

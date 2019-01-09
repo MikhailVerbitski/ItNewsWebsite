@@ -1,4 +1,6 @@
-﻿namespace Domain.Contracts.Models.ViewModels.Account
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Domain.Contracts.Models.ViewModels.Account
 {
     public class RegisterViewModel
     {
@@ -13,6 +15,8 @@
         public string Password { get; set; }
 
         //public string ConfirmPassword { get; set; }
+
+        public IFormFile Avatar { get; set; }
 
         public string ReturnUrl { get; set; }
     }

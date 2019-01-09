@@ -1,5 +1,4 @@
 ﻿@model Domain.Contracts.Models.ViewModels.Post.PostViewModel
-@using Domain.Contracts.Models.ViewModels.Comment
 
 @{
     ViewData["Title"] = "PostViewModel";
@@ -31,5 +30,6 @@
     <input type="submit"  class="btn btn-default" value="Put an estimate"/>
 </form>
 
-@Html.Partial("CreateComment", new CommentViewModel() { PostId = Model.PostId })
+@Html.Partial("CreateCommentPartialView", new Domain.Contracts.Models.ViewModels.Comment.CommentCreateEditViewModel() { PostId = Model.PostId })
 
+@await Html.PartialAsync("ListCommentViewModel", Model.Comments)

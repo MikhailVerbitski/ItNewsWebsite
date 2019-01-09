@@ -1,4 +1,5 @@
-﻿using Domain.Contracts.Models.ViewModels.User;
+﻿using Domain.Contracts.Models.ViewModels.Comment;
+using Domain.Contracts.Models.ViewModels.User;
 using System.Collections.Generic;
 
 namespace Domain.Contracts.Models.ViewModels.Post
@@ -26,5 +27,7 @@ namespace Domain.Contracts.Models.ViewModels.Post
         public IEnumerable<string> Tags { get; set; }
 
         public IEnumerable<string> Images { get; set; }
+
+        public IEnumerable<CommentViewModel> Comments { get; set; }
     }
 }

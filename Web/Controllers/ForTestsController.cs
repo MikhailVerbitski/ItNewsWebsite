@@ -26,6 +26,7 @@ namespace Web.Controllers
         private readonly ServiceOfSection serviceOfSection;
         private readonly ServiceOfRole serviceOfRole;
         private readonly ServiceOfUser serviceOfUser;
+        private readonly ServiceOfComment serviceOfComment;
 
         public ForTestsController(
             UserManager<ApplicationUserEntity> userManager, 
@@ -42,6 +43,7 @@ namespace Web.Controllers
             serviceOfSection = new ServiceOfSection(context, mapper);
             serviceOfRole = new ServiceOfRole(context);
             serviceOfUser = new ServiceOfUser(context, mapper, hostingEnvironment);
+            serviceOfComment = new ServiceOfComment(context, mapper);
         }
 
         public IActionResult Index()
@@ -75,30 +77,44 @@ namespace Web.Controllers
             return RedirectToAction("PostViewModel", new { postId = postId });
         }
 
-        public IActionResult CreateComment(CommentViewModel commentViewModel)
+        [HttpPost]
+        public IActionResult CreateComment(CommentCreateEditViewModel commentViewModel)
         {
+            serviceOfComment.Create(userManager.GetUserId(User), commentViewModel);
             return RedirectToAction("PostViewModel", new { postId = commentViewModel.PostId });
+        }
+        public IActionResult LikeComment(int commentId, int postId)
+        {
+            serviceOfComment.LikeComment(userManager.GetUserId(User), commentId);
+            //
+            return RedirectToAction("PostViewModel", new { postId = postId });
+        }
+        public IActionResult DislikeComment(int commentId, int postId)
+        {
+            serviceOfComment.DislikeComment(userManager.GetUserId(User), commentId);
+            //
+            return RedirectToAction("PostViewModel", new { postId = postId });
         }
 
         public IActionResult ListPostsViewModel()
         {
-            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User));
+            var posts = serviceOfPost.Get<PostViewModel>(null);
             return View(posts);
         }
         public IActionResult ListNotFinishedPostsViewModel()
         {
-            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), false);
+            var posts = serviceOfPost.Get<PostViewModel>(null, false);
             return View(posts);
         }
 
         public IActionResult ListPostsMiniViewModel()
         {
-            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User));
+            var posts = serviceOfPost.Get<PostMiniViewModel>(null);
             return View(posts);
         }
         public IActionResult ListNotFinishedPostsMiniViewModel()
         {
-            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User), false);
+            var posts = serviceOfPost.Get<PostMiniViewModel>(null, false);
             return View(posts);
         }
 
@@ -112,7 +128,7 @@ namespace Web.Controllers
         public IActionResult EditUser(UserEditViewModel userEditViewModel)
         {
             serviceOfUser.EditUser(userEditViewModel);
-            return View();
+            return RedirectToAction("Index");
         }
     }
 }

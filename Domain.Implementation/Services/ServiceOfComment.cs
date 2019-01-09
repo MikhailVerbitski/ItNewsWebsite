@@ -24,6 +24,7 @@ namespace Domain.Implementation.Services
             repositoryOfPost = new RepositoryOfPost(context);
             repositoryOfComment = new RepositoryOfComment(context);
             repositoryOfCommentLike = new RepositoryOfCommentLike(context);
+            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
         }
 
         public CommentViewModel Create(string applicationUserId, CommentCreateEditViewModel commentCreateEditViewModel)
@@ -53,7 +54,7 @@ namespace Domain.Implementation.Services
             return commentViewModel;
         }
 
-        private TCommentViewModel LikeComment<TCommentViewModel>(string applicationUserId, int commentId) where TCommentViewModel : class
+        public void LikeComment(string applicationUserId, int commentId)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
             var commentLike = new CommentLikeEntity()
@@ -62,16 +63,14 @@ namespace Domain.Implementation.Services
                 UserProfileId = applicationUser.UserProfileId
             };
             var commentLikeEntity = repositoryOfCommentLike.Create(commentLike);
-
-            if (typeof(TCommentViewModel) == null)
-            {
-                return null;
-            }
-
-            var commentEntity = repositoryOfComment.Read(a => a.Id == commentLikeEntity.CommentId);
-            var commentViewModel = mapper.Map<CommentEntity, TCommentViewModel>(commentEntity);
-            return commentViewModel;
         }
+        public void DislikeComment(string applicationUserId, int commentId)
+        {
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
+            var commentLike = repositoryOfCommentLike.Read(a => a.CommentId == commentId && a.UserProfileId == applicationUser.UserProfileId);
+            repositoryOfCommentLike.Delete(commentLike);
+        }
+        
 
         private void Delete<TCommentViewModel>(TCommentViewModel commentViewModel)
         {

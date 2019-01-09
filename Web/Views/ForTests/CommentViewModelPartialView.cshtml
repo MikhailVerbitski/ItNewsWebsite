@@ -1,0 +1,21 @@
+﻿@model Domain.Contracts.Models.ViewModels.Comment.CommentViewModel
+
+<div class="container">
+    <div class="row">
+        @Html.Partial("UserMini_PartialView", Model.AuthorUserMiniViewModel)
+    </div>
+    <div>
+        @Model.Content
+    </div>
+    <div>
+        Likes - @Model.CountOfLikes
+        @if (Model.IsUserLiked)
+        {
+            @Html.ActionLink("Dislike", "DislikeComment", "ForTests", new { commentId = Model.CommentId, postId = Model.PostId }, new { @class = "btn btn-info", role = "button" })
+        }
+        else
+        {
+            @Html.ActionLink("Like", "LikeComment", "ForTests", new { commentId = Model.CommentId, postId = Model.PostId }, new { @class = "btn btn-info", role = "button" })
+        }
+    </div>
+</div>
