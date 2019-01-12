@@ -1,4 +1,5 @@
 ﻿using Data.Contracts.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -18,16 +19,18 @@ namespace Data.Implementation
         public DbSet<PostEntity> Posts { get; set; }
         public DbSet<PostRatingEntity> PostRatings { get; set; }
         public DbSet<PostTagEntity> PostTags { get; set; }
-        public DbSet<RoleEntity> MyRoles { get; set; }
+        //public DbSet<RoleEntity> Roles { get; set; }
         public DbSet<SectionEntity> Sections { get; set; }
         public DbSet<TagEntity> Tags { get; set; }
         public DbSet<UserProfileEntity> UserProfiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            RoleEntity adminRole = new RoleEntity { Id = 1, Name = "admin" };
-            RoleEntity userRole = new RoleEntity { Id = 2, Name = "user" };
-            builder.Entity<RoleEntity>().HasData(new RoleEntity[] { adminRole, userRole });
+            builder.Entity<IdentityRole>().HasData(new IdentityRole[]
+            {
+                new IdentityRole() { Name = "admin", NormalizedName = "ADMIN" },
+                new IdentityRole(){ Name = "user", NormalizedName = "USER" }
+            });
 
 
             var sectionsName = new string[] { "Java", "C#", "C++", "Algorithms", "Machine Learning" };
@@ -48,10 +51,6 @@ namespace Data.Implementation
                 .WithOne(a => a.ApplicationUser)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey<ApplicationUserEntity>(a => a.UserProfileId);
-            ApplicationUser
-                .HasOne(a => a.Role)
-                .WithMany(a => a.ApplicationUsers)
-                .HasForeignKey(a => a.RoleId);
 
 
             var UserProfile = builder.Entity<UserProfileEntity>();
@@ -126,13 +125,6 @@ namespace Data.Implementation
                 .WithOne(a => a.Post)
                 .HasForeignKey(a => a.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-
-            var Role = builder.Entity<RoleEntity>();
-            Role
-                .HasMany(a => a.ApplicationUsers)
-                .WithOne(a => a.Role)
-                .HasForeignKey(a => a.RoleId);
 
 
             var Section = builder.Entity<SectionEntity>();

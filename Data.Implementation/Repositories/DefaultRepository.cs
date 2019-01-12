@@ -26,15 +26,16 @@ namespace Data.Implementation.Repositories
         public virtual T Read(Expression<Func<T, bool>> keySelector, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
-            var result = (keySelector != null) ? dbQuery.Where(keySelector).SingleOrDefault() : entities.SingleOrDefault();
+            var result = (keySelector != null) ? dbQuery.SingleOrDefault(keySelector) : null;
             return result;
         }
         public virtual IEnumerable<T> ReadMany(Expression<Func<T, bool>> keySelector, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
-            return (keySelector != null) ? dbQuery.Where(keySelector) : dbQuery;
+            var result = (keySelector != null) ? dbQuery.Where(keySelector) : dbQuery;
+            return result;
         }
-        public virtual void Update(T entity)
+        public virtual void Update(T entity, params Expression<Func<T, object>>[] properties)
         {
             var property = typeof(T).GetProperties().SingleOrDefault(a => a.Name == "Id");
             if (property == null)
@@ -42,19 +43,38 @@ namespace Data.Implementation.Repositories
                 property = typeof(T).GetProperties().Where(a => a.Name.Contains("id") || a.Name.Contains("Id")).First();
             }
             var id = property.GetValue(entity);
-            var localEntity = entities.Local.SingleOrDefault(a => property.GetValue(a).Equals(id));
-            if (localEntity != null)
+
+            if (properties.Length == 0)
             {
-                var localEntityEntry = context.Entry(localEntity);
-                localEntityEntry.State = EntityState.Detached;
-                context.SaveChanges();
+                var localEntity = entities.Local.SingleOrDefault(a => property.GetValue(a).Equals(id));
+                if (localEntity != null)
+                {
+                    var localEntityEntry = context.Entry(localEntity);
+                    localEntityEntry.State = EntityState.Detached;
+                    context.SaveChanges();
+                }
+
+                entities.Attach(entity);
+                var entry = context.Entry(entity);
+                entry.State = EntityState.Modified;
             }
-
-            entities.Attach(entity);
-            var entry = context.Entry(entity);
-            entry.State = EntityState.Modified;
-            //entry.CurrentValues.SetValues(entity);
-
+            else
+            {
+                var lastEntity = entities.Find(id);
+                foreach (var item in properties)
+                {
+                    var body = ((item.Body is UnaryExpression)
+                        ? (item.Body as UnaryExpression).Operand
+                        : item.Body)
+                        as MemberExpression;
+                    if (body == null)
+                    {
+                        throw new ArgumentException("The body must be a member expression");
+                    }
+                    var propertyInfo = typeof(T).GetProperty(body.Member.Name);
+                    propertyInfo.SetValue(lastEntity, propertyInfo.GetValue(entity));
+                }
+            }
             context.SaveChanges();
         }
         public virtual void Delete(T entity)
@@ -71,7 +91,9 @@ namespace Data.Implementation.Repositories
             {
                 MemberExpression body = item.Body as MemberExpression;
                 if (body == null)
+                {
                     throw new ArgumentException("The body must be a member expression");
+                }
                 dbQuery = dbQuery.Include(body.Member.Name);
             }
             return dbQuery;

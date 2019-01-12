@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Domain.Contracts.Models.ViewModels.User
 {
@@ -25,8 +24,6 @@ namespace Domain.Contracts.Models.ViewModels.User
 
         public IFormFile Avatar { get; set; }
 
-        public int? RoleId { get; set; }
-
-        public string Role { get; set; }
+        public IEnumerable<SelectListItem> Roles { get; set; }
     }
 }

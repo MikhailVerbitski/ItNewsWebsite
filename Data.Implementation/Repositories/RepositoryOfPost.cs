@@ -27,7 +27,7 @@ namespace Data.Implementation.Repositories
             return base.Create(entity);
         }
 
-        public override void Update(PostEntity entity)
+        public override void Update(PostEntity entity, params Expression<Func<PostEntity, object>>[] properties)
         {
             var lastPost = this.Read(a => a.Id == entity.Id, a => a.Section);
             RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
@@ -68,7 +68,7 @@ namespace Data.Implementation.Repositories
                 repositoryOfSection.Update(lastPost.Section);
             }
 
-            base.Update(entity);
+            base.Update(entity, properties);
         }
 
         public override void Delete(PostEntity entity)

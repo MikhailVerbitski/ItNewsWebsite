@@ -39,11 +39,11 @@ namespace Domain.Implementation.Services
             var commentViewModel = mapper.Map<CommentEntity, CommentViewModel>(commentEntity);
             return commentViewModel;
         }
-        
-        public IEnumerable<TCommentViewModel> Get<TCommentViewModel>(int PostId, string applicationUserIdCurrent) 
+
+        public IEnumerable<TCommentViewModel> Get<TCommentViewModel>(int postId, string applicationUserIdCurrent) 
             where TCommentViewModel : class
         {
-            var post = repositoryOfPost.Read(a => a.Id == PostId, a => a.Comments);
+            var post = repositoryOfPost.Read(a => a.Id == postId, a => a.Comments);
             var commentEntities = post.Comments;
             var commentViewModel = commentEntities.Select(a => GetViewModelWithProperty<TCommentViewModel>(a, applicationUserIdCurrent));
             return commentViewModel.ToList();
@@ -98,7 +98,6 @@ namespace Domain.Implementation.Services
                 CommentId = commentId,
                 UserProfileId = applicationUser.UserProfileId
             };
-
             var commentLikeEntity = repositoryOfCommentLike.Create(commentLike);
         }
 
@@ -108,8 +107,8 @@ namespace Domain.Implementation.Services
             var commentLike = repositoryOfCommentLike.Read(a => a.CommentId == commentId && a.UserProfileId == applicationUser.UserProfileId);
             repositoryOfCommentLike.Delete(commentLike);
         }
-        
-        private void Delete<TCommentViewModel>(TCommentViewModel commentViewModel)
+
+        public void Delete<TCommentViewModel>(TCommentViewModel commentViewModel)
         {
             var commentEntity = mapper.Map<TCommentViewModel, CommentEntity>(commentViewModel);
             repositoryOfComment.Delete(commentEntity);

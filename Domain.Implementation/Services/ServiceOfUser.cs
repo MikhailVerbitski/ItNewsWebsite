@@ -2,101 +2,79 @@
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
-using Domain.Contracts.Models.ViewModels.Account;
 using Domain.Contracts.Models.ViewModels.User;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Hosting;
-using System;
-using System.Security.Cryptography;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Domain.Implementation.Services
 {
     public class ServiceOfUser
     {
-        ApplicationDbContext context;
-
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly IMapper mapper;
+        private readonly UserManager<ApplicationUserEntity> userManager;
 
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
-        private readonly RepositoryOfRole repositoryOfRole;
+        private readonly RepositoryOfIdentityUserRole repositoryOfRole;
 
         private readonly ServiceOfImage serviceOfImage;
+        private readonly ServiceOfAccount serviceOfAccount;
 
-        public ServiceOfUser(ApplicationDbContext context, IMapper mapper, IHostingEnvironment hostingEnvironment)
+        public ServiceOfUser(
+            ApplicationDbContext context, 
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUserEntity> userManager,
+            IMapper mapper, 
+            IHostingEnvironment hostingEnvironment)
         {
-            this.context = context;
-
+            this.roleManager = roleManager;
             this.mapper = mapper;
+            this.userManager = userManager;
 
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             repositoryOfUserProfile = new RepositoryOfUserProfile(context);
-            repositoryOfRole = new RepositoryOfRole(context);
+            repositoryOfRole = new RepositoryOfIdentityUserRole(context);
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
+            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
         }
 
-        public ApplicationUserEntity GetApplicationUser(RegisterViewModel registerViewModel)
-        {
-            var applicationUser = mapper.Map<RegisterViewModel, ApplicationUserEntity>(registerViewModel);
-
-            var applicationUsercheck = repositoryOfApplicationUser.Read(a => a.UserName == registerViewModel.Login);
-            if (applicationUsercheck == null)
-            {
-                applicationUser = repositoryOfApplicationUser.Create(applicationUser);
-            }
-            else
-            {
-                applicationUser = applicationUsercheck;
-            }
-            if(applicationUser.UserProfileId == null)
-            {
-                var userProfile = new UserProfileEntity();
-                userProfile.ApplicationUserId = applicationUser.Id;
-                userProfile = repositoryOfUserProfile.Create(userProfile);
-                applicationUser.UserProfileId = userProfile.Id;
-                applicationUser.UserProfile = userProfile;
-                repositoryOfApplicationUser.Update(applicationUser);
-            }
-            if(registerViewModel.Avatar != null)
-            {
-                var pathAvatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, registerViewModel.Avatar);
-                applicationUser.Avatar = pathAvatar;
-                repositoryOfApplicationUser.Update(applicationUser);
-            }
-            return applicationUser;
-        }
-
-        public void EditUser(UserEditViewModel userEditViewModel)
+        public async void EditUser(string applicationUserIdCurrent, UserEditViewModel userEditViewModel)
         {
             var applicationUser = mapper.Map<UserEditViewModel, ApplicationUserEntity>(userEditViewModel);
-            var roleId = repositoryOfRole.Read(a => a.Id == Int32.Parse(userEditViewModel.Role)).Id;
             applicationUser.Avatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, userEditViewModel.Avatar, true);
-            applicationUser.RoleId = roleId;
-            applicationUser.PasswordHash = GetHashPassword(userEditViewModel.Password);
+            
+            repositoryOfApplicationUser.Update(applicationUser,
+                a => a.UserName,
+                a => a.LastName,
+                a => a.UserName,
+                a => a.Email,
+                a => a.PhoneNumber,
+                a => a.Avatar);
 
-            repositoryOfApplicationUser.Update(applicationUser);
-        }
-        private string GetHashPassword(string password)
-        {
-            byte[] salt = new byte[128 / 8];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(salt);
-            }
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8));
-            return hashed;
+            await serviceOfAccount.ChangePassword(userEditViewModel.ApplicationUserId, userEditViewModel.Password);
+            var tasksOfAddsRoles = userEditViewModel
+                .Roles
+                .Where(a => a.Selected)
+                .Select(a => serviceOfAccount.AddUserRole(userEditViewModel.ApplicationUserId, a.Text));
+            Task.WaitAll(tasksOfAddsRoles.ToArray());
         }
 
-        public UserEditViewModel GetUserEditViewModel(string applicationUserId)
+        public async Task<UserEditViewModel> GetUserEditViewModel(string applicationUserId)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
             var userEditViewModel = mapper.Map<ApplicationUserEntity, UserEditViewModel>(applicationUser);
+            var userRoles = await userManager.GetRolesAsync(applicationUser);
+            userEditViewModel.Roles = roleManager.Roles.Select(a => new SelectListItem()
+            {
+                Text = a.Name,
+                Value = a.Id,
+                Selected = userRoles.Contains(a.Name)
+            }).ToList();
             return userEditViewModel;
         }
     }

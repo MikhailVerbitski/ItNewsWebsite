@@ -19,6 +19,7 @@ namespace Domain.Implementation.Services
 
             repositoryOfImage = new RepositoryOfImage(context);
         }
+
         public string LoadImage(string folder, string name, IFormFile image, bool isRewrite = false)
         {
             var extension = Path.GetExtension(image.FileName);
@@ -40,6 +41,7 @@ namespace Domain.Implementation.Services
             string result = $"/Images/{folder}/{fileName}";
             return result;
         }
+
         public ImageEntity CreateImageForPost(int postId, IFormFile image)
         {
             string path = LoadImage("Post", postId.ToString(), image);
@@ -50,6 +52,7 @@ namespace Domain.Implementation.Services
             });
             return imageEntity;
         }
+
         public void Delete(string path)
         {
             if(File.Exists(path))

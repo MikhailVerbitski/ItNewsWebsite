@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
-using Domain.Contracts.Models.ViewModels.Comment;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Linq;

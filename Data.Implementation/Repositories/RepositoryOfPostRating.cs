@@ -1,4 +1,6 @@
 ﻿using Data.Contracts.Models.Entities;
+using System;
+using System.Linq.Expressions;
 
 namespace Data.Implementation.Repositories
 {
@@ -41,7 +43,7 @@ namespace Data.Implementation.Repositories
             base.Delete(entity);
         }
 
-        public override void Update(PostRatingEntity entity)
+        public override void Update(PostRatingEntity entity, params Expression<Func<PostRatingEntity, object>>[] properties)
         {
             RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context);
             RepositoryOfPostRating repositoryOfPostRating = new RepositoryOfPostRating(context);
@@ -57,7 +59,7 @@ namespace Data.Implementation.Repositories
             Post.SumOfScore += entity.Score;
             repositoryOfPost.Update(Post);
 
-            base.Update(entity);
+            base.Update(entity, properties);
         }
     }
 }

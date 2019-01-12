@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
@@ -14,45 +12,42 @@ namespace SocialNetwork.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IMapper mapper;
-        private readonly UserManager<ApplicationUserEntity> userManager;
         private readonly SignInManager<ApplicationUserEntity> signInManager;
 
         private readonly ServiceOfUser serviceOfUser;
-        private readonly ServiceOfImage serviceOfImage;
+        private readonly ServiceOfAccount serviceOfAccount;
 
         public AccountController(
+            RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context, 
             UserManager<ApplicationUserEntity> userManager, 
             SignInManager<ApplicationUserEntity> signInManager,
             IHostingEnvironment hostingEnvironment,
             IMapper mapper)
         {
-            this.mapper = mapper;
-            this.userManager = userManager;
             this.signInManager = signInManager;
 
-            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
-            serviceOfUser = new ServiceOfUser(context, mapper, hostingEnvironment);
+            serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
+            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
         }
 
         [HttpGet]
         public IActionResult Register(string returnUrl = null)
         {
-            return View(new RegisterViewModel() { ReturnUrl = returnUrl });
+            var registerViewModel = new RegisterViewModel()
+            {
+                ReturnUrl = returnUrl,
+            };
+            return View(registerViewModel);
         }
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                ApplicationUserEntity userEntity = mapper.Map<RegisterViewModel, ApplicationUserEntity>(model);
-
-                var result = await userManager.CreateAsync(userEntity, model.Password);
-
+                var result = await serviceOfAccount.TryToRegistration(model);
                 if (result.Succeeded)
                 {
-                    userEntity = serviceOfUser.GetApplicationUser(model);
                     return RedirectToAction("Login");
                 }
                 else

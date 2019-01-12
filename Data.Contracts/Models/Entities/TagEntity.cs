@@ -6,10 +6,10 @@ namespace Data.Contracts.Models.Entities
     {
         public int Id { get; set; }
 
-        public string Name { get; set; } // Name
+        public string Name { get; set; }
 
-        public virtual IEnumerable<PostTagEntity> Posts { get; set; } // Posts
+        public virtual IEnumerable<PostTagEntity> Posts { get; set; }
 
-        public long CountOfUsage { get; set; } // Count of Usage
+        public long CountOfUsage { get; set; }
     }
 }

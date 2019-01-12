@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
+using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
@@ -10,10 +11,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "user")]
     public class ForTestsController : Controller
     {
         UserManager<ApplicationUserEntity> userManager;
@@ -23,12 +28,13 @@ namespace Web.Controllers
         private readonly ServiceOfPost serviceOfPost;
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfSection serviceOfSection;
-        private readonly ServiceOfRole serviceOfRole;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly ServiceOfUser serviceOfUser;
         private readonly ServiceOfComment serviceOfComment;
 
         public ForTestsController(
-            UserManager<ApplicationUserEntity> userManager, 
+            UserManager<ApplicationUserEntity> userManager,
+            RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context, 
             IMapper mapper, 
             IHostingEnvironment hostingEnvironment)
@@ -36,12 +42,12 @@ namespace Web.Controllers
             this.userManager = userManager;
             this.mapper = mapper;
             this.hostingEnvironment = hostingEnvironment;
+            this.roleManager = roleManager;
 
             serviceOfPost = new ServiceOfPost(context, mapper, hostingEnvironment);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfSection = new ServiceOfSection(context, mapper);
-            serviceOfRole = new ServiceOfRole(context);
-            serviceOfUser = new ServiceOfUser(context, mapper, hostingEnvironment);
+            serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
             serviceOfComment = new ServiceOfComment(context, mapper);
         }
 
@@ -66,7 +72,9 @@ namespace Web.Controllers
 
         public IActionResult PostViewModel(int postId)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             var postViewModel = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), postId);
+            stopwatch.Stop();
             return View(postViewModel);
         }
         public IActionResult PutEstimate(int postId, byte score)
@@ -84,13 +92,11 @@ namespace Web.Controllers
         public IActionResult LikeComment(int commentId, int postId)
         {
             serviceOfComment.LikeComment(userManager.GetUserId(User), commentId);
-            //
             return RedirectToAction("PostViewModel", new { postId = postId });
         }
         public IActionResult DislikeComment(int commentId, int postId)
         {
             serviceOfComment.DislikeComment(userManager.GetUserId(User), commentId);
-            //
             return RedirectToAction("PostViewModel", new { postId = postId });
         }
 
@@ -116,16 +122,17 @@ namespace Web.Controllers
             return View(posts);
         }
 
-        public IActionResult EditUser()
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> EditUser()
         {
-            ViewData["Roles"] = serviceOfRole.GetSelectListItem();
-            var userEditViewModel = serviceOfUser.GetUserEditViewModel(userManager.GetUserId(User));
+            var userEditViewModel = await serviceOfUser.GetUserEditViewModel(userManager.GetUserId(User));
             return View(userEditViewModel);
         }
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public IActionResult EditUser(UserEditViewModel userEditViewModel)
         {
-            serviceOfUser.EditUser(userEditViewModel);
+            serviceOfUser.EditUser(userManager.GetUserId(User), userEditViewModel);
             return RedirectToAction("Index");
         }
     }

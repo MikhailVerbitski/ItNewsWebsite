@@ -6,11 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
-using FluentValidation;
 using Data.Implementation;
 using Data.Contracts.Models.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Infrastructure.AutomapperProfiles;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
@@ -40,13 +38,13 @@ namespace Web
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                //.AddCookie(a => 
-                //{
-                //    a.LoginPath = new PathString("/Account/Login");
-                //    a.AccessDeniedPath = new PathString("/Account/Login");
-                //});
+            //.AddCookie(a => 
+            //{
+            //    a.LoginPath = new PathString("/Account/Login");
+            //    a.AccessDeniedPath = new PathString("/Account/Login");
+            //});
 
-            services.AddIdentity<ApplicationUserEntity, IdentityRole>(a => 
+            services.AddIdentity<ApplicationUserEntity, IdentityRole>(a =>
             {
                 a.Password.RequireNonAlphanumeric = false;
                 a.Password.RequireLowercase = false;
@@ -64,9 +62,9 @@ namespace Web
             });
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
-            
+
             services.AddMvc()
-                .AddFluentValidation(a => 
+                .AddFluentValidation(a =>
                 {
                     a.RegisterValidatorsFromAssemblyContaining<LoginValidator>();
                     a.RegisterValidatorsFromAssemblyContaining<RegisterValidator>();

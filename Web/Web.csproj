@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <Folder Include="Images\" />
+    <Folder Include="Images\Avatars\" />
+    <Folder Include="Images\Post\" />
   </ItemGroup>
 
 </Project>

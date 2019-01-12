@@ -155,7 +155,8 @@ namespace Domain.Implementation.Services
                 .ToList();
         }
         
-        public IEnumerable<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, bool postIsFinished = true) where TPostViewModel : class
+        public IEnumerable<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, bool postIsFinished = true) 
+            where TPostViewModel : class
         {
             var posts = repositoryOfPost.ReadMany(null, 
                     a => a.Tags, 
@@ -213,15 +214,6 @@ namespace Domain.Implementation.Services
                 var comentsViewModels = serviceOfComment.Get<CommentViewModel>(postEntity.Id, applicationUserIdCurrent);
                 propertyComments.SetValue(postViewModel, comentsViewModels);
             }
-            return postViewModel;
-        }
-
-        public PostViewModel Update(PostCreateEditViewModel postCreateEditViewModel)
-        {
-            var postEntity = mapper.Map<PostCreateEditViewModel, PostEntity>(postCreateEditViewModel);
-            repositoryOfPost.Update(postEntity);
-            postEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId);
-            var postViewModel = mapper.Map<PostEntity, PostViewModel>(postEntity);
             return postViewModel;
         }
 

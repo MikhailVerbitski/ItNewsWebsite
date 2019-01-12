@@ -10,9 +10,8 @@ namespace Data.Implementation.Repositories
         public override CommentLikeEntity Create(CommentLikeEntity entity)
         {
             RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context);
             RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
-
+            
             var comment = entity.Comment;
             if(comment == null)
             {
@@ -30,7 +29,6 @@ namespace Data.Implementation.Repositories
         public override void Delete(CommentLikeEntity entity)
         {
             RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context);
             RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
 
             var comment = entity.Comment;
