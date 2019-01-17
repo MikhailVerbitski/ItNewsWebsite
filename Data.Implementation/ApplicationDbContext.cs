@@ -19,7 +19,6 @@ namespace Data.Implementation
         public DbSet<PostEntity> Posts { get; set; }
         public DbSet<PostRatingEntity> PostRatings { get; set; }
         public DbSet<PostTagEntity> PostTags { get; set; }
-        //public DbSet<RoleEntity> Roles { get; set; }
         public DbSet<SectionEntity> Sections { get; set; }
         public DbSet<TagEntity> Tags { get; set; }
         public DbSet<UserProfileEntity> UserProfiles { get; set; }

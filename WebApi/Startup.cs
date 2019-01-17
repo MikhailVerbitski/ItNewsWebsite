@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,12 +10,17 @@ using Data.Contracts.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Infrastructure.AutomapperProfiles;
 using Microsoft.Extensions.FileProviders;
-using System.IO;
-using FluentValidation.AspNetCore;
-using Domain.Contracts.Validators.ViewModels.Account;
+using Microsoft.AspNetCore.ResponseCompression;
 using System.Linq;
+using System.Net.Mime;
+using Microsoft.AspNetCore.Blazor.Server;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using WebApi.Server.Service;
+using WebApi.Server.Interface;
 
-namespace Web
+namespace WebApi
 {
     public class Startup
     {
@@ -29,21 +33,9 @@ namespace Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //.AddCookie(a => 
-            //{
-            //    a.LoginPath = new PathString("/Account/Login");
-            //    a.AccessDeniedPath = new PathString("/Account/Login");
-            //});
 
             services.AddIdentity<ApplicationUserEntity, IdentityRole>(a =>
             {
@@ -66,30 +58,55 @@ namespace Web
 
             services.AddCors();
 
-            services.AddMvc()
-                .AddFluentValidation(a =>
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddTransient<IJwtTokenService, JwtTokenService>();
+            //Setting up Jwt Authentication
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
                 {
-                    a.RegisterValidatorsFromAssemblyContaining<LoginValidator>();
-                    a.RegisterValidatorsFromAssemblyContaining<RegisterValidator>();
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                });
+
+            services.AddResponseCompression(options =>
+            {
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+                {
+                    MediaTypeNames.Application.Octet,
+                    WasmMediaTypeNames.Application.Wasm,
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment hostingEnvironment)
         {
+            app.UseResponseCompression();
             if (hostingEnvironment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            app.UseHttpsRedirection();
-            app.UseCookiePolicy();
-            app.UseStaticFiles();
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                context.Database.EnsureCreated();
+            }
 
             var folders = hostingEnvironment.ContentRootPath.Split('\\');
             var SolutionPath = string.Join('\\', folders.Take(folders.Length - 1));
@@ -100,19 +117,19 @@ namespace Web
                 FileProvider = new PhysicalFileProvider(SolutionPath),
                 RequestPath = "/Images"
             });
-            app.UseAuthentication();
             app.UseCors(builder =>
             {
                 builder.AllowAnyOrigin();
                 builder.AllowAnyHeader();
                 builder.AllowAnyHeader();
             });
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=ForTests}/{action=Index}/{id?}");
+                routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
+            app.UseBlazor<WebBlazor.Program>();
         }
     }
 }

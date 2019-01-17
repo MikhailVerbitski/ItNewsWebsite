@@ -4,18 +4,21 @@ using Data.Implementation.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using System.Linq;
 
 namespace Domain.Implementation.Services
 {
     public class ServiceOfImage
     {
-        private readonly IHostingEnvironment hostingEnvironment;
+        private readonly string SolutionPath;
 
         private readonly RepositoryOfImage repositoryOfImage;
 
         public ServiceOfImage(ApplicationDbContext context, IHostingEnvironment hostingEnvironment)
         {
-            this.hostingEnvironment = hostingEnvironment;
+            var folders = hostingEnvironment.ContentRootPath.Split('\\');
+            this.SolutionPath = string.Join('\\', folders.Take(folders.Length - 1));
+            this.SolutionPath += @"\WebBlazor";
 
             repositoryOfImage = new RepositoryOfImage(context);
         }
@@ -24,15 +27,15 @@ namespace Domain.Implementation.Services
         {
             var extension = Path.GetExtension(image.FileName);
             int addition = 0;
-            while(!isRewrite && File.Exists(Path.Combine(hostingEnvironment.ContentRootPath, "Images", folder, $"{name}_{addition}{extension}")))
+            while(!isRewrite && File.Exists(Path.Combine(SolutionPath, "Images", folder, $"{name}_{addition}{extension}")))
             {
                 addition++;
             }
             var fileName = isRewrite ? $"{name}{extension}" : $"{name}_{addition}{extension}";
-            var filePath = Path.Combine(hostingEnvironment.ContentRootPath, "Images", folder, fileName);
-            if(!Directory.Exists(Path.Combine(hostingEnvironment.ContentRootPath, "Images", folder)))
+            var filePath = Path.Combine(SolutionPath, "Images", folder, fileName);
+            if(!Directory.Exists(Path.Combine(SolutionPath, "Images", folder)))
             {
-                Directory.CreateDirectory(Path.Combine(hostingEnvironment.ContentRootPath, "Images", folder));
+                Directory.CreateDirectory(Path.Combine(SolutionPath, "Images", folder));
             }
             using (var stream = new FileStream(filePath, FileMode.Create))
             {

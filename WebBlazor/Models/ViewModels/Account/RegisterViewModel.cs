@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Domain.Contracts.Models.ViewModels.Account
+namespace WebBlazor.Models.ViewModels.Account
 {
     public class RegisterViewModel
     {

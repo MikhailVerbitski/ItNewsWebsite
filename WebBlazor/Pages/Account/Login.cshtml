@@ -1,0 +1,33 @@
+﻿@page "/Login"
+@inject HttpClient Http
+
+<div class="container">
+    <h1>Login</h1>
+    <div class="form-group">
+        <label for"email">Email</label>
+        <input type="text" name="email" placeholder="Email" class="form-control" bind="@Email" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" name="password" placeholder="Password" class="form-control" bind="@Password" />
+
+    </div>
+    <button onclick="@SubmitForm">Submit</button>
+</div>
+
+@functions{
+    public string Email { get; set; } = "";
+    public string Password { get; set; } = "";
+    public string Token { get; set; } = "";
+
+    private async Task SubmitForm()
+    {
+        WebBlazor.Models.ViewModels.TokenViewModel tokenViewModel = new Models.ViewModels.TokenViewModel
+        {
+            Email = Email,
+            Password = Password
+        };
+        var response = await Http.PostJsonAsync<object>("https://localhost:44328/api/Token/Login", tokenViewModel);
+        Console.WriteLine(response);
+    }
+}

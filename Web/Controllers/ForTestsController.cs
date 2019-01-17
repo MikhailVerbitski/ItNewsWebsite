@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
-using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
@@ -11,14 +10,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web.Controllers
 {
-    [Authorize(Roles = "user")]
+    //[Authorize(Roles = "user")]
     public class ForTestsController : Controller
     {
         UserManager<ApplicationUserEntity> userManager;
@@ -72,9 +68,7 @@ namespace Web.Controllers
 
         public IActionResult PostViewModel(int postId)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
             var postViewModel = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), postId);
-            stopwatch.Stop();
             return View(postViewModel);
         }
         public IActionResult PutEstimate(int postId, byte score)
@@ -122,14 +116,14 @@ namespace Web.Controllers
             return View(posts);
         }
 
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         public async Task<IActionResult> EditUser()
         {
             var userEditViewModel = await serviceOfUser.GetUserEditViewModel(userManager.GetUserId(User));
             return View(userEditViewModel);
         }
         [HttpPost]
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         public IActionResult EditUser(UserEditViewModel userEditViewModel)
         {
             serviceOfUser.EditUser(userManager.GetUserId(User), userEditViewModel);

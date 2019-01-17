@@ -1,0 +1,32 @@
+﻿@page "/Posts"
+@inject HttpClient Http
+@using WebBlazor.Models.ViewModels.Post
+
+@if (ListOfPosts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ListViewTemplate Items="ListOfPosts">
+        <ItemTemplate>
+            <div class="row">
+                <h2>@context.Header</h2>
+                <p>Score: @context.Score</p>
+                <span>@context.BriefDesctiption</span>
+            </div>
+            <UserMini User="@context.AuthorUserMiniViewModel" />
+        </ItemTemplate>
+    </ListViewTemplate>
+}
+
+
+@functions {
+    public string Path { get; set; } = $"https://localhost:44328/Post/ListPostsViewModel";
+    private List<PostViewModel> ListOfPosts;
+
+    protected override async Task OnInitAsync()
+    {
+        ListOfPosts = await Http.GetJsonAsync<List<PostViewModel>>(Path);
+    }
+}
