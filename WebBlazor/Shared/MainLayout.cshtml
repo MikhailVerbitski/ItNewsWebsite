@@ -1,24 +1,12 @@
 @inherits BlazorLayoutComponent
 
-<link rel="stylesheet" type="text/css" href="~/css/bootstrap/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="~/css/bootstrap/bootstrap.min.css.map">
-
-<div class="col-md-12 bg-light" style="height:100vh;">
-    <nav class="navbar navbar-fixed-top bg-primary rounded-bottom">
-
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" href="#">Features</a>
-                <a class="nav-item nav-link" href="#">Pricing</a>
-                <a class="nav-item nav-link disabled" href="#">Disabled</a>
-            </div>
-        </div>
-
-    </nav>
-    @Body
+<div class="grid-main">
+    <div class="pure-menu pure-menu-horizontal">
+        <a href="#" class="pure-menu-heading pure-menu-link">BRAND</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="/Login" class="pure-menu-link">Login</a></li>
+            <li class="pure-menu-item"><a href="/Registration" class="pure-menu-link">Registration</a></li>
+        </ul>
+    </div>
+    <div>@Body</div>
 </div>
