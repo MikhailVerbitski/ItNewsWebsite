@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Data.Contracts.Models.Entities
 {
@@ -26,6 +27,8 @@ namespace Data.Contracts.Models.Entities
         public string Content { get; set; }
 
         public string BriefDesctiption { get; set; }
+
+        public DateTime Created { get; set; }
 
         public virtual IEnumerable<PostTagEntity> Tags { get; set; }
 

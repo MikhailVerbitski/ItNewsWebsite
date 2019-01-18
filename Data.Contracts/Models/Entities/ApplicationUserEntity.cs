@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System;
 
 namespace Data.Contracts.Models.Entities
 {
@@ -15,5 +16,7 @@ namespace Data.Contracts.Models.Entities
         public virtual UserProfileEntity UserProfile { get; set; }
 
         public string Avatar { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

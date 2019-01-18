@@ -67,6 +67,10 @@ namespace Data.Implementation.Repositories
                 lastPost.Section.CountOfUsage++;
                 repositoryOfSection.Update(lastPost.Section);
             }
+            if(entity.Created.Millisecond == 0)
+            {
+                entity.Created = DateTime.Now;
+            }
 
             base.Update(entity, properties);
         }

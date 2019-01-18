@@ -51,19 +51,22 @@ namespace Domain.Implementation.Services
                 {
                     var resultAddRole = await userManager.AddToRoleAsync(applicationUser, "user");
                 }
-                if (applicationUser.UserProfileId == null)
+                if(applicationUser.UserProfileId == null || registerViewModel.Avatar != null)
                 {
-                    var userProfile = new UserProfileEntity();
-                    userProfile.ApplicationUserId = applicationUser.Id;
-                    userProfile = RepositoryOfUserProfile.Create(userProfile);
-                    applicationUser.UserProfileId = userProfile.Id;
-                    applicationUser.UserProfile = userProfile;
-                    repositoryOfApplicationUser.Update(applicationUser);
-                }
-                if (registerViewModel.Avatar != null)
-                {
-                    var pathAvatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, registerViewModel.Avatar);
-                    applicationUser.Avatar = pathAvatar;
+                    if (applicationUser.UserProfileId == null)
+                    {
+                        var userProfile = new UserProfileEntity();
+                        userProfile.ApplicationUserId = applicationUser.Id;
+                        userProfile = RepositoryOfUserProfile.Create(userProfile);
+                        applicationUser.UserProfileId = userProfile.Id;
+                        applicationUser.UserProfile = userProfile;
+                        applicationUser.Created = System.DateTime.Now;
+                    }
+                    if (registerViewModel.Avatar != null)
+                    {
+                        var pathAvatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, registerViewModel.Avatar);
+                        applicationUser.Avatar = pathAvatar;
+                    }
                     repositoryOfApplicationUser.Update(applicationUser);
                 }
             }

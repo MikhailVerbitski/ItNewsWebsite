@@ -7,6 +7,7 @@ namespace Data.Contracts.Models.Entities
         public int Id { get; set; }
 
         public string ApplicationUserId { get; set; }
+
         public virtual ApplicationUserEntity ApplicationUser { get; set; }
 
         public virtual IEnumerable<PostEntity> Posts { get; set; }

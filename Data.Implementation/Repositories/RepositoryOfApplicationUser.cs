@@ -10,6 +10,7 @@ namespace Data.Implementation.Repositories
 
         public override ApplicationUserEntity Create(ApplicationUserEntity entity)
         {
+            entity.Created = System.DateTime.Now;
             var ApplicationUser = base.Create(entity);
 
             RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context);
