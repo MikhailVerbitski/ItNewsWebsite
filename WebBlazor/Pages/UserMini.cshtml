@@ -1,16 +1,13 @@
 ﻿@using WebBlazor.Models.ViewModels.User
 
-<div class="row">
-    <div class="col-md-1">
-        <img src="~@User.Avatar" asp-append-version="true" height="50" width="50" />
-    </div>
-    <div class="col-md-11">
-        <div class="row">
-            <h4>@User.FirstName @User.LastName (@User.Role) - @User.CountOfLikes</h4>
-        </div>
+<br/>
+<div class="grid-userMini">
+    <img src="~@User.Avatar" class="userMiniImg" asp-append-version="true" height="50" width="50" />
+    <div>
+        <p><a><font size="3">(<font color="@User.RoleColor">@User.Role</font>) @User.FirstName @User.LastName</font></a></p>
+        <p>Ratin - @User.CountOfLikes</p>
     </div>
 </div>
-
 
 @functions{
     [Parameter] UserMiniViewModel User { get; set; }

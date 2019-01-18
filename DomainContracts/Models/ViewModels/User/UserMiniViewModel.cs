@@ -12,6 +12,8 @@
 
         public string Role { get; set; }
 
+        public string RoleColor { get; set; }
+
         public int CountOfLikes { get; set; }
     }
 }

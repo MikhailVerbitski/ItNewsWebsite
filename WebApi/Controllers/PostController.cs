@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
@@ -28,7 +29,7 @@ namespace WebApi.Controllers
 
         public PostController(
             UserManager<ApplicationUserEntity> userManager,
-            //RoleManager<IdentityRole> roleManager,
+            RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context,
             IMapper mapper,
             IHostingEnvironment hostingEnvironment
@@ -39,7 +40,7 @@ namespace WebApi.Controllers
             //this.hostingEnvironment = hostingEnvironment;
             //this.roleManager = roleManager;
 
-            serviceOfPost = new ServiceOfPost(context, mapper, hostingEnvironment);
+            serviceOfPost = new ServiceOfPost(context, roleManager, userManager, mapper, hostingEnvironment);
             //serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfSection = new ServiceOfSection(context, mapper);
             //serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);

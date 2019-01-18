@@ -40,7 +40,7 @@ namespace Web.Controllers
             this.hostingEnvironment = hostingEnvironment;
             this.roleManager = roleManager;
 
-            serviceOfPost = new ServiceOfPost(context, mapper, hostingEnvironment);
+            serviceOfPost = new ServiceOfPost(context, roleManager, userManager, mapper, hostingEnvironment);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfSection = new ServiceOfSection(context, mapper);
             serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);

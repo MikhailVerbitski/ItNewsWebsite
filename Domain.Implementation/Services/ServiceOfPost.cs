@@ -7,10 +7,12 @@ using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Domain.Implementation.Services
 {
@@ -27,8 +29,15 @@ namespace Domain.Implementation.Services
 
         private readonly ServiceOfComment serviceOfComment;
         private readonly ServiceOfImage serviceOfImage;
+        private readonly ServiceOfUser serviceOfUser;
 
-        public ServiceOfPost(ApplicationDbContext context, IMapper mapper, IHostingEnvironment hostingEnvironment)
+        public ServiceOfPost(
+            ApplicationDbContext context, 
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUserEntity> userManager,
+            IMapper mapper,
+            IHostingEnvironment hostingEnvironment
+            )
         {
             this.mapper = mapper;
 
@@ -41,6 +50,7 @@ namespace Domain.Implementation.Services
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfComment = new ServiceOfComment(context, mapper);
+            serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
         }
 
         public PostCreateEditViewModel CreateNotFinished(string applicationUserId)
@@ -164,11 +174,11 @@ namespace Domain.Implementation.Services
                     a => a.Section, 
                     a => a.UserProfile);
             posts = posts.Where(a => a.IsFinished == postIsFinished);
-            var postsViewModels = posts.Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent)).ToList();
-            return postsViewModels;
+            var potsViewModels = posts.Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent)).ToList();
+            return potsViewModels;
         }
 
-        public TPostViewModel Get<TPostViewModel>(string applicationUserIdCurrent, int postId) where TPostViewModel : class
+        public async Task<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, int postId) where TPostViewModel : class
         {
             var postEntity = repositoryOfPost.Read(a => a.Id == postId, 
                 a => a.Tags, 
@@ -207,6 +217,9 @@ namespace Domain.Implementation.Services
             if (propertyUserMiniViewModel != null)
             {
                 UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserPost);
+                var role = serviceOfUser.GetUserRole(applicationUserPost).Result;
+                userMiniViewModel.Role = role.Item1;
+                userMiniViewModel.RoleColor = role.Item2;
                 propertyUserMiniViewModel.SetValue(postViewModel, userMiniViewModel);
             }
             if (propertyComments != null)

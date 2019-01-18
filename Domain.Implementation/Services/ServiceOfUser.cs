@@ -6,6 +6,7 @@ using Domain.Contracts.Models.ViewModels.User;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,8 +19,8 @@ namespace Domain.Implementation.Services
         private readonly UserManager<ApplicationUserEntity> userManager;
 
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
-        private readonly RepositoryOfUserProfile repositoryOfUserProfile;
-        private readonly RepositoryOfIdentityUserRole repositoryOfRole;
+        //private readonly RepositoryOfUserProfile repositoryOfUserProfile;
+        //private readonly RepositoryOfIdentityUserRole repositoryOfRole;
 
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfAccount serviceOfAccount;
@@ -29,15 +30,16 @@ namespace Domain.Implementation.Services
             RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUserEntity> userManager,
             IMapper mapper, 
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment
+            )
         {
             this.roleManager = roleManager;
             this.mapper = mapper;
             this.userManager = userManager;
 
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            repositoryOfUserProfile = new RepositoryOfUserProfile(context);
-            repositoryOfRole = new RepositoryOfIdentityUserRole(context);
+            //repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            //repositoryOfRole = new RepositoryOfIdentityUserRole(context);
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
@@ -76,6 +78,28 @@ namespace Domain.Implementation.Services
                 Selected = userRoles.Contains(a.Name)
             }).ToList();
             return userEditViewModel;
+        }
+
+        public async Task<Tuple<string, string>> GetUserRole(ApplicationUserEntity applicationUserEntity)
+        {
+            var roles = await userManager.GetRolesAsync(applicationUserEntity);
+            if (roles.Contains("admin"))
+            {
+                return new Tuple<string, string>("admin", "#FF0101");
+            }
+            else if (roles.Contains("user"))
+            {
+                return new Tuple<string, string>("user", "#BEA500");
+            }
+            else
+            {
+                return new Tuple<string, string>("not found", "#000000");
+            }
+        }
+        public async Task<Tuple<string, string>> GetUserRole(string applicationUserId)
+        {
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
+            return await GetUserRole(applicationUser);
         }
     }
 }

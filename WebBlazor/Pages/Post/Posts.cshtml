@@ -10,19 +10,28 @@ else
 {
     <ListViewTemplate Items="ListOfPosts">
         <ItemTemplate>
-            <div class="row">
-                <h2>@context.Header</h2>
-                <p>Score: @context.Score</p>
-                <span>@context.BriefDesctiption</span>
+            <div class="grid-post">
+                <div>
+                    <button>♥</button>
+                    <button></button>
+
+                </div>
+                <div>
+                    <h2>@context.Header</h2>
+                    <p>Score: @context.Score</p>
+                    <span>@context.BriefDesctiption</span>
+                </div>
             </div>
             <UserMini User="@context.AuthorUserMiniViewModel" />
+            <hr />
+            <br />
         </ItemTemplate>
-    </ListViewTemplate>
+    </ListViewTemplate> 
 }
 
 
 @functions {
-    public string Path { get; set; } = $"https://localhost:44328/Post/ListPostsViewModel";
+    public string Path { get; set; } = $"https://localhost:44328/api/Post/ListPostsViewModel";
     private List<PostViewModel> ListOfPosts;
 
     protected override async Task OnInitAsync()
