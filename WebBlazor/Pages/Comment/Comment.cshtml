@@ -1,0 +1,75 @@
+﻿@page "/Comment"
+@inject HttpClient Http
+@using WebBlazor.Models.ViewModels.Comment;
+
+
+<div class="comment">
+    <div class="grid-post">
+        <UserMini User="@comment.AuthorUserMiniViewModel" />
+    </div>
+    <div style="padding: 0 0 0 50px;">
+        <div class="comment-content">
+            <p style="word-wrap: break-word;">@comment.Content</p>
+        </div>
+        <div class="grid-comment-footer">
+            <p class="container-date">@GetTime(comment.Created)</p>
+            <div></div>
+            @if (comment.IsUserLiked)
+            {
+                <button onclick="@Dislike" class="pure-button"><font color="#FF3347">♥ @comment.CountOfLikes</font></button>
+            }
+            else
+            {
+                <button onclick="@Like" class="pure-button">♥ @comment.CountOfLikes</button>
+            }
+        </div>
+    </div>
+    <br />
+</div>
+<hr />
+
+
+@functions{
+    [Parameter] CommentViewModel comment { get; set; }
+
+    protected override void OnInit()
+    {
+        var field = typeof(TimeZoneInfo).GetField("local", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+        field.SetValue(null, TimeZoneInfo.CreateCustomTimeZone("FAKE", TimeSpan.FromHours(3), "FAKE", "FAKE"));
+        base.OnInit();
+    }
+
+    public async Task Dislike()
+    {
+        await Http.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+        comment.IsUserLiked = !comment.IsUserLiked;
+        comment.CountOfLikes--;
+    }
+    public async Task Like()
+    {
+        await Http.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+        comment.IsUserLiked = !comment.IsUserLiked;
+        comment.CountOfLikes++;
+    }
+
+    public string GetTime(DateTime time)
+    {
+        string res;
+        var now = DateTime.Now;
+        var difference = now - time;
+        if (difference.Days > 0)
+        {
+            res = $"{difference.Days} дней";
+        } else if(difference.Hours > 0)
+        {
+            res = $"{difference.Hours} чесов";
+        } else if (difference.Minutes > 0)
+        {
+            res = $"{difference.Minutes} минут";
+        } else {
+            res = $"{difference.Seconds} секунд";
+        }
+        res += " назад";
+        return res;
+    }
+}

@@ -40,11 +40,11 @@ namespace Web.Controllers
             this.hostingEnvironment = hostingEnvironment;
             this.roleManager = roleManager;
 
-            serviceOfPost = new ServiceOfPost(context, roleManager, userManager, mapper, hostingEnvironment);
+            serviceOfPost = new ServiceOfPost(context, roleManager, userManager, hostingEnvironment, mapper);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfSection = new ServiceOfSection(context, mapper);
             serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
-            serviceOfComment = new ServiceOfComment(context, mapper);
+            serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
         }
 
         public IActionResult Index()

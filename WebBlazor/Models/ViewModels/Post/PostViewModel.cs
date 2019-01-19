@@ -16,7 +16,7 @@ namespace WebBlazor.Models.ViewModels.Post
 
         public double Score { get; set; }
 
-        public byte? UserScore { get; set; } 
+        public byte? UserScore { get; set; }
 
         public virtual UserMiniViewModel AuthorUserMiniViewModel { get; set; }
 

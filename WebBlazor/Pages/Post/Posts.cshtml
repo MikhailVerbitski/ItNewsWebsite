@@ -8,25 +8,21 @@
 }
 else
 {
-    <ListViewTemplate Items="ListOfPosts">
-        <ItemTemplate>
-            <div class="grid-post">
+    <div id="container-posts">
+        <ListViewTemplate Items="ListOfPosts">
+            <ItemTemplate>
                 <div>
-                    <button>♥</button>
-                    <button></button>
-
-                </div>
-                <div>
-                    <h2>@context.Header</h2>
+                    <a href="/Post/@context.PostId"><h2>@context.Header</h2></a>
                     <p>Score: @context.Score</p>
                     <span>@context.BriefDesctiption</span>
                 </div>
-            </div>
-            <UserMini User="@context.AuthorUserMiniViewModel" />
-            <hr />
-            <br />
-        </ItemTemplate>
-    </ListViewTemplate> 
+                <br />
+                <UserMini User="@context.AuthorUserMiniViewModel" />
+                <hr />
+                <br />
+            </ItemTemplate>
+        </ListViewTemplate> 
+    </div>
 }
 
 

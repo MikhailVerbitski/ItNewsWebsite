@@ -6,5 +6,11 @@ namespace Data.Implementation.Repositories
     {
         public RepositoryOfComment(ApplicationDbContext context) : base(context)
         { }
+
+        public override CommentEntity Create(CommentEntity entity)
+        {
+            entity.Created = System.DateTime.Now;
+            return base.Create(entity);
+        }
     }
 }

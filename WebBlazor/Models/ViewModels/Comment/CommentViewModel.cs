@@ -1,5 +1,6 @@
 ﻿using WebBlazor.Models.ViewModels.User;
 using System.Collections.Generic;
+using System;
 
 namespace WebBlazor.Models.ViewModels.Comment
 {
@@ -18,5 +19,7 @@ namespace WebBlazor.Models.ViewModels.Comment
         public int? PostId { get; set; }
 
         public bool IsUserLiked { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

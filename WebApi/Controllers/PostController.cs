@@ -40,7 +40,7 @@ namespace WebApi.Controllers
             //this.hostingEnvironment = hostingEnvironment;
             //this.roleManager = roleManager;
 
-            serviceOfPost = new ServiceOfPost(context, roleManager, userManager, mapper, hostingEnvironment);
+            serviceOfPost = new ServiceOfPost(context, roleManager, userManager, hostingEnvironment, mapper);
             //serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfSection = new ServiceOfSection(context, mapper);
             //serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
@@ -48,7 +48,7 @@ namespace WebApi.Controllers
         }
 
         //
-        string temporaryUserId = "225a36b5-e119-4ac5-a487-69db344f7e21";
+        string temporaryUserId = "e46bc008-f20e-4a2b-b9ed-025135801130";
         //
         [HttpGet("[action]")]
         [Route("CreatePost")]
@@ -78,7 +78,7 @@ namespace WebApi.Controllers
         public JsonResult PostViewModel(int postId)
         {
             var currentUserId = temporaryUserId;//userManager.GetUserId(User);
-            var postViewModel = serviceOfPost.Get<PostViewModel>(currentUserId, postId);
+            var postViewModel = serviceOfPost.Get<PostViewModel>(currentUserId, postId).Result;
             return Json(postViewModel);
         }
         [HttpGet("[action]")]

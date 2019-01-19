@@ -3,12 +3,13 @@ using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Implementation.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Comment")]
     [ApiController]
     public class CommentController : Controller
     {
@@ -25,9 +26,9 @@ namespace WebApi.Controllers
 
         public CommentController(
             UserManager<ApplicationUserEntity> userManager,
-            //RoleManager<IdentityRole> roleManager,
+            RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context,
-            //IHostingEnvironment hostingEnvironment,
+            IHostingEnvironment hostingEnvironment,
             IMapper mapper
             )
         {
@@ -40,26 +41,37 @@ namespace WebApi.Controllers
             //serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             //serviceOfSection = new ServiceOfSection(context, mapper);
             //serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
-            serviceOfComment = new ServiceOfComment(context, mapper);
+            serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
         }
 
+        //
+        string temporaryUserId = "e46bc008-f20e-4a2b-b9ed-025135801130";
+        //
+
         [HttpPost]
-        [Route("CreateComment")]
-        public void CreateComment(CommentCreateEditViewModel commentViewModel)
+        //[Route("CreateComment")]
+        public JsonResult CreateComment([FromBody] CommentCreateEditViewModel commentViewModel)
         {
-            serviceOfComment.Create(userManager.GetUserId(User), commentViewModel);
+            var user = temporaryUserId;
+            var newComment = serviceOfComment.Create(user, commentViewModel);
+            return Json(newComment);
+        }
+
+        [HttpGet("[action]")]
+        [Route("api/commetn/LikeComment")]
+        public IActionResult LikeComment(int commentId, int postId)
+        {
+            var user = temporaryUserId;
+            serviceOfComment.LikeComment(user, commentId);
+            return Ok();
         }
         [HttpGet("[action]")]
-        [Route("LikeComment")]
-        public void LikeComment(int commentId, int postId)
+        [Route("api/Comment/DislikeComment")]
+        public IActionResult DislikeComment(int commentId, int postId)
         {
-            serviceOfComment.LikeComment(userManager.GetUserId(User), commentId);
-        }
-        [HttpGet("[action]")]
-        [Route("DislikeComment")]
-        public void DislikeComment(int commentId, int postId)
-        {
-            serviceOfComment.DislikeComment(userManager.GetUserId(User), commentId);
+            var user = temporaryUserId;
+            serviceOfComment.DislikeComment(user, commentId);
+            return Ok();
         }
     }
 }

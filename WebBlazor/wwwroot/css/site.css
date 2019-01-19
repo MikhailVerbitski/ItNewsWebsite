@@ -51,7 +51,7 @@ p{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr) minmax(320px, 2fr) minmax(120px, 1fr));
     grid-column-gap: 4vh;
-    grid-template-rows: 100%;
+    height: 100%;
 }
 #posts {
     grid-column-start: 2;
@@ -59,10 +59,16 @@ p{
 }
 
 
-.grid-post {
+.grid-posts {
     display: grid;
     grid-template-columns: 1fr 4fr;
     grid-column-gap: 1fr;
+}
+
+
+.grid-cols-two{
+    display: grid;
+    grid-template-columns: auto auto;
 }
 
 
@@ -77,9 +83,164 @@ p{
 }
 
 
+.grid-comment-footer{
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+}
+
+
 .contentDivs {
     background-color: white;
-    padding: 10px;
     border-radius: 15px 15px 0 0;
     box-shadow: 0 0 5px white;
+}
+
+.post-content {
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+    color: #4C4C4C;
+}
+
+
+.comment {
+    margin: 10px 15px 10px 15px;
+    padding: 6px;
+}
+
+.comment-content {
+    border-radius: 16px;
+    min-height: 60px;
+    padding: 10px 10px 10px 0;
+    margin: 0 0 10px 0;
+}
+
+#SubmitComment{
+    width: 100%;
+}
+
+
+#container-posts {
+    padding: 10px;
+}
+
+#container-post {
+    padding: 20px;
+}
+
+.container-date {
+    opacity: 0.3;
+}
+
+.tag {
+    background-color: #E1E1E1;
+    border-radius: 5px;
+    padding: 2px;
+    margin: 0 5px 0 0;
+}
+
+
+
+ol, ul {
+    list-style: none;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+a, a:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.rating {
+    position: relative;
+    width: 85px;
+    height: 14px;
+    margin: 10px 0;
+    list-style: none;
+    background: url(../img/rating-star2.png);
+}
+
+.rating li {
+float: left;
+height: 14px;
+}
+
+.rating li.current {
+    z-index: 1;
+    background: url(../img/rating-star2.png) left bottom;
+}
+
+.rating li span[class*="star"] {
+    position: absolute;
+    z-index: 5;
+    display: block;
+    width: 17px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.rating li span[class*="star"]:hover {
+    left: 0;
+    z-index: 2;
+    background: url(../img/rating-star2.png) left bottom;
+}
+
+.rating li span.star1 {
+    left: 0;
+}
+
+.rating li span.star1:hover {
+    width: 17px;
+}
+
+.rating li span.star2 {
+    left: 17px;
+}
+
+.rating li span.star2:hover {
+    width: 34px;
+}
+
+.rating li span.star3 {
+    left: 34px;
+}
+
+.rating li span.star3:hover {
+    width: 51px;
+}
+
+.rating li span.star4 {
+    left: 51px;
+}
+
+.rating li span.star4:hover {
+    width: 68px;
+}
+
+.rating li span.star5 {
+    left: 68px;
+}
+
+.rating li span.star5:hover {
+    width: 85px;
 }

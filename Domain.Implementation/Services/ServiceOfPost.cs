@@ -35,8 +35,8 @@ namespace Domain.Implementation.Services
             ApplicationDbContext context, 
             RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUserEntity> userManager,
-            IMapper mapper,
-            IHostingEnvironment hostingEnvironment
+            IHostingEnvironment hostingEnvironment,
+            IMapper mapper
             )
         {
             this.mapper = mapper;
@@ -49,7 +49,7 @@ namespace Domain.Implementation.Services
             repositoryOfSection = new RepositoryOfSection(context);
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
-            serviceOfComment = new ServiceOfComment(context, mapper);
+            serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
             serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
         }
 

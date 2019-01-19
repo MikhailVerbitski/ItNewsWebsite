@@ -4,6 +4,8 @@ using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.User;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,7 +21,15 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
 
-        public ServiceOfComment(ApplicationDbContext context, IMapper mapper)
+        private readonly ServiceOfUser serviceOfUser;
+
+        public ServiceOfComment(
+            ApplicationDbContext context,
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUserEntity> userManager,
+            IHostingEnvironment hostingEnvironment,
+            IMapper mapper
+            )
         {
             this.mapper = mapper;
 
@@ -28,6 +38,8 @@ namespace Domain.Implementation.Services
             repositoryOfCommentLike = new RepositoryOfCommentLike(context);
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+
+            serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
         }
 
         public CommentViewModel Create(string applicationUserId, CommentCreateEditViewModel commentCreateEditViewModel)
@@ -36,7 +48,7 @@ namespace Domain.Implementation.Services
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
             commentEntity.UserProfileId = applicationUser.UserProfileId;
             commentEntity = repositoryOfComment.Create(commentEntity);
-            var commentViewModel = mapper.Map<CommentEntity, CommentViewModel>(commentEntity);
+            var commentViewModel = GetViewModelWithProperty<CommentViewModel>(commentEntity, applicationUserId);
             return commentViewModel;
         }
 
@@ -70,6 +82,9 @@ namespace Domain.Implementation.Services
             {
                 var applicationUserForComment = repositoryOfUserProfile.Read(a => a.Id == commentEntity.UserProfileId, a => a.ApplicationUser).ApplicationUser;
                 UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserForComment);
+                var role = serviceOfUser.GetUserRole(applicationUserForComment).Result;
+                userMiniViewModel.Role = role.Item1;
+                userMiniViewModel.RoleColor = role.Item2;
                 propertyAuthorUserMiniViewModel.SetValue(commentViewModel, userMiniViewModel);
             }
             if(propertyIsUserLiked != null)

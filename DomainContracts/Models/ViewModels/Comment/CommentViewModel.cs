@@ -1,4 +1,5 @@
 ﻿using Domain.Contracts.Models.ViewModels.User;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Contracts.Models.ViewModels.Comment
@@ -18,5 +19,7 @@ namespace Domain.Contracts.Models.ViewModels.Comment
         public int? PostId { get; set; }
 
         public bool IsUserLiked { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

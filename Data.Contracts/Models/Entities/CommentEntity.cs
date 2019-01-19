@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Data.Contracts.Models.Entities
 {
@@ -19,5 +20,7 @@ namespace Data.Contracts.Models.Entities
         public int? PostId { get; set; }
 
         public PostEntity Post { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }
