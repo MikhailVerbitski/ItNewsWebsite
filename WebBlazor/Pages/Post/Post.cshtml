@@ -2,7 +2,6 @@
 @inject HttpClient Http
 @using WebBlazor.Models.ViewModels.Post;
 @using WebBlazor.Models.ViewModels.Comment;
-@using Newtonsoft.Json;
 
 
 @if (postViewModel == null)
@@ -15,7 +14,9 @@ else
         <h1 style="text-align: center;">@postViewModel.Header</h1>
         <h3>Section: <Tag tag="@postViewModel.Section" /></h3>
         <br />
-        <p class="post-content">@postViewModel.Content</p>
+        <p class="post-content">
+            <Markdown Content="@postViewModel.Content" /> 
+        </p>
         <br />
         <span>Tags:</span>
         <ListViewTemplate Items="@Tags">
@@ -28,13 +29,16 @@ else
         <div class="grid-cols-two">
             <UserMini User="@postViewModel.AuthorUserMiniViewModel" />
             <div>
+
+                @error
+
                 <span>Rating</span>
                 <ul class="rating clearfix">
-                    <li class="current" style="width: @(postViewModel.Score * 20)%;" onclick="@Rating1"><span class="star1"></span></li>
-                    <li><span class="star2" onclick="@Rating2"></span></li>
-                    <li><span class="star3" onclick="@Rating3"></span></li>
-                    <li><span class="star4" onclick="@Rating4"></span></li>
-                    <li><span class="star5" onclick="@Rating5"></span></li>
+                    <li class="current" style="width: @(PercentOfRating)%;" onclick="@(() => SetRating(1))"><span class="star1"></span></li>
+                    <li><span class="star2" onclick="@(() => SetRating(2))"></span></li>
+                    <li><span class="star3" onclick="@(() => SetRating(3))"></span></li>
+                    <li><span class="star4" onclick="@(() => SetRating(4))"></span></li>
+                    <li><span class="star5" onclick="@(() => SetRating(5))"></span></li>
                 </ul>
             </div>
         </div>
@@ -50,7 +54,7 @@ else
     <hr/>
     <ListViewTemplate Items="comments">
         <ItemTemplate>
-            <Comment comment="@context" />
+            <Comment comment="@context"/>
         </ItemTemplate>
     </ListViewTemplate>
 }
@@ -59,21 +63,22 @@ else
 @functions{
     [Parameter] private int Id { get; set; }
 
-    public string PathGetPostViewModel { get; set; } = $"https://localhost:44328/api/Post/PostViewModel";
-    public string PathGetCreateComment { get; set; } = $"https://localhost:44328/api/Comment/CreateComment";
-    public string PathGetComment { get; set; } = $"https://localhost:44328/api/Comment/GetComment";
+    public string PathPostController { get; set; } = "https://localhost:44328/api/Post";
 
     public PostViewModel postViewModel;
     public List<CommentViewModel> comments;
     public List<string> Tags;
-
+    public double PercentOfRating { get; set; }
     public string CommentContent { get; set; }
+
+    string error;
 
     protected override async Task OnInitAsync()
     {
-        postViewModel = await Http.GetJsonAsync<PostViewModel>($"{PathGetPostViewModel}?postId={Id}");
+        postViewModel = await Http.GetJsonAsync<PostViewModel>($"{PathPostController}/PostViewModel?postId={Id}");
         comments = postViewModel.Comments.ToList();
         Tags = postViewModel.Tags.ToList();
+        PercentOfRating = postViewModel.Score * 20;
     }
 
     private async Task SubmitCommentForm()
@@ -86,15 +91,9 @@ else
         var newComment = await Http.SendJsonAsync<CommentViewModel>(HttpMethod.Post, "api/Comment/", comment);
         comments.Add(newComment);
         CommentContent = string.Empty;
-        //comments = await Http.GetJsonAsync<IEnumerable<CommentViewModel>>($"{PathGetComment}/{postViewModel.PostId}");
     }
-    private void Rating1() => Rating(1);
-    private void Rating2() => Rating(2);
-    private void Rating3() => Rating(3);
-    private void Rating4() => Rating(4);
-    private void Rating5() => Rating(5);
-    private async void Rating(int score)
+    private void SetRating(int score)
     {
-        await Http.GetAsync($"https://localhost:44328/api/Post/PutEstimate?postId={postViewModel.PostId}&score={score}");
+        PercentOfRating = 20 * Http.GetJsonAsync<double>($"{PathPostController}/PutEstimate?postId={postViewModel.PostId}&score={score}").Result;
     }
 }

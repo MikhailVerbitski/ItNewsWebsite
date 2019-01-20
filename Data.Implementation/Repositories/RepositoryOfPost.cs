@@ -23,6 +23,10 @@ namespace Data.Implementation.Repositories
                 section.CountOfUsage++;
                 repositoryOfSection.Update(section);
             }
+            if(entity.IsFinished)
+            {
+                entity.Created = DateTime.Now;
+            }
 
             return base.Create(entity);
         }

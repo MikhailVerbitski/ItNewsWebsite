@@ -12,7 +12,7 @@ p{
 .grid-main {
     display: grid;
     grid-template-columns: 1fr 20fr 1fr;
-    grid-template-rows: 5vh 95vh;
+    grid-template-rows: 5vh 100%;
     grid-row-gap: 50px;
 }
 #navbar {
@@ -56,13 +56,6 @@ p{
 #posts {
     grid-column-start: 2;
     grid-column-end: 4;
-}
-
-
-.grid-posts {
-    display: grid;
-    grid-template-columns: 1fr 4fr;
-    grid-column-gap: 1fr;
 }
 
 
@@ -243,4 +236,12 @@ height: 14px;
 
 .rating li span.star5:hover {
     width: 85px;
+}
+
+#createPost-top {
+    padding: 20px;
+}
+
+label, input, select, textarea{
+    width: 100%;
 }

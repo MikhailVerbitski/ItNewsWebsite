@@ -21,5 +21,7 @@ namespace WebBlazor.Models.ViewModels.Post
         public string Tags { get; set; }
 
         public IEnumerable<string> Images { get; set; }
+
+        public bool IsFinished { get; set; }
     }
 }

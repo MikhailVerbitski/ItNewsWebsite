@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Post")]
     [ApiController]
     public class PostController : Controller
     {
@@ -26,6 +26,7 @@ namespace WebApi.Controllers
         //private readonly RoleManager<IdentityRole> roleManager;
         //private readonly ServiceOfUser serviceOfUser;
         //private readonly ServiceOfComment serviceOfComment;
+        private readonly ServiceOfTag serviceOfTag;
 
         public PostController(
             UserManager<ApplicationUserEntity> userManager,
@@ -45,33 +46,35 @@ namespace WebApi.Controllers
             serviceOfSection = new ServiceOfSection(context, mapper);
             //serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
             //serviceOfComment = new ServiceOfComment(context, mapper);
+            serviceOfTag = new ServiceOfTag(context, mapper);
         }
 
         //
         string temporaryUserId = "e46bc008-f20e-4a2b-b9ed-025135801130";
         //
-        [HttpGet("[action]")]
-        [Route("CreatePost")]
-        public JsonResult CreatePost()
-        {
-            var currentUserId = temporaryUserId;//userManager.GetUserId(User);
-            var postCreateEditViewModel = serviceOfPost.CreateNotFinished(currentUserId);
-            return Json(postCreateEditViewModel.PostId);
-        }
+        //[HttpGet("[action]")]
+        //[Route("CreatePost")]
+        //public JsonResult CreatePost()
+        //{
+        //    var currentUserId = temporaryUserId;//userManager.GetUserId(User);
+        //    var postCreateEditViewModel = serviceOfPost.CreateNotFinished(currentUserId);
+        //    return Json(postCreateEditViewModel.PostId);
+        //}
         [HttpPost]
         [Route("CreatePost")]
-        public IActionResult CreatePost(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
+        public void CreatePost([FromBody] PostCreateEditViewModel postCreateEditViewModel/*, IFormFile[] images*/)
         {
-            serviceOfPost.CreateFinished(postCreateEditViewModel);
-            serviceOfPost.AddImage(postCreateEditViewModel.PostId, images);
-            return View();
+            var userId = temporaryUserId;//
+            serviceOfPost.Create(userId, postCreateEditViewModel);
+            //serviceOfPost.AddImage(postCreateEditViewModel.PostId, images);
         }
         [HttpGet("[action]")]
         [Route("PutEstimate")]
-        public void PutEstimate(int postId, byte score)
+        public JsonResult PutEstimate(int postId, byte score)
         {
             var currentUserId = temporaryUserId;//userManager.GetUserId(User);
-            serviceOfPost.RatingPost(currentUserId, postId, score);
+            var rating = serviceOfPost.RatingPost(currentUserId, postId, score);
+            return Json(rating);
         }
         [HttpGet("[action]")]
         [Route("PostViewModel")]
@@ -95,6 +98,13 @@ namespace WebApi.Controllers
         {
             var listOfSelections = serviceOfSection.Get().Select(a => a.Text);
             return Json(listOfSelections);
+        }
+        [HttpGet("[action]")]
+        [Route("GetListOfTags")]
+        public JsonResult GetListOfTags()
+        {
+            var listOfTags = serviceOfTag.Get();
+            return Json(listOfTags);
         }
     }
 }

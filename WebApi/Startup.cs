@@ -52,6 +52,7 @@ namespace WebApi
                 a.AddProfile(new AutomapperCommentProfile());
                 a.AddProfile(new AutomapperPostProfile());
                 a.AddProfile(new AutomapperUserProfile());
+                a.AddProfile(new AutomapperTagProfile());
             });
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);

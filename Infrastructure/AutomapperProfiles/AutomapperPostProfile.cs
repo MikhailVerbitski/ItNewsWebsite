@@ -15,6 +15,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
                 .ForMember(a => a.SectionId, a => a.MapFrom(b => b.SectionId))
                 .ForMember(a => a.UserProfileId, a => a.MapFrom(b => b.UserProfileId))
+                .ForMember(a => a.IsFinished, a => a.MapFrom(b => b.IsFinished))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<PostEntity, PostMiniViewModel>()
                 .ForMember(a => a.PostId, a => a.MapFrom(b => b.Id))
@@ -39,6 +40,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
                 .ForMember(a => a.SectionId, a => a.MapFrom(b => b.SectionId))
                 .ForMember(a => a.UserProfileId, a => a.MapFrom(b => b.UserProfileId))
+                .ForMember(a => a.IsFinished, a => a.MapFrom(b => b.IsFinished))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<PostMiniViewModel, PostEntity>()
                 .ForMember(a => a.Id, a => a.MapFrom(b => b.PostId))

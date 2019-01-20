@@ -8,7 +8,7 @@ using WebApi.Server.Interface;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Token")]
     [ApiController]
     public class TokenController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("[action]")]
-        [Route("Registration")]
+        [Route("api/Token/Registration")]
         public async Task<IActionResult> Registration([FromBody] TokenViewModel tokenViewModel)
         {
             if(!ModelState.IsValid)
@@ -48,7 +48,7 @@ namespace WebApi.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("Registration")]
+        [Route("api/Token/Login")]
         public async Task<IActionResult> Login([FromBody] TokenViewModel tokenViewModel)
         {
             if (!ModelState.IsValid)

@@ -1,0 +1,81 @@
+﻿@page "/CreatePost"
+@inject HttpClient Http;
+@using WebBlazor.Models.ViewModels.Tag;
+@using WebBlazor.Models.ViewModels.Post;
+@using Markdig;
+
+
+<div id="container-post">
+    <h1 style="text-align: center;">@header</h1>
+    <h3>Section: <Tag tag="@section" /></h3>
+    <br />
+    <p class="post-content">
+        <Markdown Content="@ContentValue" />
+    </p>
+    <br />
+    <span>Tags:</span>
+    <TagsOnChange StrTags="@strTags" />
+</div>
+<hr />
+<div id="createPost-top">
+    <div class="pure-form pure-form-stacked">
+        <fieldset>
+            <label for="header">Header</label>
+            <input id="header" type="text" bind="@header" />
+
+            <label for="selection">Selection: </label>
+            <select bind="@section">
+                @if (Selections != null)
+                {
+                    foreach (var item in Selections)
+                    {
+                        <option>@item</option>
+                    }
+                }
+            </select>
+
+            <div>
+                <label for="content">Content</label>
+                <textarea id="content" rows="10" bind="@ContentValue" />
+            </div>
+
+            <label for="strTags">Tags:</label>
+            <input id="strTags" type="text" bind="@strTags" />
+
+            <button onclick="@ClickCreatePost" class="pure-button pure-button-primary">Send</button>
+        </fieldset>
+    </div>
+</div>
+
+
+@functions{
+    public string ContentValue { get; set; } = "# Content";
+    public string header { get; set; } = "Header";
+
+    public string section { get; set; }
+    public string strTags { get; set; }
+    public IEnumerable<string> Selections { get; set; }
+
+    public List<TagViewModel> ServerTags { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        Selections = await Http.GetJsonAsync<List<string>>("api/Post/GetListOfSelections");
+        section = Selections.First();
+        ServerTags = await Http.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
+        ServerTags = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
+    }
+    private async Task ClickCreatePost()
+    {
+        var post = new PostCreateEditViewModel()
+        {
+            Header = header,
+            Content = Markdig.Markdown.ToHtml(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
+            Tags = strTags,
+            Section = section,
+            BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
+            IsFinished = true
+        };
+        await Http.SendJsonAsync(HttpMethod.Post, "api/Post/CreatePost", post);
+    }
+}

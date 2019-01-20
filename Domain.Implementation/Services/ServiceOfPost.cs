@@ -53,18 +53,8 @@ namespace Domain.Implementation.Services
             serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
         }
 
-        public PostCreateEditViewModel CreateNotFinished(string applicationUserId)
-        {
-            var postEntity = new PostEntity();
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            postEntity.UserProfileId = applicationUser.UserProfileId;
-            postEntity.IsFinished = false;
-            postEntity = repositoryOfPost.Create(postEntity);
-            var postViewModel = mapper.Map<PostEntity, PostCreateEditViewModel>(postEntity);
-            return postViewModel;
-        }
 
-        public PostViewModel Update(PostCreateEditViewModel postCreateEditViewModel, bool isFinishe = false)
+        public void Update(PostCreateEditViewModel postCreateEditViewModel)
         {
             var postEntity = mapper.Map<PostCreateEditViewModel, PostEntity>(postCreateEditViewModel);
             var lastPostEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId,
@@ -106,52 +96,45 @@ namespace Domain.Implementation.Services
                 }));
             postEntity.Tags = newPostTags;
             repositoryOfPost.Update(postEntity);
-            if(isFinishe)
-            {
-                var postViewModel = mapper.Map<PostEntity, PostViewModel>(postEntity);
-                return postViewModel;
-            }
-            return null;
         }
-
-        public PostViewModel CreateFinished(PostCreateEditViewModel postCreateEditViewModel, bool isReturnViewModel = false)
+        
+        public int Create(string applicationUserIdCurrent, PostCreateEditViewModel postCreateEditViewModel)
         {
             var postEntity = mapper.Map<PostCreateEditViewModel, PostEntity>(postCreateEditViewModel);
-            
-            var section = repositoryOfSection.Read(a => a.Id == Int32.Parse(postCreateEditViewModel.Section));
-            postEntity.Section = section;
-            postEntity.SectionId = section.Id;
-            
-            var postTagEntities = postCreateEditViewModel
-                .Tags
-                .Split(" ")
-                .Distinct()
-                .Select(a => {
-                    var tag = repositoryOfTag.Read(b => b.Name == a);
-                    if (tag == null)
-                    {
-                        tag = repositoryOfTag.Create(new TagEntity() { Name = a });
-                    }
-                    return tag;
-                })
-                .Select(a => repositoryOfPostTag.Create(new PostTagEntity()
-                {
-                    PostId = postEntity.Id,
-                    TagId = a.Id,
-                    Tag = a,
-                }))
-                .ToList();
-
-            postEntity.Tags = postTagEntities;
-            postEntity.IsFinished = true;
-            
-            repositoryOfPost.Update(postEntity);
-            if(isReturnViewModel)
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            postEntity.UserProfileId = applicationUser.UserProfileId;
+            if(postCreateEditViewModel != null && postCreateEditViewModel.Section != null)
             {
-                var postViewModel = mapper.Map<PostEntity, PostViewModel>(postEntity);
-                return postViewModel;
+                var section = repositoryOfSection.Read(a => a.Name == postCreateEditViewModel.Section);
+                postEntity.Section = section;
+                postEntity.SectionId = section.Id;
             }
-            return null;
+
+            postEntity = repositoryOfPost.Create(postEntity);
+
+            if(postCreateEditViewModel != null && postCreateEditViewModel.Tags != "")
+            {
+                postCreateEditViewModel
+                    .Tags
+                    .Split(" ")
+                    .Distinct()
+                    .Select(a =>
+                    {
+                        var tag = repositoryOfTag.Read(b => b.Name == a);
+                        if (tag == null)
+                        {
+                            tag = repositoryOfTag.Create(new TagEntity() { Name = a });
+                        }
+                        return tag;
+                    })
+                    .Select(a => repositoryOfPostTag.Create(new PostTagEntity()
+                    {
+                        PostId = postEntity.Id,
+                        TagId = a.Id,
+                        Tag = a,
+                    }));
+            }
+            return postEntity.Id;
         }
 
         public void AddImage(int postId, params IFormFile[] images)
@@ -230,7 +213,7 @@ namespace Domain.Implementation.Services
             return postViewModel;
         }
 
-        public void RatingPost(string applicationUserId, int postId, byte score) 
+        public double RatingPost(string applicationUserId, int postId, byte score) 
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
             var lastPostRating = repositoryOfPostRating.Read(a => a.PostId == postId && a.UserProfileId == applicationUser.UserProfileId);
@@ -254,7 +237,10 @@ namespace Domain.Implementation.Services
                     Score = score
                 };
                 repositoryOfPostRating.Update(updatePostRating);
+
             }
+            var post = repositoryOfPost.Read(a => a.Id == postId);
+            return (post.SumOfScore / (double)post.CountOfScore);
         }
 
         private void Delete<TPostViewModel>(TPostViewModel postViewModel)
