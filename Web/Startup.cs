@@ -15,6 +15,7 @@ using System.IO;
 using FluentValidation.AspNetCore;
 using Domain.Contracts.Validators.ViewModels.Account;
 using System.Linq;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Web
 {
@@ -38,8 +39,8 @@ namespace Web
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //.AddCookie(a => 
+            //services.AddAuthentication(CookieAuthenticationDefaults.)
+            //.AddCookie(a =>
             //{
             //    a.LoginPath = new PathString("/Account/Login");
             //    a.AccessDeniedPath = new PathString("/Account/Login");
@@ -63,7 +64,7 @@ namespace Web
                 a.AddProfile(new AutomapperTagProfile());
             });
             IMapper mapper = mappingConfig.CreateMapper();
-            services.AddSingleton(mapper);
+            services.AddScoped<IMapper>(p => mapper);
 
             services.AddCors();
 

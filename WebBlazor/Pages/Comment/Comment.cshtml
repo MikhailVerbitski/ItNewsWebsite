@@ -1,6 +1,8 @@
 ﻿@page "/Comment"
 @inject HttpClient Http
 @using WebBlazor.Models.ViewModels.Comment;
+@using WebBlazor.Models.ViewModels.Post;
+@using WebBlazor.Models.ViewModels.User;
 
 
 <div class="comment">
@@ -31,6 +33,7 @@
 
 @functions{
     [Parameter] CommentViewModel comment { get; set; }
+    [Parameter] PostViewModel post { get; set; }
 
     protected override void OnInit()
     {
@@ -44,12 +47,16 @@
         await Http.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
         comment.IsUserLiked = !comment.IsUserLiked;
         comment.CountOfLikes--;
+
+        UserRatingChange(-1);
     }
     public async Task Like()
     {
         await Http.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
         comment.IsUserLiked = !comment.IsUserLiked;
         comment.CountOfLikes++;
+
+        UserRatingChange(1);
     }
 
     public string GetTime(DateTime time)
@@ -60,16 +67,32 @@
         if (difference.Days > 0)
         {
             res = $"{difference.Days} дней";
-        } else if(difference.Hours > 0)
+        }
+        else if (difference.Hours > 0)
         {
             res = $"{difference.Hours} чесов";
-        } else if (difference.Minutes > 0)
+        }
+        else if (difference.Minutes > 0)
         {
             res = $"{difference.Minutes} минут";
-        } else {
+        }
+        else
+        {
             res = $"{difference.Seconds} секунд";
         }
         res += " назад";
         return res;
+    }
+    private void UserRatingChange(int plus)
+    {
+        var users = new UserMiniViewModel[] { post.AuthorUserMiniViewModel }
+            .Concat(post.Comments
+            .Select(a => a.AuthorUserMiniViewModel))
+            .Where(a => a.ApplicationUserId == comment.AuthorUserMiniViewModel.ApplicationUserId);
+
+        foreach (var item in users)
+        {
+            item.CountOfLikes += plus;
+        }
     }
 }

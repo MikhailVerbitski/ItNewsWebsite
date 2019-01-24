@@ -52,11 +52,13 @@ else
     </div>
     <br />
     <hr/>
-    <ListViewTemplate Items="comments">
-        <ItemTemplate>
-            <Comment comment="@context"/>
-        </ItemTemplate>
-    </ListViewTemplate>
+    <div onmousemove="@Update">
+        <ListViewTemplate Items="comments">
+            <ItemTemplate>
+                <Comment comment="@context" post="@postViewModel"/>
+            </ItemTemplate>
+        </ListViewTemplate>
+    </div>
 }
 
 
@@ -88,12 +90,16 @@ else
             PostId = postViewModel.PostId,
             Content = CommentContent
         };
-        var newComment = await Http.SendJsonAsync<CommentViewModel>(HttpMethod.Post, "api/Comment/", comment);
+        var newComment = await Http.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
         comments.Add(newComment);
         CommentContent = string.Empty;
     }
-    private void SetRating(int score)
+    private async Task SetRating(int score)
     {
-        PercentOfRating = 20 * Http.GetJsonAsync<double>($"{PathPostController}/PutEstimate?postId={postViewModel.PostId}&score={score}").Result;
+        PercentOfRating = 20 * await Http.GetJsonAsync<double>($"{PathPostController}/PutEstimate?postId={postViewModel.PostId}&score={score}");
+    }
+    private void Update()
+    {
+        this.ShouldRender();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using WebBlazor.Models.ViewModels.Tag;
 
 namespace WebBlazor.Models.ViewModels.Post
 {
@@ -18,7 +19,7 @@ namespace WebBlazor.Models.ViewModels.Post
 
         public string BriefDesctiption { get; set; }
 
-        public string Tags { get; set; }
+        public IEnumerable<TagViewModel> Tags { get; set; }
 
         public IEnumerable<string> Images { get; set; }
 

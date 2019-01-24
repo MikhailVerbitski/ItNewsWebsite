@@ -101,5 +101,14 @@ namespace Domain.Implementation.Services
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
             return await GetUserRole(applicationUser);
         }
+
+        public UserMiniViewModel GetUserMiniViewModel(ApplicationUserEntity applicationUserPost)
+        {
+            UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserPost);
+            var role = GetUserRole(applicationUserPost).Result;
+            userMiniViewModel.Role = role.Item1;
+            userMiniViewModel.RoleColor = role.Item2;
+            return userMiniViewModel;
+        }
     }
 }

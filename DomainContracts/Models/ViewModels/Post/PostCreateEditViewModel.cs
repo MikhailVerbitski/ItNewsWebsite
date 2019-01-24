@@ -1,14 +1,10 @@
-﻿using Domain.Contracts.Models.ViewModels.User;
+﻿using Domain.Contracts.Models.ViewModels.Tag;
 using System.Collections.Generic;
 
 namespace Domain.Contracts.Models.ViewModels.Post
 {
-    public class PostCreateEditViewModel
+    public class PostCreateEditViewModel : BasePostViewModel
     {
-        public int PostId { get; set; }
-
-        public string Header { get; set; }
-
         public int? SectionId { get; set; }
 
         public string Section { get; set; }
@@ -17,9 +13,7 @@ namespace Domain.Contracts.Models.ViewModels.Post
 
         public string Content { get; set; }
 
-        public string BriefDesctiption { get; set; }
-
-        public string Tags { get; set; }
+        public IEnumerable<TagViewModel> Tags { get; set; }
 
         public IEnumerable<string> Images { get; set; }
 

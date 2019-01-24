@@ -33,7 +33,7 @@
                 Email = Email,
                 Password = Password
             };
-            var response = Http.PostJsonAsync<object>("https://localhost:44328/api/Token/Registration", tokenViewModel).Result;
+            var response = await Http.PostJsonAsync<object>("https://localhost:44328/api/Token/Registration", tokenViewModel);
             Console.WriteLine(response.ToString());
             UriHelper.NavigateTo("/Login");
         }

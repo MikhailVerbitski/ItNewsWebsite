@@ -33,7 +33,7 @@ namespace Data.Implementation.Repositories
         {
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
             var result = (keySelector != null) ? dbQuery.Where(keySelector) : dbQuery;
-            return result;
+            return result.ToList();
         }
         public virtual void Update(T entity, params Expression<Func<T, object>>[] properties)
         {

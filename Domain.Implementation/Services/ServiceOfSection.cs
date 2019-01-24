@@ -24,7 +24,7 @@ namespace Domain.Implementation.Services
 
         public IEnumerable<SelectListItem> Get()
         {
-            return repositoryOfSection.ReadMany(null).Select(a => new SelectListItem(a.Name, a.Id.ToString()));
+            return repositoryOfSection.ReadMany(null).Select(a => new SelectListItem(a.Name, a.Name));
         }
     }
 }

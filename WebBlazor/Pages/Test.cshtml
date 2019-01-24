@@ -1,0 +1,10 @@
+﻿@page "/Test"
+
+<div id="clouder" style="width:500px; height:500px;"/>
+
+@functions{
+    protected async override Task OnAfterRenderAsync()
+    {
+        await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas();
+    }
+}

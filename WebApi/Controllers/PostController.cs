@@ -81,7 +81,7 @@ namespace WebApi.Controllers
         public JsonResult PostViewModel(int postId)
         {
             var currentUserId = temporaryUserId;//userManager.GetUserId(User);
-            var postViewModel = serviceOfPost.Get<PostViewModel>(currentUserId, postId).Result;
+            var postViewModel = serviceOfPost.Get<PostViewModel>(currentUserId, postId);
             return Json(postViewModel);
         }
         [HttpGet("[action]")]
@@ -100,7 +100,7 @@ namespace WebApi.Controllers
             return Json(listOfSelections);
         }
         [HttpGet("[action]")]
-        [Route("GetListOfTags")]
+        [Route("api/Post/GetListOfTags")]
         public JsonResult GetListOfTags()
         {
             var listOfTags = serviceOfTag.Get();

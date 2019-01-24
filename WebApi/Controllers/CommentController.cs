@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers
 {
     [Route("api/Comment")]
+    
     [ApiController]
     public class CommentController : Controller
     {
@@ -48,8 +49,7 @@ namespace WebApi.Controllers
         string temporaryUserId = "e46bc008-f20e-4a2b-b9ed-025135801130";
         //
 
-        [HttpPost]
-        //[Route("CreateComment")]
+        [HttpPost("/api/Comment/CreateComment")]
         public JsonResult CreateComment([FromBody] CommentCreateEditViewModel commentViewModel)
         {
             var user = temporaryUserId;

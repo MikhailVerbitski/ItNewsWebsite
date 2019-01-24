@@ -55,13 +55,14 @@ namespace Web.Controllers
         public IActionResult CreatePost()
         {
             ViewData["Sections"] = serviceOfSection.Get();
-            var postCreateEditViewModel =  serviceOfPost.Create(userManager.GetUserId(User), null);
+            var postId =  serviceOfPost.Create(userManager.GetUserId(User), null);
+            var postCreateEditViewModel = serviceOfPost.Get<PostCreateEditViewModel>(userManager.GetUserId(User), postId);
             return View(postCreateEditViewModel);
         }
         [HttpPost]
         public IActionResult CreatePost(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
         {
-            serviceOfPost.Create(userManager.GetUserId(User), postCreateEditViewModel);
+            serviceOfPost.Update(postCreateEditViewModel);
             serviceOfPost.AddImage(postCreateEditViewModel.PostId, images);
             return View();
         }

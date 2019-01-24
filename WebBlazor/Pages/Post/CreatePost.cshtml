@@ -14,9 +14,14 @@
     </p>
     <br />
     <span>Tags:</span>
-    <TagsOnChange StrTags="@strTags" />
+    <ListViewTemplateWithIf Items="TagsForDeselect">
+        <ItemTemplate>
+            <div style="display: inline-block; margin-top: 4px;" class="tag">@context.Name</div>
+        </ItemTemplate>
+    </ListViewTemplateWithIf>
 </div>
 <hr />
+<h2 style="text-align: center; padding:20px;">Constructor</h2>
 <div id="createPost-top">
     <div class="pure-form pure-form-stacked">
         <fieldset>
@@ -33,15 +38,29 @@
                     }
                 }
             </select>
-
             <div>
                 <label for="content">Content</label>
                 <textarea id="content" rows="10" bind="@ContentValue" />
             </div>
-
-            <label for="strTags">Tags:</label>
-            <input id="strTags" type="text" bind="@strTags" />
-
+            <label for="tagInput">Tags:</label>
+            <div id="grid-tag">
+                <div style="display: inline-block;">
+                    <ListViewTemplateWithIf Items="TagsForDeselect">
+                        <ItemTemplate>
+                            <div style="display: inline-block; margin-top: 4px;" class="tag" onclick="@(() => DeselectTag(context))">@(context.Name)</div>
+                        </ItemTemplate>
+                    </ListViewTemplateWithIf>
+                </div>
+                <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress"/>
+                <datalist id="listTags">
+                    <ListViewTemplateWithIf Items="TagsForSelect">
+                        <ItemTemplate>
+                            <option>@(context.Name)</option>
+                        </ItemTemplate>
+                    </ListViewTemplateWithIf>
+                </datalist>
+            </div>
+            <br/>
             <button onclick="@ClickCreatePost" class="pure-button pure-button-primary">Send</button>
         </fieldset>
     </div>
@@ -54,16 +73,23 @@
 
     public string section { get; set; }
     public string strTags { get; set; }
-    public IEnumerable<string> Selections { get; set; }
+    string bindStrForInput { get; set; }
 
-    public List<TagViewModel> ServerTags { get; set; }
+    public IEnumerable<string> Selections { get; set; }
+    public IEnumerable<TagViewModel> ServerTags { get; set; }
+
+    List<TagViewModel> TagsForSelect;
+    List<TagViewModel> TagsForDeselect;
 
     protected override async Task OnInitAsync()
     {
         Selections = await Http.GetJsonAsync<List<string>>("api/Post/GetListOfSelections");
         section = Selections.First();
-        ServerTags = await Http.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
-        ServerTags = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
+        ServerTags = await Http.GetJsonAsync<IEnumerable<TagViewModel>>("api/Post/GetListOfTags");
+        TagsForSelect = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
+        TagsForDeselect = new List<TagViewModel>();
+
+        TagsForDeselect.Add(new TagViewModel() { Name = "fashdasgiofuaheroguaheruioaheriah" });
     }
     private async Task ClickCreatePost()
     {
@@ -71,11 +97,49 @@
         {
             Header = header,
             Content = Markdig.Markdown.ToHtml(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
-            Tags = strTags,
+            Tags = TagsForDeselect,
             Section = section,
             BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
             IsFinished = true
         };
         await Http.SendJsonAsync(HttpMethod.Post, "api/Post/CreatePost", post);
+    }
+    private void SelectTag(TagViewModel tagViewModel)
+    {
+        TagsForDeselect.Add(tagViewModel);
+        TagsForSelect.Remove(tagViewModel);
+    }
+    private void DeselectTag(TagViewModel tagViewModel)
+    {
+        TagsForSelect.Add(tagViewModel);
+        TagsForDeselect.Remove(tagViewModel);
+    }
+    private void TagKeyPress(UIKeyboardEventArgs eventArgs)
+    {
+        if(eventArgs.Key == "Backspace")
+        {
+            strTags = new string(strTags.Take(strTags.Length - 1).ToArray());
+        }
+        else if(eventArgs.Key.Length > 1)
+        {
+            return;
+        }
+        else
+        {
+            strTags += eventArgs.Key;
+        }
+        var tag = TagsForSelect.Where(a => a.Name == strTags || a.Name == bindStrForInput).SingleOrDefault();
+        if(tag != null)
+        {
+            SelectTag(tag);
+            bindStrForInput = string.Empty;
+            strTags = string.Empty;
+        }
+        else if(eventArgs.Key == " ")
+        {
+            SelectTag(new TagViewModel() { Name = strTags });
+            bindStrForInput = string.Empty;
+            strTags = string.Empty;
+        }
     }
 }
