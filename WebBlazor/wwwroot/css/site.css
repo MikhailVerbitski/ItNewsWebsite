@@ -1,7 +1,7 @@
 ﻿/*@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');*/
 
-body{
-    background-color: dimgray;
+body {
+    background-color: #C1BBA8;
 }
 p{
     margin:0px;
@@ -12,17 +12,18 @@ p{
 .grid-main {
     display: grid;
     grid-template-columns: 1fr 20fr 1fr;
-    grid-template-rows: 5vh 100%;
+    grid-template-rows: 5vh 90vh;
     grid-row-gap: 50px;
 }
 #navbar {
-    grid-column-start: 2;
-    grid-column-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 4;
     position: sticky;
     top: 0;
-    background-color: #FAFAFB;
+    background-color: #EFE7CC;
     border-radius: 0 0 10px 10px;
     box-shadow: 0 0 10px black;
+    padding-left: 5px;
 }
 #mainBody {
     grid-row-start: 2;
@@ -49,7 +50,7 @@ p{
 
 .grid-content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr) minmax(320px, 2fr) minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr) minmax(320px, 3fr));
     grid-column-gap: 4vh;
     height: 100%;
 }
@@ -81,6 +82,11 @@ p{
     grid-template-columns: auto 1fr auto;
 }
 
+.grid-userMini-search {
+    display: grid;
+    grid-template-columns: 100px auto;
+    grid-template-rows: auto;
+}
 
 #grid-tag {
     display: grid;
@@ -108,7 +114,7 @@ p{
 
 
 .contentDivs {
-    background-color: white;
+    background-color: #F0F4F3;
     border-radius: 15px 15px 0 0;
     box-shadow: 0 0 5px white;
 }
@@ -141,7 +147,7 @@ p{
 
 
 #container-posts {
-    padding: 10px;
+    padding: 20px 30px 0 30px;
 }
 
 #container-post {
@@ -271,3 +277,9 @@ height: 14px;
 label, input, select, textarea{
     width: 100%;
 }
+
+#keywords {
+    height: 16vh;
+    z-index: inherit;
+}
+

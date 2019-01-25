@@ -1,40 +1,40 @@
-﻿    @page "/Registration"
-    @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
-    @inject HttpClient Http
+﻿@page "/Registration"
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject HttpClient Http
 
 
-    <h1>Registration</h1>
-    <form class="pure-form pure-form-stacked">
-        <fieldset>
+<h1>Registration</h1>
+<div class="pure-form pure-form-stacked">
+    <fieldset>
 
-            <label for="email">Email</label>
-            <input id="email" type="email" placeholder="Email" bind="@Email"/>
-            <span class="pure-form-message">This is a required field.</span>
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="Email" bind="@Email"/>
+        <span class="pure-form-message">This is a required field.</span>
 
-            <label for="password">Password</label>
-            <input id="password" type="password" placeholder="Password" bind="@Password"/>
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Password" bind="@Password"/>
         
-            <label for="remember" class="pure-checkbox">
-                <input id="remember" type="checkbox"> Remember me
-            </label>
+        <label for="remember" class="pure-checkbox">
+            <input id="remember" type="checkbox"> Remember me
+        </label>
 
-            <button type="submit" onclick="@SubmitForm" class="pure-button pure-button-primary">Register</button>
-        </fieldset>
-    </form>
+        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Login</button>
+    </fieldset>
+</div>
 
-    @functions{
-        public string Email { get; set; } = "";
-        public string Password { get; set; } = "";
+@functions{
+    public string Email { get; set; } = "";
+    public string Password { get; set; } = "";
 
-        private async Task SubmitForm()
+    private async Task SubmitForm()
+    {
+        WebBlazor.Models.ViewModels.TokenViewModel tokenViewModel = new Models.ViewModels.TokenViewModel
         {
-            WebBlazor.Models.ViewModels.TokenViewModel tokenViewModel = new Models.ViewModels.TokenViewModel
-            {
-                Email = Email,
-                Password = Password
-            };
-            var response = await Http.PostJsonAsync<object>("https://localhost:44328/api/Token/Registration", tokenViewModel);
-            Console.WriteLine(response.ToString());
-            UriHelper.NavigateTo("/Login");
-        }
+            Email = Email,
+            Password = Password
+        };
+        var response = await Http.PostJsonAsync<object>("/api/Token/Registration", tokenViewModel);
+        Console.WriteLine(response.ToString());
+        UriHelper.NavigateTo("/Login");
     }
+}

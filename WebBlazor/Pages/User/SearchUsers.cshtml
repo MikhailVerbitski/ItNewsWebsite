@@ -1,0 +1,53 @@
+﻿@page "/SearchUsers/"
+@page "/SearchUsers/{property}"
+@layout ContentLayout
+@using WebBlazor.Models.ViewModels.User
+@inject HttpClient Http
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+
+
+<div id="container-posts">
+    <div>
+        <label for="property">Property:</label>
+        <input id="property" bind="@property" />
+        <button onclick="@Search">Search</button>
+    </div>
+    @if (ListOfUserMiniViewModels != null)
+    {
+        <ListViewTemplate Items="@ListOfUserMiniViewModels">
+            <ItemTemplate>
+                <div class="grid-userMini-search">
+                    <img src="@context.Avatar" class="userMiniImg" asp-append-version="true" height="100" width="100" />
+                    <div>
+                        <p><a><font size="3">(<font color="@context.RoleColor">@context.Role</font>) @context.FirstName @context.LastName</font></a></p>
+                        <p>Ratin - @context.CountOfLikes</p>
+                    </div>
+                </div>
+                <br />
+                <hr />
+                <br />
+                <br />
+            </ItemTemplate>
+        </ListViewTemplate>
+    }
+</div>
+
+
+@functions{
+    [Parameter] private string property { get; set; }
+    private List<UserMiniViewModel> ListOfUserMiniViewModels { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        if (property != "")
+        {
+            var users = await Http.GetJsonAsync<IEnumerable<UserMiniViewModel>>($"/api/User/GetUserByProperty?property={property}");
+            ListOfUserMiniViewModels = users.ToList();
+        }
+        property = string.Empty;
+    }
+    private void Search()
+    {
+        UriHelper.NavigateTo($"/SearchUsers/{property}");
+    }
+}

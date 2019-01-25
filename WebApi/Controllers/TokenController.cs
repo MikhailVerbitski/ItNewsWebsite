@@ -28,7 +28,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("[action]")]
-        [Route("api/Token/Registration")]
+        [Route("/api/Token/Registration")]
         public async Task<IActionResult> Registration([FromBody] TokenViewModel tokenViewModel)
         {
             if(!ModelState.IsValid)
@@ -48,7 +48,7 @@ namespace WebApi.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("api/Token/Login")]
+        [Route("/api/Token/Login")]
         public async Task<IActionResult> Login([FromBody] TokenViewModel tokenViewModel)
         {
             if (!ModelState.IsValid)

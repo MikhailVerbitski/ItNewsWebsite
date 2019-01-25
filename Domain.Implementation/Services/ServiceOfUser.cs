@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Domain.Implementation.Services
@@ -43,6 +46,24 @@ namespace Domain.Implementation.Services
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
+        }
+
+        public IEnumerable<UserMiniViewModel> GetUserByProperty(string propetry)
+        {
+            return GetUsers(a => a.FirstName.Contains(propetry) || a.LastName.Contains(propetry) || a.UserName.Contains(propetry));
+        }
+
+        public IEnumerable<UserMiniViewModel> GetUsers(params Expression<Func<ApplicationUserEntity, bool>>[] properties)
+        {
+            var users = repositoryOfApplicationUser.ReadMany(null);
+            foreach (var item in properties)
+            {
+                users = users.Where(item.Compile());
+            }
+            var userMiniViewModels = users
+                .Select(a => GetUserMiniViewModel(a))
+                .ToList();
+            return userMiniViewModels;
         }
 
         public async void EditUser(string applicationUserIdCurrent, UserEditViewModel userEditViewModel)

@@ -1,19 +1,37 @@
 ﻿@inherits BlazorLayoutComponent
+@using WebBlazor.Models.ViewModels.Tag
 @layout MainLayout
+@inject HttpClient Http
 
 
 <div class="grid-content">
     <div class="contentDivs">
-
+        <div id="keywords"></div>
+        <hr/>
     </div>
     <div class="contentDivs" id="posts">
         @Body
     </div>
-    <div class="contentDivs">
-
-    </div>
 </div>
 
-@functions{
 
+@functions{
+    protected async override Task OnAfterRenderAsync()
+    {
+        var tags = await Http.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
+        var tagsForCloud = tags.Select(a => new TagForCloud()
+        {
+            text = a.Name,
+            weight = a.CountOfUsage,
+            link = $"/PostsByTag/{a.Id}"
+        });
+        var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
+        await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
+    }
+    class TagForCloud
+    {
+        public string text { get; set; }
+        public long weight { get; set; }
+        public string link { get; set; }
+    }
 }

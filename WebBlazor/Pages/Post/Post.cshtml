@@ -29,9 +29,6 @@ else
         <div class="grid-cols-two">
             <UserMini User="@postViewModel.AuthorUserMiniViewModel" />
             <div>
-
-                @error
-
                 <span>Rating</span>
                 <ul class="rating clearfix">
                     <li class="current" style="width: @(PercentOfRating)%;" onclick="@(() => SetRating(1))"><span class="star1"></span></li>
@@ -72,8 +69,6 @@ else
     public List<string> Tags;
     public double PercentOfRating { get; set; }
     public string CommentContent { get; set; }
-
-    string error;
 
     protected override async Task OnInitAsync()
     {

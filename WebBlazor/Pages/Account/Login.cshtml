@@ -1,9 +1,10 @@
 ﻿@page "/Login"
+@using Blazor.Extensions.Storage;
 @inject HttpClient Http
-
+@inject LocalStorage localStorage
 
 <h1>Login</h1>
-<form class="pure-form pure-form-stacked">
+<div class="pure-form pure-form-stacked">
     <fieldset>
 
         <label for="email">Email</label>
@@ -17,15 +18,14 @@
             <input id="remember" type="checkbox"> Remember me
         </label>
 
-        <button type="submit" onclick="@SubmitForm" class="pure-button pure-button-primary">Register</button>
+        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Register</button>
     </fieldset>
-</form>
+</div>
 
 
 @functions{
     public string Email { get; set; } = "";
     public string Password { get; set; } = "";
-    public string Token { get; set; } = "";
 
     private async Task SubmitForm()
     {
@@ -34,7 +34,13 @@
             Email = Email,
             Password = Password
         };
-        var response = await Http.PostJsonAsync<object>("https://localhost:44328/api/Token/Login", tokenViewModel);
-        Console.WriteLine(response);
+        var result = await Http.PostJsonAsync<Token>("/api/Token/Login", tokenViewModel);
+        Console.WriteLine(result);
+        Console.WriteLine(result.token);
+        await localStorage.SetItem<string>("token", result.token);
+    }
+    class Token
+    {
+        public string token { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Implementation.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -90,6 +91,14 @@ namespace WebApi.Controllers
         {
             var currentUserId = temporaryUserId;//userManager.GetUserId(User);
             var posts = serviceOfPost.Get<PostViewModel>(currentUserId);
+            return Json(posts);
+        }
+        [HttpGet("[action]")]
+        [Route("ListPostsViewModelByTag")]
+        public JsonResult ListPostsViewModelByTag(int tagId)
+        {
+            var currentUserId = temporaryUserId;//userManager.GetUserId(User);
+            var posts = serviceOfPost.Get<PostViewModel>(currentUserId, a => a.Tags.Any(b => b.TagId == tagId));
             return Json(posts);
         }
         [HttpGet("[action]")]

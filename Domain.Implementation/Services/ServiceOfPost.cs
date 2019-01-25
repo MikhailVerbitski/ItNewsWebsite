@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Domain.Implementation.Services
 {
@@ -165,7 +166,23 @@ namespace Domain.Implementation.Services
                 .Select(a => serviceOfImage.CreateImageForPost(postId, a))
                 .ToList();
         }
-        
+
+        public IEnumerable<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, params Expression<Func<PostEntity, bool>>[] properties)
+            where TPostViewModel : class
+        {
+            var posts = repositoryOfPost.ReadMany(null,
+                    a => a.Tags,
+                    a => a.Comments,
+                    a => a.Section,
+                    a => a.UserProfile);
+            foreach (var item in properties)
+            {
+                posts = posts.Where(item.Compile());
+            }
+            var potsViewModels = posts.Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent) as TPostViewModel).ToList();
+            return potsViewModels;
+        }
+
         public IEnumerable<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, bool postIsFinished = true) 
             where TPostViewModel : class
         {

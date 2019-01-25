@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/PostsByTag/{Id:int}"
 @inject HttpClient Http
 @using WebBlazor.Models.ViewModels.Post
 
@@ -10,7 +10,7 @@
 else
 {
     <div id="container-posts">
-        <ListViewTemplate Items="@ListOfPosts">
+        <ListViewTemplate Items="ListOfPosts">
             <ItemTemplate>
                 <div>
                     <a href="/Post/@context.PostId"><h2>@context.Header</h2></a>
@@ -24,17 +24,18 @@ else
                 <br />
                 <br />
             </ItemTemplate>
-        </ListViewTemplate> 
+        </ListViewTemplate>
     </div>
 }
 
 
-@functions {
-    public string Path { get; set; } = $"https://localhost:44328/api/Post/ListPostsViewModel";
+@functions{
+    [Parameter] private int Id { get; set; }
     private List<PostViewModel> ListOfPosts;
 
-    protected override async Task OnInitAsync()
+    protected async override Task OnParametersSetAsync()
     {
-        ListOfPosts = await Http.GetJsonAsync<List<PostViewModel>>(Path);
+        ListOfPosts = await Http.GetJsonAsync<List<PostViewModel>>($"/api/Post/ListPostsViewModelByTag?tagId={Id}");
+        this.ShouldRender();
     }
 }
