@@ -7,11 +7,6 @@
 
 
 <div id="container-posts">
-    <div>
-        <label for="property">Property:</label>
-        <input id="property" bind="@property" />
-        <button onclick="@Search">Search</button>
-    </div>
     @if (ListOfUserMiniViewModels != null)
     {
         <ListViewTemplate Items="@ListOfUserMiniViewModels">
@@ -19,7 +14,7 @@
                 <div class="grid-userMini-search">
                     <img src="@context.Avatar" class="userMiniImg" asp-append-version="true" height="100" width="100" />
                     <div>
-                        <p><a><font size="3">(<font color="@context.RoleColor">@context.Role</font>) @context.FirstName @context.LastName</font></a></p>
+                        <p><a href="/UserPage/@(context.Login)"><font size="3">(<font color="@context.RoleColor">@context.Role</font>) @context.FirstName @context.LastName</font></a></p>
                         <p>Ratin - @context.CountOfLikes</p>
                     </div>
                 </div>

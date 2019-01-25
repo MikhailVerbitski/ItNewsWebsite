@@ -1,11 +1,16 @@
 ﻿@page "/"
 @inject HttpClient Http
 @using WebBlazor.Models.ViewModels.Post
+@using WebBlazor.Models
 
 
 @if (ListOfPosts == null)
 {
     <p><em>Loading...</em></p>
+}
+else if (ListOfPosts.Count() == 0)
+{
+    <p><em>Posts with such parameters no :(</em></p>
 }
 else
 {
@@ -13,18 +18,23 @@ else
         <ListViewTemplate Items="@ListOfPosts">
             <ItemTemplate>
                 <div>
-                    <a href="/Post/@context.PostId"><h2>@context.Header</h2></a>
-                    <p>Score: @context.Score</p>
+                    <div class="post-head">
+                        <a href="/Post/@context.PostId"><h3>@context.Header</h3></a>
+                        <span><StarsRating PercentOfRating="@(context.Score * 20)" PostId="@(context.PostId)" /></span>
+                    </div>
                     <span>@context.BriefDesctiption</span>
                 </div>
                 <br />
-                <UserMini User="@context.AuthorUserMiniViewModel" />
+                <div class="grid-cols-two">
+                    <UserMini User="@context.AuthorUserMiniViewModel" />
+                    <p class="container-date">@DateConverter.GetTime(context.Created)</p>
+                </div>
                 <br />
                 <hr />
                 <br />
                 <br />
             </ItemTemplate>
-        </ListViewTemplate> 
+        </ListViewTemplate>
     </div>
 }
 

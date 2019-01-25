@@ -1,0 +1,25 @@
+﻿@inject HttpClient Http
+
+
+<ul class="rating clearfix">
+    <li class="current" style="width: @(PercentOfRating)%;" onclick="@(() => SetRating(1))"><span class="star1"></span></li>
+    <li><span class="star2" onclick="@(() => SetRating(2))"></span></li>
+    <li><span class="star3" onclick="@(() => SetRating(3))"></span></li>
+    <li><span class="star4" onclick="@(() => SetRating(4))"></span></li>
+    <li><span class="star5" onclick="@(() => SetRating(5))"></span></li>
+</ul>
+
+
+@functions{
+    [Parameter] double PercentOfRating { get; set; }
+    [Parameter] int PostId { get; set; }
+    [Parameter] bool CanChange { get; set; } = false;
+
+    private async Task SetRating(int score)
+    {
+        if (CanChange)
+        {
+            PercentOfRating = 20 * await Http.GetJsonAsync<double>($"/api/Post/PutEstimate?postId={PostId}&score={score}");
+        }
+    }
+}

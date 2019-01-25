@@ -55,7 +55,16 @@ namespace Domain.Implementation.Services
             });
             return imageEntity;
         }
-
+        public void AddImage(int postId, params IFormFile[] images)
+        {
+            if (images.Length == 0)
+            {
+                return;
+            }
+            var imageEntities = images
+                .Select(a => CreateImageForPost(postId, a))
+                .ToList();
+        }
         public void Delete(string path)
         {
             if(File.Exists(path))

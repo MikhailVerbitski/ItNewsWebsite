@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Web.Controllers
@@ -62,8 +63,7 @@ namespace Web.Controllers
         [HttpPost]
         public IActionResult CreatePost(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
         {
-            serviceOfPost.Update(postCreateEditViewModel);
-            serviceOfPost.AddImage(postCreateEditViewModel.PostId, images);
+            serviceOfPost.Update(postCreateEditViewModel, images);
             return View();
         }
 
@@ -97,12 +97,14 @@ namespace Web.Controllers
 
         public IActionResult ListPostsViewModel()
         {
+            var start = Stopwatch.StartNew();
             var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User));
+            start.Stop();
             return View(posts);
         }
         public IActionResult ListNotFinishedPostsViewModel()
         {
-            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), false);
+            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), a => a.IsFinished == false);
             return View(posts);
         }
 
@@ -113,7 +115,7 @@ namespace Web.Controllers
         }
         public IActionResult ListNotFinishedPostsMiniViewModel()
         {
-            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User), false);
+            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User), a => a.IsFinished == false);
             return View(posts);
         }
 

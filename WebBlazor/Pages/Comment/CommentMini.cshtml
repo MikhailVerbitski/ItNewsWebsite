@@ -1,0 +1,20 @@
+﻿@using WebBlazor.Models.ViewModels.Comment
+@using WebBlazor.Models
+
+<a href="/Post/@comment.PostId"><h3>@comment.PostHeader</h3></a>
+<br />
+<div style="word-wrap: break-word;">
+    @comment.Content
+</div>
+<br />
+<div class="grid-comment-footer">
+    <p class="container-date">@DateConverter.GetTime(comment.Created)</p>
+    <div></div>
+    <p>@comment.CountOfLikes</p>
+</div>
+<hr />
+<br />
+
+@functions{
+    [Parameter] private CommentMiniViewModel comment { get; set; }
+}

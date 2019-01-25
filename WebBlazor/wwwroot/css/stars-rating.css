@@ -1,0 +1,64 @@
+﻿.rating li span[class*="star"]:hover {
+    left: 0;
+    z-index: 2;
+    background: url(../img/rating-star2.png) left bottom;
+}
+
+.rating li span.star1 {
+    left: 0;
+}
+
+.rating li span.star1:hover {
+    width: 17px;
+}
+
+.rating li span.star2 {
+    left: 17px;
+}
+
+.rating li span.star2:hover {
+    width: 34px;
+}
+
+.rating li span.star3 {
+    left: 34px;
+}
+
+.rating li span.star3:hover {
+    width: 51px;
+}
+
+.rating li span.star4 {
+    left: 51px;
+}
+
+.rating li span.star4:hover {
+    width: 68px;
+}
+
+.rating li span.star5 {
+    left: 68px;
+}
+
+.rating li span.star5:hover {
+    width: 85px;
+}
+
+.rating li {
+    float: left;
+    height: 14px;
+}
+
+.rating li.current {
+    z-index: 1;
+    background: url(../img/rating-star2.png) left bottom;
+}
+
+.rating li span[class*="star"] {
+    position: absolute;
+    z-index: 5;
+    display: block;
+    width: 17px;
+    height: 14px;
+    cursor: pointer;
+}

@@ -1,4 +1,5 @@
-﻿using WebBlazor.Models.ViewModels.User;
+﻿using System;
+using WebBlazor.Models.ViewModels.User;
 
 namespace WebBlazor.Models.ViewModels.Post
 {
@@ -13,5 +14,7 @@ namespace WebBlazor.Models.ViewModels.Post
         public virtual UserMiniViewModel AuthorUserMiniViewModel { get; set; }
 
         public string BriefDesctiption { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

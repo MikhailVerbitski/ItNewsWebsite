@@ -1,0 +1,21 @@
+﻿@using WebBlazor.Models.ViewModels.Post
+@using WebBlazor.Models
+
+<div class="post-head">
+    <a href="/Post/@post.PostId"><h3>@post.Header</h3></a>
+    <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" /></span>
+</div>
+<p>@post.BriefDesctiption</p>
+<br />
+<div class="grid-comment-footer">
+    <p class="container-date">@DateConverter.GetTime(post.Created)</p>
+    <div></div>
+    <div></div>
+</div>
+<hr />
+<br />
+
+
+@functions{
+    [Parameter] PostMiniViewModel post { get; set; }
+}

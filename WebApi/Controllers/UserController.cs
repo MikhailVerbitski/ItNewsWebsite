@@ -49,11 +49,19 @@ namespace WebApi.Controllers
             //serviceOfComment = new ServiceOfComment(context, mapper);
             serviceOfTag = new ServiceOfTag(context, mapper);
         }
+
+
         [HttpGet("/api/User/GetUserByProperty")]
         public JsonResult GetUserByProperty(string property)
         {
             var users = serviceOfUser.GetUserByProperty(property);
             return Json(users);
+        }
+        [HttpGet("/api/User/GetUserViewModel")]
+        public JsonResult GetUserViewModel(string login)
+        {
+            var user = serviceOfUser.GetUserViewModel(login);
+            return Json(user);
         }
     }
 }

@@ -65,7 +65,7 @@ namespace Domain.Implementation.Services
         }
 
 
-        public void Update(PostCreateEditViewModel postCreateEditViewModel)
+        public void Update(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
         {
             var postEntity = mapper.Map<PostCreateEditViewModel, PostEntity>(postCreateEditViewModel);
             var lastPostEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId,
@@ -108,6 +108,8 @@ namespace Domain.Implementation.Services
                 }));
             postEntity.Tags = newPostTags;
             repositoryOfPost.Update(postEntity);
+
+            serviceOfImage.AddImage(postCreateEditViewModel.PostId, images);
         }
         
         public int Create(string applicationUserIdCurrent, PostCreateEditViewModel postCreateEditViewModel)
@@ -156,19 +158,9 @@ namespace Domain.Implementation.Services
             return postEntity.Id;
         }
 
-        public void AddImage(int postId, params IFormFile[] images)
-        {
-            if(images.Length == 0)
-            {
-                return;
-            }
-            var imageEntities = images
-                .Select(a => serviceOfImage.CreateImageForPost(postId, a))
-                .ToList();
-        }
 
-        public IEnumerable<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, params Expression<Func<PostEntity, bool>>[] properties)
-            where TPostViewModel : class
+        public IEnumerable<BasePostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, params Expression<Func<PostEntity, bool>>[] properties)
+            where TPostViewModel : BasePostViewModel
         {
             var posts = repositoryOfPost.ReadMany(null,
                     a => a.Tags,
@@ -179,24 +171,15 @@ namespace Domain.Implementation.Services
             {
                 posts = posts.Where(item.Compile());
             }
-            var potsViewModels = posts.Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent) as TPostViewModel).ToList();
-            return potsViewModels;
+            return posts
+                .Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent) as TPostViewModel)
+                .OrderBy(a => a.Created)
+                .Reverse()
+                .AsParallel()
+                .ToList();
         }
 
-        public IEnumerable<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, bool postIsFinished = true) 
-            where TPostViewModel : class
-        {
-            var posts = repositoryOfPost.ReadMany(null, 
-                    a => a.Tags, 
-                    a => a.Comments, 
-                    a => a.Section, 
-                    a => a.UserProfile);
-            posts = posts.Where(a => a.IsFinished == postIsFinished);
-            var potsViewModels = posts.Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent) as TPostViewModel).ToList();
-            return potsViewModels;
-        }
-
-        public TPostViewModel Get<TPostViewModel>(string applicationUserIdCurrent, int postId) where TPostViewModel : class
+        public BasePostViewModel Get<TPostViewModel>(string applicationUserIdCurrent, int postId) where TPostViewModel : BasePostViewModel
         {
             var postEntity = repositoryOfPost.Read(a => a.Id == postId, 
                 a => a.Tags, 
@@ -206,27 +189,7 @@ namespace Domain.Implementation.Services
             var postViewModel = GetViewModelWithProperty<TPostViewModel>(postEntity, applicationUserIdCurrent);
             return postViewModel as TPostViewModel;
         }
-        public double RatingPost(string applicationUserId, int postId, byte score)
-        {
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            var lastPostRating = repositoryOfPostRating.Read(a => a.PostId == postId && a.UserProfileId == applicationUser.UserProfileId);
-            if (lastPostRating == null)
-            {
-                var postRatingEntity = new PostRatingEntity();
-                postRatingEntity.PostId = postId;
-                postRatingEntity.UserProfileId = applicationUser.UserProfileId;
-                postRatingEntity.Score = score;
-                repositoryOfPostRating.Create(postRatingEntity);
-            }
-            else
-            {
-                lastPostRating.Score = score;
-                repositoryOfPostRating.Update(lastPostRating);
-            }
-            var post = repositoryOfPost.Read(a => a.Id == postId);
-            return (post.SumOfScore / (double)post.CountOfScore);
-        }
-
+        
         private PostCreateEditViewModel GetPostCreateEditViewModel(PostEntity postEntity, string applicationUserIdCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostCreateEditViewModel>(postEntity);
@@ -267,7 +230,28 @@ namespace Domain.Implementation.Services
             postEntity.Images.ToList().ForEach(a => File.Delete(a.Path));
             repositoryOfPost.Delete(postEntity);
         }
-
+        public double RatingPost(string applicationUserId, int postId, byte score)
+        {
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
+            var lastPostRating = repositoryOfPostRating.Read(a => a.PostId == postId && a.UserProfileId == applicationUser.UserProfileId);
+            var postRatingEntity = new PostRatingEntity()
+            {
+                PostId = postId,
+                UserProfileId = applicationUser.UserProfileId,
+                Score = score
+            };
+            if (lastPostRating == null)
+            {
+                repositoryOfPostRating.Create(postRatingEntity);
+            }
+            else
+            {
+                postRatingEntity.Id = lastPostRating.Id;
+                repositoryOfPostRating.Update(postRatingEntity);
+            }
+            var post = repositoryOfPost.Read(a => a.Id == postId);
+            return (post.SumOfScore / (double)post.CountOfScore);
+        }
         private int GetRatin(PostEntity postEntity, int UserProfileId)
         {
             var postRating = repositoryOfPostRating.Read(a => a.PostId == postEntity.Id && a.UserProfileId == UserProfileId);

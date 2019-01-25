@@ -3,7 +3,7 @@
 <div class="grid-userMini">
     <img src="@User.Avatar" class="userMiniImg" asp-append-version="true" height="50" width="50" />
     <div>
-        <p><a><font size="3">(<font color="@User.RoleColor">@User.Role</font>) @User.FirstName @User.LastName</font></a></p>
+        <p><a href="/UserPage/@(User.Login)"><font size="3">(<font color="@User.RoleColor">@User.Role</font>) @User.FirstName @User.LastName</font></a></p>
         <p>Ratin - @User.CountOfLikes</p>
     </div>
 </div>

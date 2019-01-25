@@ -1,4 +1,5 @@
-﻿using WebBlazor.Models.ViewModels.User;
+﻿using System;
+using WebBlazor.Models.ViewModels.User;
 
 namespace WebBlazor.Models.ViewModels.Comment
 {
@@ -13,5 +14,9 @@ namespace WebBlazor.Models.ViewModels.Comment
         public int CountOfLikes { get; set; }
 
         public int? PostId { get; set; }
+
+        public string PostHeader { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

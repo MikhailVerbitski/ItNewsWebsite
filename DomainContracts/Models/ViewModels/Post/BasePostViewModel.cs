@@ -1,4 +1,6 @@
-﻿namespace Domain.Contracts.Models.ViewModels.Post
+﻿using System;
+
+namespace Domain.Contracts.Models.ViewModels.Post
 {
     public class BasePostViewModel
     {
@@ -7,5 +9,7 @@
         public string Header { get; set; }
 
         public string BriefDesctiption { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

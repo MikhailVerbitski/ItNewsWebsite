@@ -23,6 +23,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Avatar, a => a.MapFrom(b => b.Avatar))
                 .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
                 .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
+                .ForMember(a => a.Login, a => a.MapFrom(b => b.UserName))
                 .ForMember(a => a.CountOfLikes, a => a.MapFrom(b => b.CountOfLikes))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<ApplicationUserEntity, UserViewModel>()
@@ -31,6 +32,9 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
                 .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
                 .ForMember(a => a.CountOfLikes, a => a.MapFrom(b => b.CountOfLikes))
+                .ForMember(a => a.Email, a => a.MapFrom(b => b.Email))
+                .ForMember(a => a.PhoneNumber, a => a.MapFrom(b => b.PhoneNumber))
+                .ForMember(a => a.Login, a => a.MapFrom(b => b.UserName))
                 .ForAllOtherMembers(a => a.Ignore());
 
             CreateMap<UserEditViewModel, ApplicationUserEntity>()
@@ -48,12 +52,16 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Id, a => a.MapFrom(b => b.ApplicationUserId))
                 .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
                 .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
+                .ForMember(a => a.UserName, a => a.MapFrom(b => b.Login))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<UserViewModel, ApplicationUserEntity>()
                 .ForMember(a => a.Avatar, a => a.MapFrom(b => b.Avatar))
                 .ForMember(a => a.Id, a => a.MapFrom(b => b.ApplicationUserId))
                 .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
                 .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
+                .ForMember(a => a.Email, a => a.MapFrom(b => b.Email))
+                .ForMember(a => a.PhoneNumber, a => a.MapFrom(b => b.PhoneNumber))
+                .ForMember(a => a.UserName, a => a.MapFrom(b => b.Login))
                 .ForAllOtherMembers(a => a.Ignore());
 
 

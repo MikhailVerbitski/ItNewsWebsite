@@ -1,7 +1,59 @@
 ﻿@page "/UserPage/{login}"
+@using WebBlazor.Models.ViewModels.User
+@inject HttpClient Http
 
+
+@if (User == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div id="grid-user-profile" class="contentDivs">
+        <div>
+            <p><a><h1>@User.FirstName @User.LastName</h1></a></p>
+            <br />
+            <div id="grid-user-profile-userData">
+                <font size="5" color="@User.RoleColor">Role:</font>
+                <font size="5" color="@User.RoleColor">@User.Role</font>
+                <font size="5">Count of likes:</font>
+                <font size="5">@User.CountOfLikes</font>
+                <font size="5">Phone number:</font>
+                <font size="5">@User.PhoneNumber</font>
+                <font size="5">Login:</font>
+                <font size="5">@User.Login</font>
+            </div>
+        </div>
+        <div class="scrollbox">
+            <h2>Posts</h2>
+            <hr />
+            <br />
+            <ListViewTemplate Items="User.Posts.ToList()">
+                <ItemTemplate>
+                    <PostMini post="@context" />
+                </ItemTemplate>
+            </ListViewTemplate>
+        </div>
+        <div class="scrollbox">
+            <h2>Comments</h2>
+            <hr/>
+            <br />
+            <ListViewTemplate Items="User.Comments.ToList()">
+                <ItemTemplate>
+                    <CommentMini comment="@context" />
+                </ItemTemplate>
+            </ListViewTemplate>
+        </div>
+    </div>
+}
 
 
 @functions{
     [Parameter] private string login { get; set; }
+    private UserViewModel User { get; set; }
+
+    protected async override Task OnInitAsync()
+    {
+        User = await Http.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?login={login}");
+    }
 }

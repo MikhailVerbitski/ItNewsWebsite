@@ -18,6 +18,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
                 .ForMember(a => a.PostId, a => a.MapFrom(b => b.PostId))
                 .ForMember(a => a.CountOfLikes, a => a.MapFrom(b => b.CountOfLikes))
+                .ForMember(a => a.Created, a => a.MapFrom(b => b.Created))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<CommentEntity, CommentViewModel>()
                 .ForMember(a => a.CommentId, a => a.MapFrom(b => b.Id))
@@ -43,7 +44,6 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.PostId, a => a.MapFrom(b => b.PostId))
                 .ForMember(a => a.CountOfLikes, a => a.MapFrom(b => b.CountOfLikes))
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
-                .ForMember(a => a.Created, a => a.MapFrom(b => b.Created))
                 .ForAllOtherMembers(a => a.Ignore());
         }
     }

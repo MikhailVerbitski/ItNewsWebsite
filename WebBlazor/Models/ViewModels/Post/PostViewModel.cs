@@ -1,6 +1,7 @@
 ﻿using WebBlazor.Models.ViewModels.Comment;
 using WebBlazor.Models.ViewModels.User;
 using System.Collections.Generic;
+using System;
 
 namespace WebBlazor.Models.ViewModels.Post
 {
@@ -29,5 +30,7 @@ namespace WebBlazor.Models.ViewModels.Post
         public IEnumerable<string> Images { get; set; }
 
         public IEnumerable<CommentViewModel> Comments { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

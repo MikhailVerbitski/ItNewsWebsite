@@ -16,10 +16,20 @@ namespace WebBlazor.Models.ViewModels.User
 
         public string Role { get; set; }
 
+        public string RoleColor { get; set; }
+
+        public int CountOfLikes { get; set; }
+
+        public string Email { get; set; }
+
+        public string PhoneNumber { get; set; }
+
+        public string Login { get; set; }
+
+        public string Password { get; set; }
+
         public virtual IEnumerable<PostMiniViewModel> Posts { get; set; }
 
         public virtual IEnumerable<CommentMiniViewModel> Comments { get; set; }
-
-        public int CountOfLikes { get; set; }
     }
 }

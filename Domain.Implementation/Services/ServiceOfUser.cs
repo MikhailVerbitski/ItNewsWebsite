@@ -2,6 +2,8 @@
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
+using Domain.Contracts.Models.ViewModels.Comment;
+using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -22,7 +24,8 @@ namespace Domain.Implementation.Services
         private readonly UserManager<ApplicationUserEntity> userManager;
 
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
-        //private readonly RepositoryOfUserProfile repositoryOfUserProfile;
+        private readonly RepositoryOfUserProfile repositoryOfUserProfile;
+        private readonly RepositoryOfPost repositoryOfPost;
         //private readonly RepositoryOfIdentityUserRole repositoryOfRole;
 
         private readonly ServiceOfImage serviceOfImage;
@@ -41,7 +44,8 @@ namespace Domain.Implementation.Services
             this.userManager = userManager;
 
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            //repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            repositoryOfPost = new RepositoryOfPost(context);
             //repositoryOfRole = new RepositoryOfIdentityUserRole(context);
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
@@ -125,11 +129,41 @@ namespace Domain.Implementation.Services
 
         public UserMiniViewModel GetUserMiniViewModel(ApplicationUserEntity applicationUserPost)
         {
-            UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserPost);
+            var userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserPost);
             var role = GetUserRole(applicationUserPost).Result;
             userMiniViewModel.Role = role.Item1;
             userMiniViewModel.RoleColor = role.Item2;
             return userMiniViewModel;
+        }
+
+        public UserViewModel GetUserViewModel(string login)
+        {
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.UserName == login);
+            var userProfile = repositoryOfUserProfile.Read(a => a.Id == applicationUser.UserProfileId.Value,
+                a => a.Posts,
+                a => a.Comments);
+            var userViewModel = mapper.Map<ApplicationUserEntity, UserViewModel>(applicationUser);
+            var role = GetUserRole(applicationUser).Result;
+            userViewModel.Role = role.Item1;
+            userViewModel.RoleColor = role.Item2;
+
+            var userMiniViewModel = GetUserMiniViewModel(applicationUser);
+            var commentMiniViewModels = userProfile.Comments.Select(a =>
+            {
+                var comment = mapper.Map<CommentEntity, CommentMiniViewModel>(a);
+                comment.AuthorUserMiniViewModel = userMiniViewModel;
+                comment.PostHeader = repositoryOfPost.Read(b => b.Id == comment.PostId).Header;
+                return comment;
+            });
+            userViewModel.Comments = commentMiniViewModels.ToList();
+            var postMiniViewModels = userProfile.Posts.Select(a =>
+            {
+                var post = mapper.Map<PostEntity, PostMiniViewModel>(a);
+                post.AuthorUserMiniViewModel = userMiniViewModel;
+                return post;
+            });
+            userViewModel.Posts = postMiniViewModels.ToList();
+            return userViewModel;
         }
     }
 }

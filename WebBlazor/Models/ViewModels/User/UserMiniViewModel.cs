@@ -15,5 +15,7 @@
         public string RoleColor { get; set; }
 
         public int CountOfLikes { get; set; }
+
+        public string Login { get; set; }
     }
 }

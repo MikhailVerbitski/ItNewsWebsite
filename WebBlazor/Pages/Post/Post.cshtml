@@ -30,13 +30,7 @@ else
             <UserMini User="@postViewModel.AuthorUserMiniViewModel" />
             <div>
                 <span>Rating</span>
-                <ul class="rating clearfix">
-                    <li class="current" style="width: @(PercentOfRating)%;" onclick="@(() => SetRating(1))"><span class="star1"></span></li>
-                    <li><span class="star2" onclick="@(() => SetRating(2))"></span></li>
-                    <li><span class="star3" onclick="@(() => SetRating(3))"></span></li>
-                    <li><span class="star4" onclick="@(() => SetRating(4))"></span></li>
-                    <li><span class="star5" onclick="@(() => SetRating(5))"></span></li>
-                </ul>
+                <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@true"/>
             </div>
         </div>
         <br />
@@ -62,20 +56,16 @@ else
 @functions{
     [Parameter] private int Id { get; set; }
 
-    public string PathPostController { get; set; } = "https://localhost:44328/api/Post";
-
     public PostViewModel postViewModel;
     public List<CommentViewModel> comments;
     public List<string> Tags;
-    public double PercentOfRating { get; set; }
     public string CommentContent { get; set; }
 
     protected override async Task OnInitAsync()
     {
-        postViewModel = await Http.GetJsonAsync<PostViewModel>($"{PathPostController}/PostViewModel?postId={Id}");
+        postViewModel = await Http.GetJsonAsync<PostViewModel>($"/api/Post/PostViewModel?postId={Id}");
         comments = postViewModel.Comments.ToList();
         Tags = postViewModel.Tags.ToList();
-        PercentOfRating = postViewModel.Score * 20;
     }
 
     private async Task SubmitCommentForm()
@@ -88,10 +78,6 @@ else
         var newComment = await Http.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
         comments.Add(newComment);
         CommentContent = string.Empty;
-    }
-    private async Task SetRating(int score)
-    {
-        PercentOfRating = 20 * await Http.GetJsonAsync<double>($"{PathPostController}/PutEstimate?postId={postViewModel.PostId}&score={score}");
     }
     private void Update()
     {

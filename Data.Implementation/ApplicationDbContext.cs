@@ -32,16 +32,28 @@ namespace Data.Implementation
             });
 
 
-            var sectionsName = new string[] { "Java", "C#", "C++", "Algorithms", "Machine Learning" };
+            var sectionNames = new string[] { "Java", "C#", "C++", "Algorithms", "Machine Learning" };
             var sections = Enumerable
-                .Range(0, sectionsName.Length)
+                .Range(0, sectionNames.Length)
                 .Select(a => new SectionEntity()
                 {
                     Id = a + 1,
-                    Name = sectionsName[a]
+                    Name = sectionNames[a]
                 })
-            .ToArray();
+                .ToArray();
             builder.Entity<SectionEntity>().HasData(sections);
+
+
+            var tagNames = new string[] { "News", "Tutorial", "Update", "Report", "Microsoft" };
+            var tags = Enumerable
+                .Range(0, tagNames.Length)
+                .Select(a => new TagEntity()
+                {
+                    Id = a + 1,
+                    Name = tagNames[a],
+                })
+                .ToArray();
+            builder.Entity<TagEntity>().HasData(tags);
 
 
             var ApplicationUser = builder.Entity<ApplicationUserEntity>();

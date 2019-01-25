@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -69,8 +70,7 @@ namespace WebApi.Controllers
             serviceOfPost.Create(userId, postCreateEditViewModel);
             //serviceOfPost.AddImage(postCreateEditViewModel.PostId, images);
         }
-        [HttpGet("[action]")]
-        [Route("PutEstimate")]
+        [HttpGet("/api/Post/PutEstimate")]
         public JsonResult PutEstimate(int postId, byte score)
         {
             var currentUserId = temporaryUserId;//userManager.GetUserId(User);
