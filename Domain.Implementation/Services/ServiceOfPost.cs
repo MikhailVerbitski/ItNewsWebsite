@@ -4,7 +4,6 @@ using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
-using Domain.Contracts.Models.ViewModels.Tag;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -23,8 +22,6 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfPost repositoryOfPost;
         private readonly RepositoryOfPostRating repositoryOfPostRating;
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
-        private readonly RepositoryOfTag repositoryOfTag;
-        private readonly RepositoryOfPostTag repositoryOfPostTag;
         private readonly RepositoryOfSection repositoryOfSection;
 
         private readonly ServiceOfComment serviceOfComment;
@@ -47,8 +44,6 @@ namespace Domain.Implementation.Services
             repositoryOfPost = new RepositoryOfPost(context);
             repositoryOfPostRating = new RepositoryOfPostRating(context);
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            repositoryOfTag = new RepositoryOfTag(context);
-            repositoryOfPostTag = new RepositoryOfPostTag(context);
             repositoryOfSection = new RepositoryOfSection(context);
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
@@ -59,11 +54,11 @@ namespace Domain.Implementation.Services
             Config = new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>[]
             {
                 new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostCreateEditViewModel), GetPostCreateEditViewModel),
+                new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostCompactViewModel), GetPostCompactViewModel),
                 new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostMiniViewModel), GetPostMiniViewModel),
                 new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostViewModel), GetPostViewModel)
             };
         }
-
 
         public void Update(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
         {
@@ -71,59 +66,22 @@ namespace Domain.Implementation.Services
             var lastPostEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId,
                 a => a.Tags
             );
-
             if (postCreateEditViewModel.Section != null)
             {
                 var section = repositoryOfSection.Read(a => a.Name == postCreateEditViewModel.Section);
                 postEntity.Section = section;
                 postEntity.SectionId = section.Id;
             }
-            var postTagEntities = postCreateEditViewModel
-                .Tags
-                .Select(a =>
-                {
-                    var tag = mapper.Map<TagViewModel, TagEntity>(a);
-                    if (tag.Id == 0)
-                    {
-                        tag = repositoryOfTag.Create(new TagEntity() { Name = a.Name });
-                    }
-                    return tag;
-                });
-            lastPostEntity
-                .Tags
-                .Select(a => a.TagId.Value)
-                .Except(postTagEntities.Select(a => a.Id))
-                .Select(a => lastPostEntity.Tags.Single(b => b.Id == a))
-                .ToList()
-                .ForEach(a => repositoryOfPostTag.Delete(a));
-            var newPostTags = postTagEntities
-                .Select(a => a.Id)
-                .Except(lastPostEntity.Tags.Select(a => a.TagId.Value))
-                .Select(a => postTagEntities.Single(b => b.Id == a))
-                .Select(a => repositoryOfPostTag.Create(new PostTagEntity()
-                {
-                    PostId = postEntity.Id,
-                    TagId = a.Id,
-                    Tag = a,
-                }));
-            postEntity.Tags = newPostTags;
+            postEntity.Tags = serviceOfTag.TagsPostUpdate(postCreateEditViewModel.Tags, lastPostEntity.Tags, postCreateEditViewModel.PostId); ;
             repositoryOfPost.Update(postEntity);
-
             serviceOfImage.AddImage(postCreateEditViewModel.PostId, images);
         }
         
-        public int Create(string applicationUserIdCurrent, PostCreateEditViewModel postCreateEditViewModel)
+        public PostEntity Create(string applicationUserIdCurrent, PostCreateEditViewModel postCreateEditViewModel)
         {
-            PostEntity postEntity;
-
-            if(postCreateEditViewModel == null)
-            {
-                postEntity = new PostEntity();
-            }
-            else
-            {
-                postEntity = mapper.Map<PostCreateEditViewModel, PostEntity>(postCreateEditViewModel);
-            }
+            PostEntity postEntity = (postCreateEditViewModel == null)
+                ? new PostEntity()
+                : postEntity = mapper.Map<PostCreateEditViewModel, PostEntity>(postCreateEditViewModel);
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
             postEntity.UserProfileId = applicationUser.UserProfileId;
             if(postCreateEditViewModel != null && postCreateEditViewModel.Section != null)
@@ -132,52 +90,23 @@ namespace Domain.Implementation.Services
                 postEntity.Section = section;
                 postEntity.SectionId = section.Id;
             }
-
             postEntity = repositoryOfPost.Create(postEntity);
-
             if(postCreateEditViewModel != null && postCreateEditViewModel.Tags != null)
             {
-                postCreateEditViewModel
-                    .Tags
-                    .Select(a =>
-                    {
-                        var tag = mapper.Map<TagViewModel, TagEntity>(a);
-                        if (tag.Id == 0)
-                        {
-                            tag = repositoryOfTag.Create(new TagEntity() { Name = a.Name });
-                        }
-                        return tag;
-                    })
-                    .Select(a => repositoryOfPostTag.Create(new PostTagEntity()
-                    {
-                        PostId = postEntity.Id,
-                        TagId = a.Id,
-                        Tag = a,
-                    }));
+                postEntity.Tags = serviceOfTag.AddTagsPost(postCreateEditViewModel.Tags, postCreateEditViewModel.PostId);
             }
-            return postEntity.Id;
+            return postEntity;
         }
 
-
-        public IEnumerable<BasePostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, params Expression<Func<PostEntity, bool>>[] properties)
-            where TPostViewModel : BasePostViewModel
-        {
-            var posts = repositoryOfPost.ReadMany(null,
+        public IEnumerable<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, params Expression<Func<PostEntity, bool>>[] whereProperties)
+            where TPostViewModel : BasePostViewModel => repositoryOfPost.ReadMany(whereProperties,
                     a => a.Tags,
                     a => a.Comments,
                     a => a.Section,
-                    a => a.UserProfile);
-            foreach (var item in properties)
-            {
-                posts = posts.Where(item.Compile());
-            }
-            return posts
-                .Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent) as TPostViewModel)
-                .OrderBy(a => a.Created)
-                .Reverse()
-                .AsParallel()
-                .ToList();
-        }
+                    a => a.UserProfile)
+                    .Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent))
+                    .AsParallel()
+                    .ToList();
 
         public BasePostViewModel Get<TPostViewModel>(string applicationUserIdCurrent, int postId) where TPostViewModel : BasePostViewModel
         {
@@ -187,7 +116,7 @@ namespace Domain.Implementation.Services
                 a => a.Section, 
                 a => a.UserProfile);
             var postViewModel = GetViewModelWithProperty<TPostViewModel>(postEntity, applicationUserIdCurrent);
-            return postViewModel as TPostViewModel;
+            return postViewModel;
         }
         
         private PostCreateEditViewModel GetPostCreateEditViewModel(PostEntity postEntity, string applicationUserIdCurrent)
@@ -198,8 +127,14 @@ namespace Domain.Implementation.Services
         private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, string applicationUserIdCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostMiniViewModel>(postEntity);
-            var applicationUserPost = repositoryOfApplicationUser
-                .Read(a => a.UserProfileId == postEntity.UserProfileId);
+            var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
+            postViewModel.Score = GetRatin(postEntity, applicationUserPost.UserProfileId.Value);
+            return postViewModel;
+        }
+        private PostCompactViewModel GetPostCompactViewModel(PostEntity postEntity, string applicationUserIdCurrent)
+        {
+            var postViewModel = mapper.Map<PostEntity, PostCompactViewModel>(postEntity);
+            var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.Score = GetRatin(postEntity, applicationUserPost.UserProfileId.Value);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
             return postViewModel;
@@ -212,20 +147,20 @@ namespace Domain.Implementation.Services
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
             postViewModel.Score = GetRatin(postEntity, applicationUserPost.UserProfileId.Value);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
-            postViewModel.Comments = serviceOfComment.Get<CommentViewModel>(postEntity.Id, applicationUserIdCurrent); ;
+            postViewModel.Comments = serviceOfComment.Get<CommentViewModel>(postEntity.Id, applicationUserIdCurrent);
             return postViewModel;
         }
 
-        private BasePostViewModel GetViewModelWithProperty<TPostViewModel>(PostEntity postEntity, string applicationUserIdCurrent) =>
-            Config.Single(a => a.Item1 == typeof(TPostViewModel)).Item2(postEntity, applicationUserIdCurrent);
+        private TPostViewModel GetViewModelWithProperty<TPostViewModel>(PostEntity postEntity, string applicationUserIdCurrent)
+            where TPostViewModel : BasePostViewModel 
+            => Config.Single(a => a.Item1 == typeof(TPostViewModel)).Item2(postEntity, applicationUserIdCurrent) as TPostViewModel;
 
-        private void Delete<TPostViewModel>(TPostViewModel postViewModel)
+        private void Delete<TPostViewModel>(TPostViewModel postViewModel) where TPostViewModel: BaseCommentViewModel
         {
             var postEntity = mapper.Map<TPostViewModel, PostEntity>(postViewModel);
             if(postEntity.Images == null)
             {
-                int id = Convert.ToInt32(typeof(TPostViewModel).GetProperty("PostId").GetValue(postViewModel));
-                postEntity = repositoryOfPost.Read(a => a.Id == id, a => a.Images);
+                postEntity = repositoryOfPost.Read(a => a.Id == postEntity.Id, a => a.Images);
             }
             postEntity.Images.ToList().ForEach(a => File.Delete(a.Path));
             repositoryOfPost.Delete(postEntity);
@@ -255,11 +190,7 @@ namespace Domain.Implementation.Services
         private int GetRatin(PostEntity postEntity, int UserProfileId)
         {
             var postRating = repositoryOfPostRating.Read(a => a.PostId == postEntity.Id && a.UserProfileId == UserProfileId);
-            if (postRating != null)
-            {
-                return postRating.Score;
-            }
-            return -1;
+            return postRating != null ? postRating.Score : -1;
         }
     }
 }

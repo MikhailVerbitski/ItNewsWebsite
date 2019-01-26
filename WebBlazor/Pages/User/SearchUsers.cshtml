@@ -1,10 +1,8 @@
-﻿@page "/SearchUsers/"
-@page "/SearchUsers/{property}"
+﻿@page "/SearchUsers/{property}"
 @layout ContentLayout
 @using WebBlazor.Models.ViewModels.User
 @inject HttpClient Http
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
-
 
 <div id="container-posts">
     @if (ListOfUserMiniViewModels != null)
@@ -26,7 +24,6 @@
         </ListViewTemplate>
     }
 </div>
-
 
 @functions{
     [Parameter] private string property { get; set; }

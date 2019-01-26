@@ -88,8 +88,6 @@
         ServerTags = await Http.GetJsonAsync<IEnumerable<TagViewModel>>("api/Post/GetListOfTags");
         TagsForSelect = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
         TagsForDeselect = new List<TagViewModel>();
-
-        TagsForDeselect.Add(new TagViewModel() { Name = "fashdasgiofuaheroguaheruioaheriah" });
     }
     private async Task ClickCreatePost()
     {

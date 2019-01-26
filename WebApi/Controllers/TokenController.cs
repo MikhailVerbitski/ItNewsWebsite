@@ -8,8 +8,8 @@ using WebApi.Server.Interface;
 
 namespace WebApi.Controllers
 {
-    [Route("api/Token")]
     [ApiController]
+    [Route("api/Token/[action]")]
     public class TokenController : ControllerBase
     {
         private readonly IJwtTokenService _tokenService;
@@ -27,8 +27,7 @@ namespace WebApi.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPost("[action]")]
-        [Route("/api/Token/Registration")]
+        [HttpPost]
         public async Task<IActionResult> Registration([FromBody] TokenViewModel tokenViewModel)
         {
             if(!ModelState.IsValid)
@@ -48,7 +47,6 @@ namespace WebApi.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("/api/Token/Login")]
         public async Task<IActionResult> Login([FromBody] TokenViewModel tokenViewModel)
         {
             if (!ModelState.IsValid)

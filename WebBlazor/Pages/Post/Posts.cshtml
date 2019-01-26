@@ -1,7 +1,6 @@
 ﻿@page "/"
 @inject HttpClient Http
 @using WebBlazor.Models.ViewModels.Post
-@using WebBlazor.Models
 
 
 @if (ListOfPosts == null)
@@ -10,41 +9,24 @@
 }
 else if (ListOfPosts.Count() == 0)
 {
-    <p><em>Posts with such parameters no :(</em></p>
+    <p><em>Posts yet :(</em></p>
 }
 else
 {
     <div id="container-posts">
         <ListViewTemplate Items="@ListOfPosts">
             <ItemTemplate>
-                <div>
-                    <div class="post-head">
-                        <a href="/Post/@context.PostId"><h3>@context.Header</h3></a>
-                        <span><StarsRating PercentOfRating="@(context.Score * 20)" PostId="@(context.PostId)" /></span>
-                    </div>
-                    <span>@context.BriefDesctiption</span>
-                </div>
-                <br />
-                <div class="grid-cols-two">
-                    <UserMini User="@context.AuthorUserMiniViewModel" />
-                    <p class="container-date">@DateConverter.GetTime(context.Created)</p>
-                </div>
-                <br />
-                <hr />
-                <br />
-                <br />
+                <PostCompact post="@context" />
             </ItemTemplate>
         </ListViewTemplate>
     </div>
 }
 
-
 @functions {
-    public string Path { get; set; } = $"https://localhost:44328/api/Post/ListPostsViewModel";
-    private List<PostViewModel> ListOfPosts;
+    private List<PostCompactViewModel> ListOfPosts;
 
     protected override async Task OnInitAsync()
     {
-        ListOfPosts = await Http.GetJsonAsync<List<PostViewModel>>(Path);
+        ListOfPosts = await Http.GetJsonAsync<List<PostCompactViewModel>>("/api/Post/ListPostsCompactViewModel");
     }
 }

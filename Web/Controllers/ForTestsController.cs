@@ -56,7 +56,7 @@ namespace Web.Controllers
         public IActionResult CreatePost()
         {
             ViewData["Sections"] = serviceOfSection.Get();
-            var postId =  serviceOfPost.Create(userManager.GetUserId(User), null);
+            var postId =  serviceOfPost.Create(userManager.GetUserId(User), null).Id;
             var postCreateEditViewModel = serviceOfPost.Get<PostCreateEditViewModel>(userManager.GetUserId(User), postId);
             return View(postCreateEditViewModel);
         }

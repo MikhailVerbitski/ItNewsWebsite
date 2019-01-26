@@ -9,20 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {
-    [Route("api/Comment")]
-    
     [ApiController]
+    [Route("api/Comment/[action]")]
     public class CommentController : Controller
     {
         UserManager<ApplicationUserEntity> userManager;
-        //private readonly IMapper mapper;
-        //private readonly IHostingEnvironment hostingEnvironment;
-
-        //private readonly ServiceOfPost serviceOfPost;
-        //private readonly ServiceOfImage serviceOfImage;
-        //private readonly ServiceOfSection serviceOfSection;
-        //private readonly RoleManager<IdentityRole> roleManager;
-        //private readonly ServiceOfUser serviceOfUser;
         private readonly ServiceOfComment serviceOfComment;
 
         public CommentController(
@@ -34,14 +25,6 @@ namespace WebApi.Controllers
             )
         {
             this.userManager = userManager;
-            //this.mapper = mapper;
-            //this.hostingEnvironment = hostingEnvironment;
-            //this.roleManager = roleManager;
-
-            //serviceOfPost = new ServiceOfPost(context, mapper, hostingEnvironment);
-            //serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
-            //serviceOfSection = new ServiceOfSection(context, mapper);
-            //serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
             serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
         }
 
@@ -49,7 +32,7 @@ namespace WebApi.Controllers
         string temporaryUserId = "e46bc008-f20e-4a2b-b9ed-025135801130";
         //
 
-        [HttpPost("/api/Comment/CreateComment")]
+        [HttpPost]
         public JsonResult CreateComment([FromBody] CommentCreateEditViewModel commentViewModel)
         {
             var user = temporaryUserId;
@@ -57,16 +40,14 @@ namespace WebApi.Controllers
             return Json(newComment);
         }
 
-        [HttpGet("[action]")]
-        [Route("api/commetn/LikeComment")]
+        [HttpGet]
         public IActionResult LikeComment(int commentId, int postId)
         {
             var user = temporaryUserId;
             serviceOfComment.LikeComment(user, commentId);
             return Ok();
         }
-        [HttpGet("[action]")]
-        [Route("api/Comment/DislikeComment")]
+        [HttpGet]
         public IActionResult DislikeComment(int commentId, int postId)
         {
             var user = temporaryUserId;

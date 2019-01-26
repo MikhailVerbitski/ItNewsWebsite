@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -26,7 +25,6 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
         private readonly RepositoryOfPost repositoryOfPost;
-        //private readonly RepositoryOfIdentityUserRole repositoryOfRole;
 
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfAccount serviceOfAccount;
@@ -46,7 +44,6 @@ namespace Domain.Implementation.Services
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             repositoryOfUserProfile = new RepositoryOfUserProfile(context);
             repositoryOfPost = new RepositoryOfPost(context);
-            //repositoryOfRole = new RepositoryOfIdentityUserRole(context);
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
@@ -54,20 +51,15 @@ namespace Domain.Implementation.Services
 
         public IEnumerable<UserMiniViewModel> GetUserByProperty(string propetry)
         {
-            return GetUsers(a => a.FirstName.Contains(propetry) || a.LastName.Contains(propetry) || a.UserName.Contains(propetry));
+            return GetUsers(a => a.FirstName.Contains(propetry), a => a.LastName.Contains(propetry), a => a.UserName.Contains(propetry));
         }
 
-        public IEnumerable<UserMiniViewModel> GetUsers(params Expression<Func<ApplicationUserEntity, bool>>[] properties)
+        public IEnumerable<UserMiniViewModel> GetUsers(params Expression<Func<ApplicationUserEntity, bool>>[] whereProperties)
         {
-            var users = repositoryOfApplicationUser.ReadMany(null);
-            foreach (var item in properties)
-            {
-                users = users.Where(item.Compile());
-            }
-            var userMiniViewModels = users
+            return repositoryOfApplicationUser
+                .ReadMany(whereProperties)
                 .Select(a => GetUserMiniViewModel(a))
                 .ToList();
-            return userMiniViewModels;
         }
 
         public async void EditUser(string applicationUserIdCurrent, UserEditViewModel userEditViewModel)
@@ -156,13 +148,13 @@ namespace Domain.Implementation.Services
                 return comment;
             });
             userViewModel.Comments = commentMiniViewModels.ToList();
-            var postMiniViewModels = userProfile.Posts.Select(a =>
+            var postCompactViewModels = userProfile.Posts.Select(a =>
             {
-                var post = mapper.Map<PostEntity, PostMiniViewModel>(a);
+                var post = mapper.Map<PostEntity, PostCompactViewModel>(a);
                 post.AuthorUserMiniViewModel = userMiniViewModel;
                 return post;
             });
-            userViewModel.Posts = postMiniViewModels.ToList();
+            userViewModel.Posts = postCompactViewModels.ToList();
             return userViewModel;
         }
     }

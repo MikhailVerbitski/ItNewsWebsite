@@ -28,7 +28,7 @@ namespace Domain.Contracts.Models.ViewModels.User
 
         public string Password { get; set; }
 
-        public virtual IEnumerable<PostMiniViewModel> Posts { get; set; }
+        public virtual IEnumerable<PostCompactViewModel> Posts { get; set; }
 
         public virtual IEnumerable<CommentMiniViewModel> Comments { get; set; }
     }

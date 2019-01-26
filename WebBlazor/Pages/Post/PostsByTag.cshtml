@@ -7,35 +7,28 @@
 {
     <p><em>Loading...</em></p>
 }
+else if (ListOfPosts.Count() == 0)
+{
+    <p><em>Posts with such parameters no :(</em></p>
+}
 else
 {
     <div id="container-posts">
-        <ListViewTemplate Items="ListOfPosts">
+        <ListViewTemplate Items="@ListOfPosts">
             <ItemTemplate>
-                <div>
-                    <a href="/Post/@context.PostId"><h2>@context.Header</h2></a>
-                    <p>Score: @context.Score</p>
-                    <span>@context.BriefDesctiption</span>
-                </div>
-                <br />
-                <UserMini User="@context.AuthorUserMiniViewModel" />
-                <br />
-                <hr />
-                <br />
-                <br />
+                <PostCompact post="@context" />
             </ItemTemplate>
         </ListViewTemplate>
     </div>
 }
 
-
-@functions{
+@functions {
     [Parameter] private int Id { get; set; }
-    private List<PostViewModel> ListOfPosts;
+    private List<PostCompactViewModel> ListOfPosts;
 
     protected async override Task OnParametersSetAsync()
     {
-        ListOfPosts = await Http.GetJsonAsync<List<PostViewModel>>($"/api/Post/ListPostsViewModelByTag?tagId={Id}");
+        ListOfPosts = await Http.GetJsonAsync<List<PostCompactViewModel>>($"/api/Post/ListPostsCompactViewModelByTag?tagId={Id}");
         this.ShouldRender();
     }
 }

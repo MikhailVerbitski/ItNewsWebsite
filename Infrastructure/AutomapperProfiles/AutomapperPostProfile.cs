@@ -24,6 +24,13 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Created, a => a.MapFrom(b => b.Created))
                 .ForMember(a => a.Score, a => a.MapFrom(b => (b.CountOfScore == 0) ? 0 : (double)b.SumOfScore / b.CountOfScore))
                 .ForAllOtherMembers(a => a.Ignore());
+            CreateMap<PostEntity, PostCompactViewModel>()
+                .ForMember(a => a.PostId, a => a.MapFrom(b => b.Id))
+                .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
+                .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
+                .ForMember(a => a.Created, a => a.MapFrom(b => b.Created))
+                .ForMember(a => a.Score, a => a.MapFrom(b => (b.CountOfScore == 0) ? 0 : (double)b.SumOfScore / b.CountOfScore))
+                .ForAllOtherMembers(a => a.Ignore());
             CreateMap<PostEntity, PostViewModel>()
                 .ForMember(a => a.PostId, a => a.MapFrom(b => b.Id))
                 .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
@@ -45,6 +52,11 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.IsFinished, a => a.MapFrom(b => b.IsFinished))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<PostMiniViewModel, PostEntity>()
+                .ForMember(a => a.Id, a => a.MapFrom(b => b.PostId))
+                .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
+                .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
+                .ForAllOtherMembers(a => a.Ignore());
+            CreateMap<PostCompactViewModel, PostEntity>()
                 .ForMember(a => a.Id, a => a.MapFrom(b => b.PostId))
                 .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))

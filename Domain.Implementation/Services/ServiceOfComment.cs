@@ -63,16 +63,18 @@ namespace Domain.Implementation.Services
         }
 
         public IEnumerable<TCommentViewModel> Get<TCommentViewModel>(int postId, string applicationUserIdCurrent) 
-            where TCommentViewModel : class
+            where TCommentViewModel : BaseCommentViewModel
         {
             var post = repositoryOfPost.Read(a => a.Id == postId, a => a.Comments);
             var commentEntities = post.Comments;
-            var commentViewModel = commentEntities.Select(a => GetViewModelWithProperty<TCommentViewModel>(a, applicationUserIdCurrent) as TCommentViewModel);
-            return commentViewModel.ToList();
+            return commentEntities
+                .Select(a => GetViewModelWithProperty<TCommentViewModel>(a, applicationUserIdCurrent) as TCommentViewModel)
+                .AsParallel()
+                .ToList();
         }
 
         public TCommentViewModel Get<TCommentViewModel>(string applicationUserIdCurrent, int commentId) 
-            where TCommentViewModel : class
+            where TCommentViewModel : BaseCommentViewModel
         {
             var commentEntity = repositoryOfComment.Read(a => a.Id == commentId);
             var commentViewModel = GetViewModelWithProperty<TCommentViewModel>(commentEntity, applicationUserIdCurrent);

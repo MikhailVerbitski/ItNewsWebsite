@@ -29,11 +29,17 @@ namespace Data.Implementation.Repositories
             var result = (keySelector != null) ? dbQuery.SingleOrDefault(keySelector) : null;
             return result;
         }
-        public virtual IEnumerable<T> ReadMany(Expression<Func<T, bool>> keySelector, params Expression<Func<T, object>>[] includes)
+        public virtual IEnumerable<T> ReadMany(Expression<Func<T, bool>>[] whereProperties, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
-            var result = (keySelector != null) ? dbQuery.Where(keySelector) : dbQuery;
-            return result;
+            if(whereProperties != null)
+            {
+                foreach (var item in whereProperties)
+                {
+                    dbQuery = dbQuery.Where(item);
+                }
+            }
+            return dbQuery;
         }
         public virtual void Update(T entity, params Expression<Func<T, object>>[] properties)
         {
