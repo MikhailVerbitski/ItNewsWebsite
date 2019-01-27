@@ -73,7 +73,7 @@ namespace WebApi.Controllers
         public JsonResult ListPostsCompactViewModelByTag(int tagId, int? take)
         {
             var currentUserId = temporaryUserId;//userManager.GetUserId(User);
-            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, a => a.Tags.Any(b => b.TagId == tagId));
+            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, null, a => a.Tags.Any(b => b.TagId == tagId));
             return Json(posts);
         }
         [HttpGet]
