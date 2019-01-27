@@ -1,6 +1,6 @@
 using Blazor.Extensions.Storage;
 using Microsoft.AspNetCore.Blazor.Builder;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection; 
 
 namespace WebBlazor
 {

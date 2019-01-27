@@ -1,6 +1,7 @@
 ﻿using WebBlazor.Models.ViewModels.Comment;
 using WebBlazor.Models.ViewModels.Post;
 using System.Collections.Generic;
+using System;
 
 namespace WebBlazor.Models.ViewModels.User
 {
@@ -27,6 +28,8 @@ namespace WebBlazor.Models.ViewModels.User
         public string Login { get; set; }
 
         public string Password { get; set; }
+
+        public DateTime Created { get; set; }
 
         public virtual IEnumerable<PostMiniViewModel> Posts { get; set; }
 

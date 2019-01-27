@@ -1,24 +1,35 @@
 ﻿/*@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');*/
 
-.grid-main {
-    display: grid;
-    grid-template-columns: 1fr 20fr 1fr;
-    grid-template-rows: 40px 90vh;
-    grid-row-gap: 5vh;
-}
 #navbar {
     grid-column-start: 1;
     grid-column-end: 4;
+    height: 40px;
     display: grid;
     grid-template-columns: auto 1fr auto auto;
-
-    position: sticky;
+    position: fixed;
     top: 0;
     background-color: #EFE7CC;
     border-radius: 0 0 10px 10px;
     box-shadow: 0 0 10px black;
     padding: 0 8px 0 8px;
+    z-index: 3;
 }
+
+.content {
+    opacity: 0.78;
+}
+
+.content-head {
+    background-color: #F0F4F3;
+    border-radius: 15px 15px 0 0;
+    box-shadow: 0 0 5px white;
+}
+.content-body {
+    background-color: #F0F4F3;
+    box-shadow: 0 0 5px white;
+    margin-top:10px;
+}
+
 #mainBody {
     grid-row-start: 2;
     grid-row-end: 2;
@@ -27,106 +38,14 @@
     height: 100%;
 }
 
-
-.grid-account {
-    display: grid;
-    grid-template-columns: 2fr 1fr 2fr;
-    grid-column-gap: 50px;
-    grid-template-rows: 10vh 40vh 45vh;
-}
-.grid-account div:nth-child(1) {
-    grid-row-start: 2;
-    grid-row-end: 2;
-    grid-column-start: 2;
-    grid-column-end: 2;
-}
-
-
-.grid-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr) minmax(320px, 3fr));
-    grid-column-gap: 4vh;
-    height: 100%;
-}
 #posts {
     grid-column-start: 2;
     grid-column-end: 4;
 }
 
-
-.grid-cols-two{
-    display: grid;
-    grid-template-columns: auto auto;
-}
-
-
-.grid-userMini {
-    display: grid;
-    grid-template-columns: 50px auto;
-    grid-template-rows: auto;
-}
 .userMiniImg {
     grid-row-start: 1;
     grid-row-end: 3;
-}
-
-
-.grid-comment-footer{
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-}
-
-.grid-userMini-search {
-    display: grid;
-    grid-template-columns: 100px auto;
-    grid-template-rows: auto;
-}
-
-#grid-tag {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    border-color: rgba(82, 168, 236, 0.8) !important;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6) !important;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6) !important;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: 1px solid #cccccc;
-}
-#grid-tag input {
-    border: 0;
-    box-shadow: none;
-    outline: none;
-    display: block;
-    padding: 4px 6px;
-    overflow: hidden;
-    height: auto;
-    border-radius: 0;
-    margin: 2px 0 2px 2px;
-}
-
-
-#grid-user-profile {
-    display: grid;
-    grid-template-columns: 6fr 5fr 5fr;
-    grid-template-rows: 88vh;
-    grid-column-gap: 20px;
-    background-color: #F0F4F3;
-    padding: 20px 30px 0 30px;
-}
-#grid-user-profile-userData{
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-column-gap: 10px;
-    grid-row-gap: 4px;
-}
-
-
-.contentDivs {
-    background-color: #F0F4F3;
-    border-radius: 15px 15px 0 0;
-    box-shadow: 0 0 5px white;
 }
 
 .post-content {
@@ -137,7 +56,6 @@
     vertical-align: baseline;
     color: #4C4C4C;
 }
-
 
 .comment {
     margin: 10px 15px 10px 15px;
@@ -151,11 +69,9 @@
     margin: 0 0 10px 0;
 }
 
-
 #SubmitComment{
     width: 100%;
 }
-
 
 #container-posts {
     padding: 20px 30px 0 30px;
@@ -169,14 +85,12 @@
     opacity: 0.3;
 }
 
-
 .tag {
     background-color: #E1E1E1;
     border-radius: 5px;
     padding: 2px;
     margin: 0 5px 0 0;
 }
-
 
 .clearfix:before,
 .clearfix:after {
@@ -192,27 +106,20 @@
     position: relative;
     width: 85px;
     height: 14px;
-    margin: 10px 0;
+    margin-top: 0;
     list-style: none;
     background: url(../img/rating-star2.png);
 }
 
-
 #createPost-top {
     padding: 20px;
 }
-
 
 #keywords {
     height: 18vh;
     z-index: inherit;
 }
 
-.post-head{
-    display:grid;
-    grid-template-columns: auto auto 1fr;
-    grid-column-gap: 16px;
-}
 .post-head h3{
     padding-top:6px;
 }
@@ -234,4 +141,8 @@
 #create-post-link {
     width:100%;
     border-radius: 15px 15px 0 0;
+}
+.grid-userMini p {
+    margin-left: 6px;
+    line-height: 0.7;
 }

@@ -1,5 +1,6 @@
 ﻿using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Contracts.Models.ViewModels.User
@@ -27,6 +28,8 @@ namespace Domain.Contracts.Models.ViewModels.User
         public string Login { get; set; }
 
         public string Password { get; set; }
+
+        public DateTime Created { get; set; }
 
         public virtual IEnumerable<PostCompactViewModel> Posts { get; set; }
 

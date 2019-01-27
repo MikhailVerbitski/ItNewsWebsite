@@ -56,17 +56,38 @@ namespace WebApi.Controllers
             return Json(postViewModel);
         }
         [HttpGet]
-        public JsonResult ListPostsCompactViewModel()
+        public JsonResult ListPostsCompactViewModel(int? take)
         {
             var currentUserId = temporaryUserId;//userManager.GetUserId(User);
-            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId);
+            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take);
             return Json(posts);
         }
         [HttpGet]
-        public JsonResult ListPostsCompactViewModelByTag(int tagId)
+        public JsonResult ListPostsMiniViewModel(int? take)
         {
             var currentUserId = temporaryUserId;//userManager.GetUserId(User);
-            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, a => a.Tags.Any(b => b.TagId == tagId));
+            var posts = serviceOfPost.Get<PostMiniViewModel>(currentUserId, take);
+            return Json(posts);
+        }
+        [HttpGet]
+        public JsonResult ListPostsCompactViewModelByTag(int tagId, int? take)
+        {
+            var currentUserId = temporaryUserId;//userManager.GetUserId(User);
+            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, a => a.Tags.Any(b => b.TagId == tagId));
+            return Json(posts);
+        }
+        [HttpGet]
+        public JsonResult TheFirstSeveralWithTheHighestRating(int? take)
+        {
+            var currentUserId = temporaryUserId;//userManager.GetUserId(User);
+            var posts = serviceOfPost.Get<PostMiniViewModel>(currentUserId, take, a => -((a.CountOfScore == 0) ? 0 : (int)(a.SumOfScore / a.CountOfScore)));
+            return Json(posts);
+        }
+        [HttpGet]
+        public JsonResult ListPostsCompactViewModelTop(int? take)
+        {
+            var currentUserId = temporaryUserId;//userManager.GetUserId(User);
+            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, a => -((a.CountOfScore == 0) ? 0 : (int)(a.SumOfScore / a.CountOfScore)));
             return Json(posts);
         }
         [HttpGet]

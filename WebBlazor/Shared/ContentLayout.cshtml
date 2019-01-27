@@ -1,22 +1,48 @@
 ﻿@inherits BlazorLayoutComponent
+@using WebBlazor.Models
 @using WebBlazor.Models.ViewModels.Tag
+@using WebBlazor.Models.ViewModels.Post
 @layout MainLayout
 @inject HttpClient Http
 
-
 <div class="grid-content">
-    <div class="contentDivs">
-        <a href="/CreatePost" id="create-post-link" class="pure-button"><font size="4">Create new post</font></a>
-        <div id="keywords"></div>
-        <hr/>
+    <div class="content">
+        <div class="content-head">
+            <a href="/CreatePost" id="create-post-link" class="pure-button"><font size="4">Create new post</font></a>
+        </div>
+        <div class="content-body">
+            <div id="keywords"></div>
+        </div>
+        <div class="content-body" style="padding: 20px;">
+            <a href="/Top"><h1 style="text-align:center;">Top posts</h1></a>
+            <br />
+            @if (TheFirstFiveWithTheHighestRating != null)
+            {
+                for (int i = 0; i < TheFirstFiveWithTheHighestRating.Count; i++)
+                {
+                    var item = TheFirstFiveWithTheHighestRating[i];
+                    <div class="grid-post-head">
+                        <a href="/Post/@item.PostId"><font size="@(5-i)">@item.Header</font></a>
+                        <span><StarsRating PercentOfRating="@(item.Score * 20)" PostId="@(item.PostId)" /></span>
+                        <div></div>
+                    </div>
+                    <hr />
+                }
+            }
+        </div>
     </div>
-    <div class="contentDivs" id="posts">
+    <div class="content-head content" id="posts">
         @Body
     </div>
 </div>
 
-
 @functions{
+    private List<PostMiniViewModel> TheFirstFiveWithTheHighestRating;
+
+    protected async override Task OnInitAsync()
+    {
+        TheFirstFiveWithTheHighestRating = await Http.GetJsonAsync<List<PostMiniViewModel>>("api/Post/TheFirstSeveralWithTheHighestRating?take=5");
+    }
     protected async override Task OnAfterRenderAsync()
     {
         var tags = await Http.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
@@ -28,11 +54,5 @@
         });
         var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
         await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
-    }
-    class TagForCloud
-    {
-        public string text { get; set; }
-        public long weight { get; set; }
-        public string link { get; set; }
     }
 }

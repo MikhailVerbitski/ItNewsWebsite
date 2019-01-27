@@ -33,7 +33,10 @@ ol, ul {
     list-style: none;
 }
 
-a, a:hover {
+a{
     color: #000;
     text-decoration: none;
+}
+a:hover {
+    color: #9D6264;
 }

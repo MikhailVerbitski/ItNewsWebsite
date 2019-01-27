@@ -1,10 +1,12 @@
-﻿@page "/SearchUsers/{property}"
+﻿@page "/SearchUsers/"
+@page "/SearchUsers/{property}"
 @layout ContentLayout
 @using WebBlazor.Models.ViewModels.User
 @inject HttpClient Http
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div id="container-posts">
+    <h2>@message</h2>
     @if (ListOfUserMiniViewModels != null)
     {
         <ListViewTemplate Items="@ListOfUserMiniViewModels">
@@ -26,15 +28,28 @@
 </div>
 
 @functions{
-    [Parameter] private string property { get; set; }
+    [Parameter] private string property { get; set; } = "";
     private List<UserMiniViewModel> ListOfUserMiniViewModels { get; set; }
+    private string message { get; set; }
 
+    protected override void OnInit()
+    {
+        if(property == "")
+        {
+            message = "nothing found :(";
+        }
+    }
     protected async override Task OnParametersSetAsync()
     {
         if (property != "")
         {
+            message = "";
             var users = await Http.GetJsonAsync<IEnumerable<UserMiniViewModel>>($"/api/User/GetUserByProperty?property={property}");
             ListOfUserMiniViewModels = users.ToList();
+        }
+        if (property == "" && ListOfUserMiniViewModels.Count == 0)
+        {
+            message = "nothing found :(";
         }
         property = string.Empty;
     }

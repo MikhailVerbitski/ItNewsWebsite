@@ -1,0 +1,31 @@
+﻿@page "/Top"
+@inject HttpClient Http
+@using WebBlazor.Models.ViewModels.Post
+
+@if (ListOfPosts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (ListOfPosts.Count() == 0)
+{
+    <p><em>Posts yet :(</em></p>
+}
+else
+{
+    <div id="container-posts">
+        <ListViewTemplate Items="@ListOfPosts">
+            <ItemTemplate>
+                <PostCompact post="@context" />
+            </ItemTemplate>
+        </ListViewTemplate>
+    </div>
+}
+
+@functions{
+    private List<PostCompactViewModel> ListOfPosts;
+
+    protected async override Task OnInitAsync()
+    {
+        ListOfPosts = await Http.GetJsonAsync<List<PostCompactViewModel>>("/api/Post/ListPostsCompactViewModelTop");
+    }
+}

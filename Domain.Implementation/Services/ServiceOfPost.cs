@@ -98,15 +98,32 @@ namespace Domain.Implementation.Services
             return postEntity;
         }
 
-        public IEnumerable<TPostViewModel> Get<TPostViewModel>(string applicationUserIdCurrent, params Expression<Func<PostEntity, bool>>[] whereProperties)
-            where TPostViewModel : BasePostViewModel => repositoryOfPost.ReadMany(whereProperties,
+        public IEnumerable<TPostViewModel> Get<TPostViewModel>(
+            string applicationUserIdCurrent, 
+            int? take, 
+            Expression<Func<PostEntity, object>> orderBy = null, 
+            params Expression<Func<PostEntity, bool>>[] whereProperties)
+            where TPostViewModel : BasePostViewModel
+        {
+            IEnumerable<PostEntity> postsEntities = repositoryOfPost.ReadMany(whereProperties,
                     a => a.Tags,
                     a => a.Comments,
                     a => a.Section,
-                    a => a.UserProfile)
-                    .Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent))
-                    .AsParallel()
-                    .ToList();
+                    a => a.UserProfile);
+            if (orderBy != null)
+            {
+                postsEntities = postsEntities.OrderBy(orderBy.Compile());
+            }
+            if (take != null)
+            {
+                postsEntities = postsEntities.Take(take.Value);
+            }
+            var postsViewModel = postsEntities
+                .Select(a => GetViewModelWithProperty<TPostViewModel>(a, applicationUserIdCurrent))
+                .AsParallel()
+                .ToList();
+            return postsViewModel;
+        }
 
         public BasePostViewModel Get<TPostViewModel>(string applicationUserIdCurrent, int postId) where TPostViewModel : BasePostViewModel
         {

@@ -1,4 +1,6 @@
-﻿namespace Domain.Contracts.Models.ViewModels.User
+﻿using System;
+
+namespace Domain.Contracts.Models.ViewModels.User
 {
     public class UserMiniViewModel
     {
@@ -17,5 +19,7 @@
         public int CountOfLikes { get; set; }
 
         public string Login { get; set; }
+
+        public DateTime Created { get; set; }
     }
 }

@@ -9,9 +9,12 @@
 }
 else
 {
-    <div id="grid-user-profile" class="contentDivs">
+    <div id="grid-user-profile" class="content-head content">
         <div>
-            <p><a><h1>@User.FirstName @User.LastName</h1></a></p>
+            <div class="grid-cols-two">
+                <p><a href="/UserPage/@(User.Login)"><h1>@User.FirstName @User.LastName</h1></a></p>
+                <img src="@((User.Avatar == null) ? "/img/default-user-profile-image.png" : User.Avatar)" asp-append-version="true" height="100" width="100" />
+            </div>
             <br />
             <div id="grid-user-profile-userData">
                 <font size="5" color="@User.RoleColor">Role:</font>

@@ -24,6 +24,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
                 .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
                 .ForMember(a => a.Login, a => a.MapFrom(b => b.UserName))
+                .ForMember(a => a.Created, a => a.MapFrom(b => b.Created))
                 .ForMember(a => a.CountOfLikes, a => a.MapFrom(b => b.CountOfLikes))
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<ApplicationUserEntity, UserViewModel>()
@@ -35,6 +36,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Email, a => a.MapFrom(b => b.Email))
                 .ForMember(a => a.PhoneNumber, a => a.MapFrom(b => b.PhoneNumber))
                 .ForMember(a => a.Login, a => a.MapFrom(b => b.UserName))
+                .ForMember(a => a.Created, a => a.MapFrom(b => b.Created))
                 .ForAllOtherMembers(a => a.Ignore());
 
             CreateMap<UserEditViewModel, ApplicationUserEntity>()

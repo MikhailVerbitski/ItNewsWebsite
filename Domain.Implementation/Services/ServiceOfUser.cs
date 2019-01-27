@@ -51,7 +51,7 @@ namespace Domain.Implementation.Services
 
         public IEnumerable<UserMiniViewModel> GetUserByProperty(string propetry)
         {
-            return GetUsers(a => a.FirstName.Contains(propetry), a => a.LastName.Contains(propetry), a => a.UserName.Contains(propetry));
+            return GetUsers(a => a.FirstName.Contains(propetry) || a.LastName.Contains(propetry) || a.UserName.Contains(propetry));
         }
 
         public IEnumerable<UserMiniViewModel> GetUsers(params Expression<Func<ApplicationUserEntity, bool>>[] whereProperties)

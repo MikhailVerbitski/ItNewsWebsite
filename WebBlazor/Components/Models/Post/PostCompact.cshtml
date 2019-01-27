@@ -1,17 +1,19 @@
 ﻿@using WebBlazor.Models.ViewModels.Post
-@using WebBlazor.Models
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div>
-    <div class="post-head">
-        <a href="/Post/@post.PostId"><h3>@post.Header</h3></a>
+    <div class="grid-post-head">
+        <a href="/Post/@post.PostId"><h2>@post.Header</h2></a>
         <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" /></span>
+        <div></div>
+        <span>@post.Created.ToLongDateString()</span>
     </div>
+    <br />
     <span>@post.BriefDesctiption</span>
 </div>
 <br />
 <div class="grid-cols-two">
     <UserMini User="@post.AuthorUserMiniViewModel" />
-    <p class="container-date">@DateConverter.GetTime(post.Created)</p>
 </div>
 <br />
 <hr />
@@ -19,5 +21,7 @@
 <br />
 
 @functions {
-[Parameter] PostCompactViewModel post { get; set; }
+    [Parameter] PostCompactViewModel post { get; set; }
+
+    private void OpenPost() => UriHelper.NavigateTo($"/Post/{post.PostId}");
 }

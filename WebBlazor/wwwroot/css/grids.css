@@ -1,0 +1,95 @@
+﻿.grid-comment-footer {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+}
+
+.grid-userMini-search {
+    display: grid;
+    grid-template-columns: 100px auto;
+    grid-template-rows: auto;
+}
+
+#grid-tag {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    border-color: rgba(82, 168, 236, 0.8) !important;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6) !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6) !important;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-radius: 3px;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+}
+
+#grid-tag input {
+    border: 0;
+    box-shadow: none;
+    outline: none;
+    display: block;
+    padding: 4px 6px;
+    overflow: hidden;
+    height: auto;
+    border-radius: 0;
+    margin: 2px 0 2px 2px;
+}
+
+
+#grid-user-profile {
+    display: grid;
+    grid-template-columns: 7fr 5fr 4fr;
+    grid-template-rows: 88vh;
+    grid-column-gap: 20px;
+    background-color: #F0F4F3;
+    padding: 20px 30px 0 30px;
+}
+
+#grid-user-profile-userData {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-column-gap: 10px;
+    grid-row-gap: 4px;
+}
+
+.grid-cols-two {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.grid-userMini {
+    display: grid;
+    grid-template-columns: 50px auto;
+    grid-template-rows: auto;
+}
+
+.grid-account {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
+    grid-column-gap: 50px;
+    grid-template-rows: 10vh 40vh 45vh;
+}
+
+.grid-account div:nth-child(1) {
+    grid-row-start: 2;
+    grid-row-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+
+
+.grid-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr) minmax(320px, 2fr));
+    grid-column-gap: 4vh;
+}
+.grid-main {
+    display: grid;
+    grid-template-columns: 1fr 8fr 1fr;
+    margin-top: 80px;
+}
+
+.grid-post-head {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    grid-column-gap: 16px;
+}

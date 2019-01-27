@@ -95,27 +95,26 @@ namespace Web.Controllers
             return RedirectToAction("PostViewModel", new { postId = postId });
         }
 
-        public IActionResult ListPostsViewModel()
+        public IActionResult ListPostsViewModel(int? take)
         {
             var start = Stopwatch.StartNew();
-            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User));
+            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), take);
             start.Stop();
             return View(posts);
         }
-        public IActionResult ListNotFinishedPostsViewModel()
+        public IActionResult ListNotFinishedPostsViewModel(int? take)
         {
-            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), a => a.IsFinished == false);
+            var posts = serviceOfPost.Get<PostViewModel>(userManager.GetUserId(User), take, a => a.IsFinished == false);
             return View(posts);
         }
-
-        public IActionResult ListPostsMiniViewModel()
+        public IActionResult ListPostsMiniViewModel(int? take)
         {
-            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User));
+            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User), take);
             return View(posts);
         }
-        public IActionResult ListNotFinishedPostsMiniViewModel()
+        public IActionResult ListNotFinishedPostsMiniViewModel(int? take)
         {
-            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User), a => a.IsFinished == false);
+            var posts = serviceOfPost.Get<PostMiniViewModel>(userManager.GetUserId(User), take, a => a.IsFinished == false);
             return View(posts);
         }
 
