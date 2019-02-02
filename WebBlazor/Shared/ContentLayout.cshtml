@@ -3,7 +3,6 @@
 @using WebBlazor.Models.ViewModels.Tag
 @using WebBlazor.Models.ViewModels.Post
 @layout MainLayout
-@inject HttpClient Http
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
@@ -46,24 +45,18 @@
 
     protected async override Task OnInitAsync()
     {
-        if (await serviceOfAuthorize.TryToAuthorize())
-        {
-            TheFirstFiveWithTheHighestRating = await Http.GetJsonAsync<List<PostMiniViewModel>>("api/Post/TheFirstSeveralWithTheHighestRating?take=5");
-        }
+        TheFirstFiveWithTheHighestRating = await serviceOfAuthorize.GetJsonAsync<List<PostMiniViewModel>>("api/Post/TheFirstSeveralWithTheHighestRating?take=5");
     }
     protected async override Task OnAfterRenderAsync()
     {
-        if (await serviceOfAuthorize.TryToAuthorize())
+        var tags = await serviceOfAuthorize.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
+        var tagsForCloud = tags.Select(a => new TagForCloud()
         {
-            var tags = await Http.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
-            var tagsForCloud = tags.Select(a => new TagForCloud()
-            {
-                text = a.Name,
-                weight = a.CountOfUsage,
-                link = $"/PostsByTag/{a.Id}"
-            });
-            var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
-            await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
-        }
+            text = a.Name,
+            weight = a.CountOfUsage,
+            link = $"/PostsByTag/{a.Id}"
+        });
+        var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
+        await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
     }
 }

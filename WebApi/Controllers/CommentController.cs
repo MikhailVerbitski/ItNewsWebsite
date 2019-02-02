@@ -3,12 +3,16 @@ using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Implementation.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace WebApi.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user")]
     [ApiController]
     [Route("api/Comment/[action]")]
     public class CommentController : Controller
@@ -27,31 +31,26 @@ namespace WebApi.Controllers
             this.userManager = userManager;
             serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
         }
-
-        //
-        string temporaryUserId = "e46bc008-f20e-4a2b-b9ed-025135801130";
-        //
-
         [HttpPost]
         public JsonResult CreateComment([FromBody] CommentCreateEditViewModel commentViewModel)
         {
-            var user = temporaryUserId;
-            var newComment = serviceOfComment.Create(user, commentViewModel);
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var newComment = serviceOfComment.Create(userId, commentViewModel);
             return Json(newComment);
         }
 
         [HttpGet]
         public IActionResult LikeComment(int commentId, int postId)
         {
-            var user = temporaryUserId;
-            serviceOfComment.LikeComment(user, commentId);
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            serviceOfComment.LikeComment(userId, commentId);
             return Ok();
         }
         [HttpGet]
         public IActionResult DislikeComment(int commentId, int postId)
         {
-            var user = temporaryUserId;
-            serviceOfComment.DislikeComment(user, commentId);
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            serviceOfComment.DislikeComment(userId, commentId);
             return Ok();
         }
     }

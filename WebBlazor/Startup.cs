@@ -1,7 +1,8 @@
 using Blazor.Extensions.Storage;
 using Blazor.FileReader;
 using Microsoft.AspNetCore.Blazor.Builder;
-using Microsoft.Extensions.DependencyInjection; 
+using Microsoft.Extensions.DependencyInjection;
+using WebBlazor.Components;
 
 namespace WebBlazor
 {
@@ -11,7 +12,7 @@ namespace WebBlazor
         {
             services.AddStorage();
             services.AddSingleton<IFileReaderService>(sp => new FileReaderService());
-            services.AddScoped(typeof(Components.ServiceOfAuthorize), typeof(Components.ServiceOfAuthorize));
+            services.AddSingleton<ServiceOfAuthorize>();
         }
 
         public void Configure(IBlazorApplicationBuilder app)

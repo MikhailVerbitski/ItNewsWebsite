@@ -48,7 +48,7 @@
 
 #grid-user-profile-userData {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto auto auto;
     grid-column-gap: 10px;
     grid-row-gap: 4px;
 }
@@ -101,5 +101,5 @@
 
 .grid-scroll{
     display:grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto 1fr;
 }

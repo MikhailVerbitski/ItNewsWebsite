@@ -1,26 +1,10 @@
 @inherits BlazorLayoutComponent
-@inject HttpClient Http
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
 
 <div>
     <div class="pure-menu pure-menu-horizontal" id="navbar">
-        <div class="logo"><a href="/" style="margin-left:3vh; padding-bottom: 0;"><font size="5">ItNews</font></a></div>
-        <div class="account-nav">
-            <ul class="pure-menu-list">
-                <li class="pure-menu-item"><a href="/Login" class="pure-menu-link">Login</a></li>
-                <li class="pure-menu-item"><a href="/Registration" class="pure-menu-link">Registration</a></li>
-            </ul>
-        </div>
-        <div class="pure-form" id="search">
-            <input type="text" class="pure-input-rounded" bind="@SearchWords" />
-            <div><a href="/SearchUsers/@SearchWords">Search</a></div>
-        </div>
+        <navbar />
     </div>
     <div id="mainBody">
         @Body
     </div>
 </div>
-
-@functions{
-    private string SearchWords { get; set; }
-}

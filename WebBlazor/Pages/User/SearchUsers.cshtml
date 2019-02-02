@@ -2,7 +2,6 @@
 @page "/SearchUsers/{property}"
 @layout ContentLayout
 @using WebBlazor.Models.ViewModels.User
-@inject HttpClient Http
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 
@@ -45,16 +44,13 @@
         if (property != "")
         {
             message = "";
-            if (await serviceOfAuthorize.TryToAuthorize())
+            var users = await serviceOfAuthorize.GetJsonAsync<IEnumerable<UserMiniViewModel>>($"/api/User/GetUserByProperty?property={property}");
+            ListOfUserMiniViewModels = users.ToList();
+            if (property == "" && ListOfUserMiniViewModels.Count == 0)
             {
-                var users = await Http.GetJsonAsync<IEnumerable<UserMiniViewModel>>($"/api/User/GetUserByProperty?property={property}");
-                ListOfUserMiniViewModels = users.ToList();
-                if (property == "" && ListOfUserMiniViewModels.Count == 0)
-                {
-                    message = "nothing found :(";
-                }
-                property = string.Empty;
+                message = "nothing found :(";
             }
+            property = string.Empty;
         }
     }
     private void Search()

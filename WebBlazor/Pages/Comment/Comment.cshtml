@@ -1,5 +1,4 @@
 ﻿@page "/Comment"
-@inject HttpClient Http
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Comment;
 @using WebBlazor.Models.ViewModels.Post;
@@ -43,28 +42,21 @@
         field.SetValue(null, TimeZoneInfo.CreateCustomTimeZone("FAKE", TimeSpan.FromHours(3), "FAKE", "FAKE"));
         base.OnInit();
     }
-
     public async Task Dislike()
     {
-        if(await serviceOfAuthorize.TryToAuthorize())
-        {
-            await Http.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
-            comment.IsUserLiked = !comment.IsUserLiked;
-            comment.CountOfLikes--;
+        await serviceOfAuthorize.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+        comment.IsUserLiked = !comment.IsUserLiked;
+        comment.CountOfLikes--;
 
-            UserRatingChange(-1);
-        }
+        UserRatingChange(-1);
     }
     public async Task Like()
     {
-        if (await serviceOfAuthorize.TryToAuthorize())
-        {
-            await Http.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
-            comment.IsUserLiked = !comment.IsUserLiked;
-            comment.CountOfLikes++;
+        await serviceOfAuthorize.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+        comment.IsUserLiked = !comment.IsUserLiked;
+        comment.CountOfLikes++;
 
-            UserRatingChange(1);
-        }
+        UserRatingChange(1);
     }
     private void UserRatingChange(int plus)
     {

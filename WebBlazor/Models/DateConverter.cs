@@ -11,7 +11,7 @@ namespace WebBlazor.Models
             var difference = now - time;
             if (difference.Days > 0)
             {
-                res = $"{difference.Days} дней";
+                res = $"{difference.Days} {(difference.Days == 1 ? "день" : "дня")}";
             }
             else if (difference.Hours > 0)
             {

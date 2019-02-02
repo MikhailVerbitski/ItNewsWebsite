@@ -1,5 +1,4 @@
 ﻿@page "/PostsByTag/{Id:int}"
-@inject HttpClient Http
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Post
 
@@ -29,10 +28,7 @@ else
 
     protected async override Task OnParametersSetAsync()
     {
-        if (await serviceOfAuthorize.TryToAuthorize())
-        {
-            ListOfPosts = await Http.GetJsonAsync<List<PostCompactViewModel>>($"/api/Post/ListPostsCompactViewModelByTag?tagId={Id}");
-            this.ShouldRender();
-        }
+        ListOfPosts = await serviceOfAuthorize.GetJsonAsync<List<PostCompactViewModel>>($"/api/Post/ListPostsCompactViewModelByTag?tagId={Id}");
+        this.ShouldRender();
     }
 }

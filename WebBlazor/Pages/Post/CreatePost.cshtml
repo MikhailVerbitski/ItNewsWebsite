@@ -1,6 +1,5 @@
 ﻿@page "/CreatePost/"
 @page "/CreatePost/{Id}"
-@inject HttpClient Http
 @inject Blazor.FileReader.IFileReaderService fileReadService
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
@@ -43,7 +42,7 @@
             </select>
             <div>
                 <label for="file" class="pure-button">Load image</label>
-                <input type="file" id="file" @*ref="files" *@ onchange="@LoadImage" style="display: none;" />
+                <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
                 <label for="content">Content</label>
                 <textarea id="content" rows="10" bind="@ContentValue" />
             </div>
@@ -84,7 +83,7 @@
     private IEnumerable<TagViewModel> ServerTags { get; set; }
 
     private List<TagViewModel> TagsForSelect;
-    //private ElementRef files;
+    private ElementRef files;
 
     private PostUpdateViewModel post = new PostUpdateViewModel()
     {
@@ -93,23 +92,17 @@
 
     protected override async Task OnInitAsync()
     {
-        if (await serviceOfAuthorize.TryToAuthorize())
-        {
-            Selections = await Http.GetJsonAsync<List<string>>("api/Post/GetListOfSelections");
-            section = Selections.First();
-            ServerTags = await Http.GetJsonAsync<IEnumerable<TagViewModel>>("api/Post/GetListOfTags");
-            TagsForSelect = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
-        }
+        Selections = await serviceOfAuthorize.GetJsonAsync<List<string>>("api/Post/GetListOfSelections");
+        section = Selections.First();
+        ServerTags = await serviceOfAuthorize.GetJsonAsync<IEnumerable<TagViewModel>>("api/Post/GetListOfTags");
+        TagsForSelect = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
     }
     protected async override Task OnParametersSetAsync()
     {
         int id;
         if (Id != null && Int32.TryParse(Id, out id))
         {
-            if (await serviceOfAuthorize.TryToAuthorize())
-            {
-                post = await Http.GetJsonAsync<PostUpdateViewModel>("api/Post/Edit");
-            }
+            post = await serviceOfAuthorize.GetJsonAsync<PostUpdateViewModel>("api/Post/Edit");
         }
     }
     private async Task UpdateCreate(bool isFinished = false)
@@ -119,18 +112,15 @@
         post.Section = section;
         post.BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build());
         post.IsFinished = isFinished;
-        if (await serviceOfAuthorize.TryToAuthorize())
+        if (isFinished)
         {
-            if (isFinished)
-            {
-                post = await Http.SendJsonAsync<PostUpdateViewModel>(HttpMethod.Post, "api/Post/Create", post);
-                UriHelper.NavigateTo($"/Post/{post.PostId}");
-            }
-            else
-            {
-                await Http.SendJsonAsync(HttpMethod.Post, "api/Post/Update", post);
-                UriHelper.NavigateTo($"/");
-            }
+            post = await serviceOfAuthorize.SendJsonAsync<PostUpdateViewModel>(HttpMethod.Post, "api/Post/Create", post);
+            UriHelper.NavigateTo($"/Post/{post.PostId}");
+        }
+        else
+        {
+            await serviceOfAuthorize.SendJsonAsync<object>(HttpMethod.Post, "api/Post/Update", post);
+            UriHelper.NavigateTo($"/");
         }
     }
     private void SelectTag(TagViewModel tagViewModel)

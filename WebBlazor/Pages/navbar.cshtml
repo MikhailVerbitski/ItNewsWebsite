@@ -1,0 +1,36 @@
+﻿@inject Components.ServiceOfAuthorize serviceOfAuthorize
+
+<div class="logo"><a href="/" style="margin-left:3vh; padding-bottom: 0;"><font size="5">ItNews</font></a></div>
+<div class="account-nav">
+    <ul class="pure-menu-list">
+        @if (IsAuthorize)
+        {
+            <li class="pure-menu-item"><a href="/Login" class="pure-menu-link" onclick="@Logout">Login out</a></li>
+        }
+        else
+        {
+            <li class="pure-menu-item"><a href="/Login" class="pure-menu-link">Login</a></li>
+            <li class="pure-menu-item"><a href="/Registration" class="pure-menu-link">Registration</a></li>
+        }
+    </ul>
+</div>
+<div class="pure-form" id="search">
+    <input type="text" class="pure-input-rounded" bind="@SearchWords" />
+    <div><a href="/SearchUsers/@SearchWords">Search</a></div>
+</div>
+
+
+@functions{
+    private string SearchWords { get; set; }
+    private bool IsAuthorize { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        IsAuthorize = await serviceOfAuthorize.TryToAuthorize();
+    }
+    private void Logout()
+    {
+        serviceOfAuthorize.Logout();
+        IsAuthorize = false;
+    }
+}

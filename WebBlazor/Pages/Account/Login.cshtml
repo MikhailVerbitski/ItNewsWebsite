@@ -16,11 +16,10 @@
         <label for="password">Password</label>
         <input id="password" type="password" placeholder="Password" bind="@Password" />
 
-        <label for="remember" class="pure-checkbox">
-            <input id="remember" type="checkbox"> Remember me
-        </label>
+        <label for="remember" class="pure-checkbox">Remember me</label>
+        <input id="remember" type="checkbox">
 
-        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Register</button>
+        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Login</button>
     </fieldset>
 </div>
 
@@ -35,13 +34,8 @@
             Email = Email,
             Password = Password
         };
-        var result = await Http.PostJsonAsync<Token>("/api/Token/Login", tokenViewModel);
-        await localStorage.SetItem<string>("token", result.token);
-        await serviceOfAuthorize.TryToAuthorize();
+        await serviceOfAuthorize.Login(tokenViewModel);
         UriHelper.NavigateTo("/");
-    }
-    class Token
-    {
-        public string token { get; set; }
+        await WebBlazor.JsInteropClasses.Reload.ReloadPage();
     }
 }

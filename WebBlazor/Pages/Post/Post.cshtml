@@ -1,5 +1,4 @@
 ﻿@page "/Post/{Id:int}"
-@inject HttpClient Http
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Post;
 @using WebBlazor.Models.ViewModels.Comment;
@@ -62,12 +61,9 @@ else
 
     protected async override Task OnParametersSetAsync()
     {
-        if (await serviceOfAuthorize.TryToAuthorize())
-        {
-            postViewModel = await Http.GetJsonAsync<PostViewModel>($"/api/Post/PostViewModel?postId={Id}");
-            comments = postViewModel.Comments.ToList();
-            Tags = postViewModel.Tags.ToList();
-        }
+        postViewModel = await serviceOfAuthorize.GetJsonAsync<PostViewModel>($"/api/Post/PostViewModel?postId={Id}");
+        comments = postViewModel.Comments.ToList();
+        Tags = postViewModel.Tags.ToList();
     }
     private async Task SubmitCommentForm()
     {
@@ -76,12 +72,9 @@ else
             PostId = postViewModel.PostId,
             Content = CommentContent
         };
-        if (await serviceOfAuthorize.TryToAuthorize())
-        {
-            var newComment = await Http.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
-            comments.Add(newComment);
-            CommentContent = string.Empty;
-        }
+        var newComment = await serviceOfAuthorize.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
+        comments.Add(newComment);
+        CommentContent = string.Empty;
     }
     private void Update()
     {
