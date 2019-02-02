@@ -53,19 +53,19 @@ namespace Web.Controllers
             return View();
         }
 
-        public IActionResult CreatePost()
-        {
-            ViewData["Sections"] = serviceOfSection.Get();
-            var postId =  serviceOfPost.Create(userManager.GetUserId(User), null).Id;
-            var postCreateEditViewModel = serviceOfPost.Get<PostCreateEditViewModel>(userManager.GetUserId(User), postId);
-            return View(postCreateEditViewModel);
-        }
-        [HttpPost]
-        public IActionResult CreatePost(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
-        {
-            serviceOfPost.Update(postCreateEditViewModel, images);
-            return View();
-        }
+        //public IActionResult CreatePost()
+        //{
+        //    ViewData["Sections"] = serviceOfSection.Get();
+        //    var postId =  serviceOfPost.Create(userManager.GetUserId(User), null).Id;
+        //    var postCreateEditViewModel = serviceOfPost.Get<PostCreateEditViewModel>(userManager.GetUserId(User), postId);
+        //    return View(postCreateEditViewModel);
+        //}
+        //[HttpPost]
+        //public IActionResult CreatePost(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
+        //{
+        //    serviceOfPost.Update(postCreateEditViewModel, images);
+        //    return View();
+        //}
 
         public IActionResult PostViewModel(int postId)
         {

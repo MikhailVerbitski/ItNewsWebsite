@@ -2,10 +2,10 @@
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
+using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -53,16 +53,16 @@ namespace Domain.Implementation.Services
 
             Config = new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>[]
             {
-                new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostCreateEditViewModel), GetPostCreateEditViewModel),
+                new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostUpdateViewModel), GetPostCreateEditViewModel),
                 new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostCompactViewModel), GetPostCompactViewModel),
                 new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostMiniViewModel), GetPostMiniViewModel),
                 new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostViewModel), GetPostViewModel)
             };
         }
 
-        public void Update(PostCreateEditViewModel postCreateEditViewModel, IFormFile[] images)
+        public void Update(PostUpdateViewModel postCreateEditViewModel)
         {
-            var postEntity = mapper.Map<PostCreateEditViewModel, PostEntity>(postCreateEditViewModel);
+            var postEntity = mapper.Map<PostUpdateViewModel, PostEntity>(postCreateEditViewModel);
             var lastPostEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId,
                 a => a.Tags
             );
@@ -74,14 +74,12 @@ namespace Domain.Implementation.Services
             }
             postEntity.Tags = serviceOfTag.TagsPostUpdate(postCreateEditViewModel.Tags, lastPostEntity.Tags, postCreateEditViewModel.PostId); ;
             repositoryOfPost.Update(postEntity);
-            serviceOfImage.AddImage(postCreateEditViewModel.PostId, images);
         }
-        
-        public PostEntity Create(string applicationUserIdCurrent, PostCreateEditViewModel postCreateEditViewModel)
+        public PostUpdateViewModel Create(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel)
         {
             PostEntity postEntity = (postCreateEditViewModel == null)
                 ? new PostEntity()
-                : postEntity = mapper.Map<PostCreateEditViewModel, PostEntity>(postCreateEditViewModel);
+                : postEntity = mapper.Map<PostUpdateViewModel, PostEntity>(postCreateEditViewModel);
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
             postEntity.UserProfileId = applicationUser.UserProfileId;
             if(postCreateEditViewModel != null && postCreateEditViewModel.Section != null)
@@ -95,7 +93,8 @@ namespace Domain.Implementation.Services
             {
                 postEntity.Tags = serviceOfTag.AddTagsPost(postCreateEditViewModel.Tags, postCreateEditViewModel.PostId);
             }
-            return postEntity;
+            var newPostCreateEditViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
+            return newPostCreateEditViewModel;
         }
 
         public IEnumerable<TPostViewModel> Get<TPostViewModel>(
@@ -125,7 +124,7 @@ namespace Domain.Implementation.Services
             return postsViewModel;
         }
 
-        public BasePostViewModel Get<TPostViewModel>(string applicationUserIdCurrent, int postId) where TPostViewModel : BasePostViewModel
+        public TPostViewModel Get<TPostViewModel>(string applicationUserIdCurrent, int postId) where TPostViewModel : BasePostViewModel
         {
             var postEntity = repositoryOfPost.Read(a => a.Id == postId, 
                 a => a.Tags, 
@@ -136,9 +135,9 @@ namespace Domain.Implementation.Services
             return postViewModel;
         }
         
-        private PostCreateEditViewModel GetPostCreateEditViewModel(PostEntity postEntity, string applicationUserIdCurrent)
+        private PostUpdateViewModel GetPostCreateEditViewModel(PostEntity postEntity, string applicationUserIdCurrent)
         {
-            var postViewModel = mapper.Map<PostEntity, PostCreateEditViewModel>(postEntity);
+            var postViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
             return postViewModel;
         }
         private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, string applicationUserIdCurrent)
@@ -209,5 +208,6 @@ namespace Domain.Implementation.Services
             var postRating = repositoryOfPostRating.Read(a => a.PostId == postEntity.Id && a.UserProfileId == UserProfileId);
             return postRating != null ? postRating.Score : -1;
         }
+        public string AddImage(ImageViewModel image) => serviceOfImage.LoadImage("Post", image);
     }
 }

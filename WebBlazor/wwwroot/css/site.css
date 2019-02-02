@@ -1,17 +1,14 @@
 ﻿/*@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');*/
 
 #navbar {
-    grid-column-start: 1;
-    grid-column-end: 4;
-    height: 40px;
     display: grid;
     grid-template-columns: auto 1fr auto auto;
     position: fixed;
-    top: 0;
+    top: 0; 
     background-color: #EFE7CC;
     border-radius: 0 0 10px 10px;
     box-shadow: 0 0 10px black;
-    padding: 0 8px 0 8px;
+    padding: 12px 8px;
     z-index: 3;
 }
 
@@ -21,26 +18,33 @@
 
 .content-head {
     background-color: #F0F4F3;
-    border-radius: 15px 15px 0 0;
     box-shadow: 0 0 5px white;
 }
+
+.content-radius-top {
+    border-radius: 7px 7px 0 0 ;
+}
+
+.content-radius-bott {
+    border-radius: 0 0 7px 7px;
+}
+.content-radius {
+    border-radius: 7px;
+}
+
 .content-body {
     background-color: #F0F4F3;
     box-shadow: 0 0 5px white;
     margin-top:10px;
+    width: 100%;
 }
 
 #mainBody {
-    grid-row-start: 2;
-    grid-row-end: 2;
-    grid-column-start: 2;
-    grid-column-end: 2;
-    height: 100%;
+    margin: 0 10%;
 }
 
 #posts {
-    grid-column-start: 2;
-    grid-column-end: 4;
+
 }
 
 .userMiniImg {
@@ -67,6 +71,9 @@
     min-height: 60px;
     padding: 10px 10px 10px 0;
     margin: 0 0 10px 0;
+
+    overflow: auto;
+    width: 100px;
 }
 
 #SubmitComment{
@@ -79,6 +86,9 @@
 
 #container-post {
     padding: 20px;
+}
+#container-post img{
+    width: 100%;
 }
 
 .container-date {
@@ -132,17 +142,43 @@
 }
 
 #search {
-    display: inline-block;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 5px;
 }
 #search input{
     width: auto;
 }
+#search div {
+    display: flex;
+    align-items:center;
+    justify-content:center;
+    background-color: #FAFAFA;
+    border-radius: 2em;
+    border: 3px solid transparent;
+    padding: 0 10px; 
+}
+#search div:hover {
+    border-color: silver;
+}
 
-#create-post-link {
+.create-post-link {
     width:100%;
-    border-radius: 15px 15px 0 0;
 }
 .grid-userMini p {
     margin-left: 6px;
     line-height: 0.7;
+}
+
+.logo {
+    justify-self: start;
+    display: block;
+}
+
+.account-nav {
+    justify-self: end;
+}
+
+.side-bar{
+
 }

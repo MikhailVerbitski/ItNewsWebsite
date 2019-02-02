@@ -2,9 +2,16 @@
 using Data.Contracts.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Domain.Implementation.Services;
 using WebApi.Models;
 using WebApi.Server.Interface;
+using System.Collections.Generic;
+using Data.Implementation;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebApi.Controllers
 {
@@ -15,16 +22,22 @@ namespace WebApi.Controllers
         private readonly IJwtTokenService _tokenService;
         private readonly UserManager<ApplicationUserEntity> userManager;
         private readonly IMapper mapper;
+        private readonly ServiceOfAccount serviceOfAccount;
 
         public TokenController(
+            ApplicationDbContext context,
             IJwtTokenService tokenService, 
-            UserManager<ApplicationUserEntity> userManager, 
+            UserManager<ApplicationUserEntity> userManager,
+            RoleManager<IdentityRole> roleManager,
+            IHostingEnvironment hostingEnvironment,
             IMapper mapper
             )
         {
             _tokenService = tokenService;
             this.userManager = userManager;
             this.mapper = mapper;
+
+            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
         }
 
         [HttpPost]
@@ -44,6 +57,7 @@ namespace WebApi.Controllers
             {
                 return StatusCode(500);
             }
+            await serviceOfAccount.TryToRegistration(tokenViewModel.Email);
             return Ok();
         }
         [HttpPost]
@@ -60,13 +74,22 @@ namespace WebApi.Controllers
             {
                 return BadRequest("Username or password is incorrect!");
             }
-            return Ok(new { token = GenerateToken(tokenViewModel.Email) });
-        }
 
-        private string GenerateToken(string email)
+            IList<string> roles = await userManager.GetRolesAsync(user);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, (roles.Contains("admin") ? "admin" : "user")),
+                new Claim("UserId" , user.Id)
+            };
+
+            return Ok(new { token = _tokenService.BuildToken(tokenViewModel.Email, claims) });
+        }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user")]
+        [HttpGet]
+        public IActionResult TokenVerification()
         {
-            var token = _tokenService.BuildToken(email);
-            return token;
+            return Ok();
         }
     }
 }

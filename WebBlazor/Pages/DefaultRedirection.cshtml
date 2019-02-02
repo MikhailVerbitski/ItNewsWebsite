@@ -1,0 +1,9 @@
+﻿@page "/api/values"
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+
+@functions{
+    protected override void OnInit()
+    {
+        UriHelper.NavigateTo("/");
+    }
+}

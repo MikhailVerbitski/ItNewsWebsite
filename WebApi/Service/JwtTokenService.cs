@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,13 +24,8 @@ namespace WebApi.Server.Service
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public string BuildToken([FromBody] string email)
+        public string BuildToken([FromBody] string email, List<Claim> claims)
         {
-            // Create a claim based on the users emai. You can add more claims like ID's and any other info
-            var claims = new[] {
-                new Claim(JwtRegisteredClaimNames.Email, email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
 
             // Creates a key from our private key that will be used in the security algorithm next
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

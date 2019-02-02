@@ -30,11 +30,7 @@ namespace Domain.Implementation.Services
         public IEnumerable<string> GetTagsForPost(PostEntity postEntity)
         {
             var tags = postEntity.Tags.Select(a => repositoryOfTag.Read(b => b.Id == a.TagId).Name);
-            if (tags.Count() > 0)
-            {
-                return tags;
-            }
-            return null;
+            return tags;
         }
         private IEnumerable<TagEntity> MapTagViewModelToTagEntity(IEnumerable<TagViewModel> tagViewModels) => tagViewModels.Select(a =>
                 {

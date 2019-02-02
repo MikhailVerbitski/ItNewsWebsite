@@ -1,12 +1,15 @@
-﻿@page "/CreatePost"
-@inject HttpClient Http;
+﻿@page "/CreatePost/"
+@page "/CreatePost/{Id}"
+@inject HttpClient Http
+@inject Blazor.FileReader.IFileReaderService fileReadService
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Tag;
 @using WebBlazor.Models.ViewModels.Post;
 @using Markdig;
 
-
 <div id="container-post">
-    <h1 style="text-align: center;">@header</h1>
+    <h1 style="text-align: center;">@(post.Header)</h1>
     <h3>Section: <Tag tag="@section" /></h3>
     <br />
     <p class="post-content">
@@ -14,7 +17,7 @@
     </p>
     <br />
     <span>Tags:</span>
-    <ListViewTemplateWithIf Items="TagsForDeselect">
+    <ListViewTemplateWithIf Items="@(post.Tags)">
         <ItemTemplate>
             <div style="display: inline-block; margin-top: 4px;" class="tag">@context.Name</div>
         </ItemTemplate>
@@ -26,7 +29,7 @@
     <div class="pure-form pure-form-stacked">
         <fieldset>
             <label for="header">Header</label>
-            <input id="header" type="text" bind="@header" />
+            <input id="header" type="text" bind="@(post.Header)" />
 
             <label for="selection">Selection: </label>
             <select bind="@section">
@@ -39,86 +42,114 @@
                 }
             </select>
             <div>
+                <label for="file" class="pure-button">Load image</label>
+                <input type="file" id="file" @*ref="files" *@ onchange="@LoadImage" style="display: none;" />
                 <label for="content">Content</label>
                 <textarea id="content" rows="10" bind="@ContentValue" />
             </div>
             <label for="tagInput">Tags:</label>
             <div id="grid-tag">
                 <div style="display: inline-block;">
-                    <ListViewTemplateWithIf Items="TagsForDeselect">
+                    <ListViewTemplateWithIf Items="@(post.Tags)">
                         <ItemTemplate>
                             <div style="display: inline-block; margin-top: 4px;" class="tag" onclick="@(() => DeselectTag(context))">@(context.Name)</div>
                         </ItemTemplate>
                     </ListViewTemplateWithIf>
                 </div>
-                <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress"/>
+                <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress" />
                 <datalist id="listTags">
-                    <ListViewTemplateWithIf Items="TagsForSelect">
+                    <ListViewTemplateWithIf Items="@(post.Tags)">
                         <ItemTemplate>
                             <option>@(context.Name)</option>
                         </ItemTemplate>
                     </ListViewTemplateWithIf>
                 </datalist>
             </div>
-            <br/>
-            <button onclick="@ClickCreatePost" class="pure-button pure-button-primary">Send</button>
+            <br />
+            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary">Send</button>
+            <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary">Update the draft</button>
         </fieldset>
     </div>
 </div>
 
-
 @functions{
-    public string ContentValue { get; set; } = "# Content";
-    public string header { get; set; } = "Header";
+    [Parameter] private string Id { get; set; }
 
-    public string section { get; set; }
-    public string strTags { get; set; }
-    string bindStrForInput { get; set; }
+    private string ContentValue { get; set; } = "# Content";
+    private string section { get; set; }
+    private string strTags { get; set; }
+    private string bindStrForInput { get; set; }
 
-    public IEnumerable<string> Selections { get; set; }
-    public IEnumerable<TagViewModel> ServerTags { get; set; }
+    private IEnumerable<string> Selections { get; set; }
+    private IEnumerable<TagViewModel> ServerTags { get; set; }
 
-    List<TagViewModel> TagsForSelect;
-    List<TagViewModel> TagsForDeselect;
+    private List<TagViewModel> TagsForSelect;
+    //private ElementRef files;
+
+    private PostUpdateViewModel post = new PostUpdateViewModel()
+    {
+        Tags = new List<TagViewModel>()
+    };
 
     protected override async Task OnInitAsync()
     {
-        Selections = await Http.GetJsonAsync<List<string>>("api/Post/GetListOfSelections");
-        section = Selections.First();
-        ServerTags = await Http.GetJsonAsync<IEnumerable<TagViewModel>>("api/Post/GetListOfTags");
-        TagsForSelect = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
-        TagsForDeselect = new List<TagViewModel>();
-    }
-    private async Task ClickCreatePost()
-    {
-        var post = new PostCreateEditViewModel()
+        if (await serviceOfAuthorize.TryToAuthorize())
         {
-            Header = header,
-            Content = Markdig.Markdown.ToHtml(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
-            Tags = TagsForDeselect,
-            Section = section,
-            BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
-            IsFinished = true
-        };
-        await Http.SendJsonAsync(HttpMethod.Post, "api/Post/CreatePost", post);
+            Selections = await Http.GetJsonAsync<List<string>>("api/Post/GetListOfSelections");
+            section = Selections.First();
+            ServerTags = await Http.GetJsonAsync<IEnumerable<TagViewModel>>("api/Post/GetListOfTags");
+            TagsForSelect = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
+        }
+    }
+    protected async override Task OnParametersSetAsync()
+    {
+        int id;
+        if (Id != null && Int32.TryParse(Id, out id))
+        {
+            if (await serviceOfAuthorize.TryToAuthorize())
+            {
+                post = await Http.GetJsonAsync<PostUpdateViewModel>("api/Post/Edit");
+            }
+        }
+    }
+    private async Task UpdateCreate(bool isFinished = false)
+    {
+        post.Content = Markdig.Markdown.ToHtml(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build());
+        post.Tags = post.Tags;
+        post.Section = section;
+        post.BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build());
+        post.IsFinished = isFinished;
+        if (await serviceOfAuthorize.TryToAuthorize())
+        {
+            if (isFinished)
+            {
+                post = await Http.SendJsonAsync<PostUpdateViewModel>(HttpMethod.Post, "api/Post/Create", post);
+                UriHelper.NavigateTo($"/Post/{post.PostId}");
+            }
+            else
+            {
+                await Http.SendJsonAsync(HttpMethod.Post, "api/Post/Update", post);
+                UriHelper.NavigateTo($"/");
+            }
+        }
     }
     private void SelectTag(TagViewModel tagViewModel)
     {
-        TagsForDeselect.Add(tagViewModel);
+        post.Tags.Add(tagViewModel);
         TagsForSelect.Remove(tagViewModel);
     }
     private void DeselectTag(TagViewModel tagViewModel)
     {
         TagsForSelect.Add(tagViewModel);
-        TagsForDeselect.Remove(tagViewModel);
+        post.Tags.Remove(tagViewModel);
     }
     private void TagKeyPress(UIKeyboardEventArgs eventArgs)
     {
-        if(eventArgs.Key == "Backspace")
+        if (eventArgs.Key == "Backspace")
         {
             strTags = new string(strTags.Take(strTags.Length - 1).ToArray());
         }
-        else if(eventArgs.Key.Length > 1)
+        else if (eventArgs.Key.Length > 1)
         {
             return;
         }
@@ -127,17 +158,44 @@
             strTags += eventArgs.Key;
         }
         var tag = TagsForSelect.Where(a => a.Name == strTags || a.Name == bindStrForInput).SingleOrDefault();
-        if(tag != null)
+        if (tag != null)
         {
             SelectTag(tag);
             bindStrForInput = string.Empty;
             strTags = string.Empty;
         }
-        else if(eventArgs.Key == " ")
+        else if (eventArgs.Key == " ")
         {
             SelectTag(new TagViewModel() { Name = strTags });
             bindStrForInput = string.Empty;
             strTags = string.Empty;
         }
     }
+    private async Task LoadImage()
+    {
+        //System.IO.Path.GetExtension()
+
+        //var Extension = ".png";
+
+        //var images = await fileReadService.CreateReference(files).EnumerateFilesAsync();
+        //var memoryStream = await images.First().CreateMemoryStreamAsync();
+
+        //var image = new Image()
+        //{
+        //    PostId = post.PostId,
+        //    Data = memoryStream.ToArray(),
+        //    Extension = Extension
+        //};
+        //var path = await Http.SendJsonAsync<string>(HttpMethod.Post, "/api/Post/AddImage", image);
+        //ContentValue += $"{Environment.NewLine}![comment to the image]({path})";
+
+
+        //var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
+    }
+    //class Image
+    //{
+    //    public int PostId { get; set; }
+    //    public byte[] Data { get; set; }
+    //    public string Extension { get; set; }
+    //}
 }

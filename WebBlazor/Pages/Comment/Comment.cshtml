@@ -1,10 +1,10 @@
 ﻿@page "/Comment"
 @inject HttpClient Http
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Comment;
 @using WebBlazor.Models.ViewModels.Post;
 @using WebBlazor.Models.ViewModels.User;
 @using WebBlazor.Models;
-
 
 <div class="comment">
     <div class="grid-post">
@@ -12,7 +12,9 @@
     </div>
     <div style="padding: 0 0 0 50px;">
         <div class="comment-content">
-            <p style="word-wrap: break-word;">@comment.Content</p>
+            <div>
+                <p style="word-wrap: break-word;">@comment.Content</p>
+            </div>
         </div>
         <div class="grid-comment-footer">
             <p class="container-date">@DateConverter.GetTime(comment.Created)</p>
@@ -31,7 +33,6 @@
 </div>
 <hr />
 
-
 @functions{
     [Parameter] CommentViewModel comment { get; set; }
     [Parameter] PostViewModel post { get; set; }
@@ -45,19 +46,25 @@
 
     public async Task Dislike()
     {
-        await Http.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
-        comment.IsUserLiked = !comment.IsUserLiked;
-        comment.CountOfLikes--;
+        if(await serviceOfAuthorize.TryToAuthorize())
+        {
+            await Http.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+            comment.IsUserLiked = !comment.IsUserLiked;
+            comment.CountOfLikes--;
 
-        UserRatingChange(-1);
+            UserRatingChange(-1);
+        }
     }
     public async Task Like()
     {
-        await Http.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
-        comment.IsUserLiked = !comment.IsUserLiked;
-        comment.CountOfLikes++;
+        if (await serviceOfAuthorize.TryToAuthorize())
+        {
+            await Http.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+            comment.IsUserLiked = !comment.IsUserLiked;
+            comment.CountOfLikes++;
 
-        UserRatingChange(1);
+            UserRatingChange(1);
+        }
     }
     private void UserRatingChange(int plus)
     {
@@ -65,7 +72,6 @@
             .Concat(post.Comments
             .Select(a => a.AuthorUserMiniViewModel))
             .Where(a => a.ApplicationUserId == comment.AuthorUserMiniViewModel.ApplicationUserId);
-
         foreach (var item in users)
         {
             item.CountOfLikes += plus;

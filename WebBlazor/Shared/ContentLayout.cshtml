@@ -4,34 +4,39 @@
 @using WebBlazor.Models.ViewModels.Post
 @layout MainLayout
 @inject HttpClient Http
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div class="grid-content">
     <div class="content">
-        <div class="content-head">
-            <a href="/CreatePost" id="create-post-link" class="pure-button"><font size="4">Create new post</font></a>
-        </div>
-        <div class="content-body">
-            <div id="keywords"></div>
-        </div>
-        <div class="content-body" style="padding: 20px;">
-            <a href="/Top"><h1 style="text-align:center;">Top posts</h1></a>
-            <br />
-            @if (TheFirstFiveWithTheHighestRating != null)
-            {
-                for (int i = 0; i < TheFirstFiveWithTheHighestRating.Count; i++)
+        <div class="side-bar">
+            <div class="content-head content-radius-top">
+                <a href="/CreatePost" class="pure-button create-post-link content-radius-top"><font size="4">Create new post</font></a>
+            </div>
+            <div class="content-body">
+                <div id="keywords"></div>
+            </div>
+            <div class="content-body content-radius-bott" style="padding: 20px;">
+                <a href="/Top"><h1 style="text-align:center;">Top posts</h1></a>
+                <br />
+                @if (TheFirstFiveWithTheHighestRating != null)
                 {
-                    var item = TheFirstFiveWithTheHighestRating[i];
-                    <div class="grid-post-head">
-                        <a href="/Post/@item.PostId"><font size="@(5-i)">@item.Header</font></a>
-                        <span><StarsRating PercentOfRating="@(item.Score * 20)" PostId="@(item.PostId)" /></span>
-                        <div></div>
-                    </div>
-                    <hr />
+                    for (int i = 0; i < TheFirstFiveWithTheHighestRating.Count; i++)
+                    {
+                        var item = TheFirstFiveWithTheHighestRating[i];
+                        <div style="padding-right: 20px;">
+                            <div class="grid-pots-ration-mini">
+                                <a href="/Post/@item.PostId"><font size="@(5-i)">@item.Header</font></a>
+                                <span><StarsRating PercentOfRating="@(item.Score * 20)" PostId="@(item.PostId)" /></span>
+                            </div>
+                        </div>
+                        <hr />
+                    }
                 }
-            }
+            </div>
         </div>
     </div>
-    <div class="content-head content" id="posts">
+    <div class="content-head content content-radius" id="posts">
         @Body
     </div>
 </div>
@@ -41,18 +46,24 @@
 
     protected async override Task OnInitAsync()
     {
-        TheFirstFiveWithTheHighestRating = await Http.GetJsonAsync<List<PostMiniViewModel>>("api/Post/TheFirstSeveralWithTheHighestRating?take=5");
+        if (await serviceOfAuthorize.TryToAuthorize())
+        {
+            TheFirstFiveWithTheHighestRating = await Http.GetJsonAsync<List<PostMiniViewModel>>("api/Post/TheFirstSeveralWithTheHighestRating?take=5");
+        }
     }
     protected async override Task OnAfterRenderAsync()
     {
-        var tags = await Http.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
-        var tagsForCloud = tags.Select(a => new TagForCloud()
+        if (await serviceOfAuthorize.TryToAuthorize())
         {
-            text = a.Name,
-            weight = a.CountOfUsage,
-            link = $"/PostsByTag/{a.Id}"
-        });
-        var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
-        await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
+            var tags = await Http.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
+            var tagsForCloud = tags.Select(a => new TagForCloud()
+            {
+                text = a.Name,
+                weight = a.CountOfUsage,
+                link = $"/PostsByTag/{a.Id}"
+            });
+            var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
+            await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
+        }
     }
 }

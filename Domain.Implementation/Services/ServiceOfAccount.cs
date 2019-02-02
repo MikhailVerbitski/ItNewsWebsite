@@ -40,37 +40,32 @@ namespace Domain.Implementation.Services
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
         }
 
-        public async Task<IdentityResult> TryToRegistration(RegisterViewModel registerViewModel)
+        public async Task TryToRegistration(string login)
         {
-            ApplicationUserEntity applicationUser = mapper.Map<RegisterViewModel, ApplicationUserEntity>(registerViewModel);
-            var result =  await userManager.CreateAsync(applicationUser, registerViewModel.Password);
-            if(result.Succeeded)
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.UserName == login);
+            var isRoleExist = await roleManager.RoleExistsAsync("user");
+            if (isRoleExist)
             {
-                var isRoleExist = await roleManager.RoleExistsAsync("user");
-                if (isRoleExist)
-                {
-                    var resultAddRole = await userManager.AddToRoleAsync(applicationUser, "user");
-                }
-                if(applicationUser.UserProfileId == null || registerViewModel.Avatar != null)
-                {
-                    if (applicationUser.UserProfileId == null)
-                    {
-                        var userProfile = new UserProfileEntity();
-                        userProfile.ApplicationUserId = applicationUser.Id;
-                        userProfile = RepositoryOfUserProfile.Create(userProfile);
-                        applicationUser.UserProfileId = userProfile.Id;
-                        applicationUser.UserProfile = userProfile;
-                        applicationUser.Created = System.DateTime.Now;
-                    }
-                    if (registerViewModel.Avatar != null)
-                    {
-                        var pathAvatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, registerViewModel.Avatar);
-                        applicationUser.Avatar = pathAvatar;
-                    }
-                    repositoryOfApplicationUser.Update(applicationUser);
-                }
+                var resultAddRole = await userManager.AddToRoleAsync(applicationUser, "user");
             }
-            return result;
+            if(applicationUser.UserProfileId == null /*|| registerViewModel.Avatar != null*/)
+            {
+                if (applicationUser.UserProfileId == null)
+                {
+                    var userProfile = new UserProfileEntity();
+                    userProfile.ApplicationUserId = applicationUser.Id;
+                    userProfile = RepositoryOfUserProfile.Create(userProfile);
+                    applicationUser.UserProfileId = userProfile.Id;
+                    applicationUser.UserProfile = userProfile;
+                    applicationUser.Created = System.DateTime.Now;
+                }
+                //if (registerViewModel.Avatar != null)
+                //{
+                //    //var pathAvatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, registerViewModel.Avatar);
+                //    //applicationUser.Avatar = pathAvatar;
+                //}
+                repositoryOfApplicationUser.Update(applicationUser);
+            }
         }
 
         public async Task ChangePassword(string applicationUserId, string newPassword)

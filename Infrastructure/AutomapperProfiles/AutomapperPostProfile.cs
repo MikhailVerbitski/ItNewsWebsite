@@ -8,7 +8,7 @@ namespace Infrastructure.AutomapperProfiles
     {
         public AutomapperPostProfile()
         {
-            CreateMap<PostEntity, PostCreateEditViewModel>()
+            CreateMap<PostEntity, PostUpdateViewModel>()
                 .ForMember(a => a.PostId, a => a.MapFrom(b => b.Id))
                 .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
@@ -42,7 +42,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Created, a => a.MapFrom(b => b.Created))
                 .ForAllOtherMembers(a => a.Ignore());
 
-            CreateMap<PostCreateEditViewModel, PostEntity>()
+            CreateMap<PostUpdateViewModel, PostEntity>()
                 .ForMember(a => a.Id, a => a.MapFrom(b => b.PostId))
                 .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))

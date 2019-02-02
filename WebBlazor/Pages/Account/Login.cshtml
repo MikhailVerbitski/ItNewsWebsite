@@ -1,7 +1,9 @@
 ﻿@page "/Login"
 @using Blazor.Extensions.Storage;
-@inject HttpClient Http
 @inject LocalStorage localStorage
+@inject HttpClient Http
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
 
 <h1>Login</h1>
 <div class="pure-form pure-form-stacked">
@@ -34,9 +36,9 @@
             Password = Password
         };
         var result = await Http.PostJsonAsync<Token>("/api/Token/Login", tokenViewModel);
-        Console.WriteLine(result);
-        Console.WriteLine(result.token);
         await localStorage.SetItem<string>("token", result.token);
+        await serviceOfAuthorize.TryToAuthorize();
+        UriHelper.NavigateTo("/");
     }
     class Token
     {

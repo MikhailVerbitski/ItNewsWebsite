@@ -1,21 +1,21 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.Blazor.Server;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc; 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 using Data.Implementation;
 using Data.Contracts.Models.Entities;
-using Microsoft.AspNetCore.Identity;
 using Infrastructure.AutomapperProfiles;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.ResponseCompression;
 using System.Linq;
 using System.Net.Mime;
-using Microsoft.AspNetCore.Blazor.Server;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApi.Server.Service;
 using WebApi.Server.Interface;
@@ -33,9 +33,7 @@ namespace WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUserEntity, IdentityRole>(a =>
             {
@@ -44,8 +42,7 @@ namespace WebApi
                 a.Password.RequireUppercase = false;
                 a.Password.RequireDigit = false;
             })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<ApplicationDbContext>();
 
             var mappingConfig = new MapperConfiguration(a =>
             {
@@ -55,30 +52,27 @@ namespace WebApi
                 a.AddProfile(new AutomapperTagProfile());
             });
             IMapper mapper = mappingConfig.CreateMapper();
+
             services.AddSingleton(mapper);
-
             services.AddCors();
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc();
 
             services.AddTransient<IJwtTokenService, JwtTokenService>();
-            //Setting up Jwt Authentication
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new TokenValidationParameters
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
-                };
-            });
-
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                    };
+                });
             services.AddResponseCompression(options =>
             {
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
@@ -121,7 +115,6 @@ namespace WebApi
                 builder.AllowAnyHeader();
                 builder.AllowAnyHeader();
             });
-            app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc(routes =>
             {

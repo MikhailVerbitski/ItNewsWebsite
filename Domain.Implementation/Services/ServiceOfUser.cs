@@ -65,7 +65,7 @@ namespace Domain.Implementation.Services
         public async void EditUser(string applicationUserIdCurrent, UserEditViewModel userEditViewModel)
         {
             var applicationUser = mapper.Map<UserEditViewModel, ApplicationUserEntity>(userEditViewModel);
-            applicationUser.Avatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, userEditViewModel.Avatar, true);
+            //applicationUser.Avatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, userEditViewModel.Avatar, true);
             
             repositoryOfApplicationUser.Update(applicationUser,
                 a => a.UserName,

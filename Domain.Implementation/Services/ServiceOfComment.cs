@@ -84,7 +84,7 @@ namespace Domain.Implementation.Services
         private CommentViewModel GetCommentViewModel(CommentEntity commentEntity, string applicationUserIdCurrent)
         {
             var commentViewModel = mapper.Map<CommentEntity, CommentViewModel>(commentEntity);
-            ApplicationUserEntity applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            ApplicationUserEntity applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile);
             var applicationUserForComment = repositoryOfUserProfile.Read(a => a.Id == commentEntity.UserProfileId, a => a.ApplicationUser).ApplicationUser;
             UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserForComment);
             commentViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserForComment);

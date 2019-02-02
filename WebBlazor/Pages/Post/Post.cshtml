@@ -1,8 +1,8 @@
 ﻿@page "/Post/{Id:int}"
 @inject HttpClient Http
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Post;
 @using WebBlazor.Models.ViewModels.Comment;
-
 
 @if (postViewModel == null)
 {
@@ -10,12 +10,12 @@
 }
 else
 {
-    <div id="container-post">
+    <div id="container-post" class="content-radius-top">
         <h1 style="text-align: center;">@postViewModel.Header</h1>
         <h3>Section: <Tag tag="@postViewModel.Section" /></h3>
         <br />
         <p class="post-content">
-            <Markdown Content="@postViewModel.Content" /> 
+            <Markdown Content="@postViewModel.Content" />
         </p>
         <br />
         <span>Tags:</span>
@@ -30,7 +30,7 @@ else
             <UserMini User="@postViewModel.AuthorUserMiniViewModel" />
             <div>
                 <span>Rating</span>
-                <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@true"/>
+                <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@true" />
             </div>
         </div>
         <br />
@@ -42,16 +42,15 @@ else
         </div>
     </div>
     <br />
-    <hr/>
+    <hr />
     <div onmousemove="@Update">
         <ListViewTemplate Items="comments">
             <ItemTemplate>
-                <Comment comment="@context" post="@postViewModel"/>
+                <Comment comment="@context" post="@postViewModel" />
             </ItemTemplate>
         </ListViewTemplate>
     </div>
 }
-
 
 @functions{
     [Parameter] private int Id { get; set; }
@@ -61,13 +60,15 @@ else
     public List<string> Tags;
     public string CommentContent { get; set; }
 
-    protected override async Task OnInitAsync()
+    protected async override Task OnParametersSetAsync()
     {
-        postViewModel = await Http.GetJsonAsync<PostViewModel>($"/api/Post/PostViewModel?postId={Id}");
-        comments = postViewModel.Comments.ToList();
-        Tags = postViewModel.Tags.ToList();
+        if (await serviceOfAuthorize.TryToAuthorize())
+        {
+            postViewModel = await Http.GetJsonAsync<PostViewModel>($"/api/Post/PostViewModel?postId={Id}");
+            comments = postViewModel.Comments.ToList();
+            Tags = postViewModel.Tags.ToList();
+        }
     }
-
     private async Task SubmitCommentForm()
     {
         var comment = new CommentViewModel()
@@ -75,9 +76,12 @@ else
             PostId = postViewModel.PostId,
             Content = CommentContent
         };
-        var newComment = await Http.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
-        comments.Add(newComment);
-        CommentContent = string.Empty;
+        if (await serviceOfAuthorize.TryToAuthorize())
+        {
+            var newComment = await Http.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
+            comments.Add(newComment);
+            CommentContent = string.Empty;
+        }
     }
     private void Update()
     {

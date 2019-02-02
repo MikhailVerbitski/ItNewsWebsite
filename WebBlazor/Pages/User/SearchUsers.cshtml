@@ -4,6 +4,7 @@
 @using WebBlazor.Models.ViewModels.User
 @inject HttpClient Http
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
 
 <div id="container-posts">
     <h2>@message</h2>
@@ -34,7 +35,7 @@
 
     protected override void OnInit()
     {
-        if(property == "")
+        if (property == "")
         {
             message = "nothing found :(";
         }
@@ -44,14 +45,17 @@
         if (property != "")
         {
             message = "";
-            var users = await Http.GetJsonAsync<IEnumerable<UserMiniViewModel>>($"/api/User/GetUserByProperty?property={property}");
-            ListOfUserMiniViewModels = users.ToList();
+            if (await serviceOfAuthorize.TryToAuthorize())
+            {
+                var users = await Http.GetJsonAsync<IEnumerable<UserMiniViewModel>>($"/api/User/GetUserByProperty?property={property}");
+                ListOfUserMiniViewModels = users.ToList();
+                if (property == "" && ListOfUserMiniViewModels.Count == 0)
+                {
+                    message = "nothing found :(";
+                }
+                property = string.Empty;
+            }
         }
-        if (property == "" && ListOfUserMiniViewModels.Count == 0)
-        {
-            message = "nothing found :(";
-        }
-        property = string.Empty;
     }
     private void Search()
     {

@@ -28,6 +28,9 @@ td {
 label, input, select, textarea {
     width: 100%;
 }
+textarea {
+    resize: none;
+}
 
 ol, ul {
     list-style: none;

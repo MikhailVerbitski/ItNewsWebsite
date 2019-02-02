@@ -1,17 +1,19 @@
 @inherits BlazorLayoutComponent
-@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject HttpClient Http
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
 
-<div class="grid-main">
-    <div class="pure-menu pure-menu-horizontal content" id="navbar">
-        <a href="/" class="pure-menu-item pure-menu-link" style="padding-left:3vh; padding-bottom: 0;"><h2>ItNews</h2></a>
-        <div></div>
-        <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a href="/Login" class="pure-menu-link">Login</a></li>
-            <li class="pure-menu-item"><a href="/Registration" class="pure-menu-link">Registration</a></li>
-        </ul>
+<div>
+    <div class="pure-menu pure-menu-horizontal" id="navbar">
+        <div class="logo"><a href="/" style="margin-left:3vh; padding-bottom: 0;"><font size="5">ItNews</font></a></div>
+        <div class="account-nav">
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="/Login" class="pure-menu-link">Login</a></li>
+                <li class="pure-menu-item"><a href="/Registration" class="pure-menu-link">Registration</a></li>
+            </ul>
+        </div>
         <div class="pure-form" id="search">
-            <input type="text" class="pure-input-rounded" bind="@SearchWords"/>
-            <a class="pure-button" href="/SearchUsers/@SearchWords">Search</a>
+            <input type="text" class="pure-input-rounded" bind="@SearchWords" />
+            <div><a href="/SearchUsers/@SearchWords">Search</a></div>
         </div>
     </div>
     <div id="mainBody">

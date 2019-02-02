@@ -13,7 +13,9 @@
     <link href="css/stars-rating.css" rel="stylesheet" />
     <link href="css/default-tags.css" rel="stylesheet" />
     <link href="css/particles.css" rel="stylesheet" />
+    <link href="css/querus.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script charset="utf-8" src="js/helper.js"></script>
     <script charset="utf-8" src="js/jqcloud.js"></script>
     <script charset="utf-8" src="js/TagsCloudStarter.js"></script>
 </head>
@@ -25,26 +27,6 @@
     
     <script src="/js/particles.js"></script>
     <script src="js/app.js"></script>
-
-    <script>
-        var count_particles, stats, update;
-        stats = new Stats;
-        stats.setMode(0);
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.left = '0px';
-        stats.domElement.style.top = '0px';
-        document.body.appendChild(stats.domElement);
-        count_particles = document.querySelector('.js-count-particles');
-        update = function () {
-            stats.begin();
-            stats.end();
-            if (window.pJSDom[0].pJS.particles && window.pJSDom[0].pJS.particles.array) {
-                count_particles.innerText = window.pJSDom[0].pJS.particles.array.length;
-            }
-            requestAnimationFrame(update);
-        };
-        requestAnimationFrame(update);
-    </script>
 
     <script src="_framework/blazor.webassembly.js"></script>
 </body>

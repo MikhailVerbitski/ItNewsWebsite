@@ -1,0 +1,32 @@
+﻿@media only screen and (max-width: 720px){
+    #mainBody {
+        margin: 0 25px;
+    }
+    .side-bar{
+        display: none;
+    }
+    .grid-content{
+        grid-template-columns: 1fr;
+        margin-top: 190px;
+    }
+    #navbar{
+        grid-template-columns: 1fr;
+        height: auto;
+        padding-bottom:10px;
+    }
+    #search{
+        grid-template-columns: auto;
+        grid-template-rows: auto auto;
+        grid-row-gap: 7px;
+    }
+    #grid-user-profile {
+        margin-top: 190px;
+        grid-template-columns: auto;
+    }
+    .account-nav {
+        justify-self: center;
+    }
+    .logo {
+        justify-self: center;
+    }
+}

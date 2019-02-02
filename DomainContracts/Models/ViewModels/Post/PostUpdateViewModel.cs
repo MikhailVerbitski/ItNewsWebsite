@@ -1,23 +1,17 @@
-﻿using System.Collections.Generic;
-using WebBlazor.Models.ViewModels.Tag;
+﻿using Domain.Contracts.Models.ViewModels.Tag;
+using System.Collections.Generic;
 
-namespace WebBlazor.Models.ViewModels.Post
+namespace Domain.Contracts.Models.ViewModels.Post
 {
-    public class PostCreateEditViewModel
+    public class PostUpdateViewModel : BasePostViewModel
     {
-        public int PostId { get; set; }
-
-        public string Header { get; set; }
-
         public int? SectionId { get; set; }
 
         public string Section { get; set; }
-        
+
         public int UserProfileId { get; set; }
 
         public string Content { get; set; }
-
-        public string BriefDesctiption { get; set; }
 
         public IEnumerable<TagViewModel> Tags { get; set; }
 

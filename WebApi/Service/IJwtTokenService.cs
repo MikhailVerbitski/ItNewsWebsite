@@ -1,7 +1,10 @@
-﻿namespace WebApi.Server.Interface
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+
+namespace WebApi.Server.Interface
 {
     public interface IJwtTokenService
     {
-        string BuildToken(string email);
+        string BuildToken(string email, List<Claim> claims);
     }
 }

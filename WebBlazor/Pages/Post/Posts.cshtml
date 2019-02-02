@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject HttpClient Http
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Post
 
 
@@ -27,6 +28,9 @@ else
 
     protected override async Task OnInitAsync()
     {
-        ListOfPosts = await Http.GetJsonAsync<List<PostCompactViewModel>>("/api/Post/ListPostsCompactViewModel");
+        if (await serviceOfAuthorize.Authorize)
+        {
+            ListOfPosts = await Http.GetJsonAsync<List<PostCompactViewModel>>("/api/Post/ListPostsCompactViewModel");
+        }
     }
-}
+}   
