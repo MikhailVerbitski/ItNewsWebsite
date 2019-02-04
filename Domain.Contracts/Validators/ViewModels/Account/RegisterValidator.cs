@@ -10,7 +10,7 @@ namespace Domain.Contracts.Validators.ViewModels.Account
             RuleFor(a => a.FirstName).NotEmpty();
             RuleFor(a => a.LastName).NotEmpty();
             RuleFor(a => a.Login).NotEmpty();
-            RuleFor(a => a.Password).NotEmpty();
+            RuleFor(a => a.Password).NotEmpty().Length(6,20);
             RuleFor(a => a.Email).NotEmpty().EmailAddress();
         }
     }

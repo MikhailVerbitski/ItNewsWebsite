@@ -1,4 +1,4 @@
-﻿namespace Domain.Contracts.Models
+﻿namespace Domain.Contracts.Models.ViewModels
 {
     public class ImageViewModel
     {

@@ -182,3 +182,15 @@
 .side-bar{
 
 }
+
+.validationerror li{
+    color: red;
+}
+
+.validationsummary li {
+    color: red;
+}
+
+.account {
+    margin: 80px 25% 40px 25%;
+}

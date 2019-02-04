@@ -2,6 +2,7 @@
 @page "/CreatePost/{Id}"
 @inject Blazor.FileReader.IFileReaderService fileReadService
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject HttpClient Http
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Tag;
 @using WebBlazor.Models.ViewModels.Post;
@@ -165,27 +166,24 @@
     {
         //System.IO.Path.GetExtension()
 
-        //var Extension = ".png";
+        var Extension = ".png";
 
-        //var images = await fileReadService.CreateReference(files).EnumerateFilesAsync();
-        //var memoryStream = await images.First().CreateMemoryStreamAsync();
+        var images = await fileReadService.CreateReference(files).EnumerateFilesAsync();
+        var memoryStream = await images.First().CreateMemoryStreamAsync();
 
-        //var image = new Image()
-        //{
-        //    PostId = post.PostId,
-        //    Data = memoryStream.ToArray(),
-        //    Extension = Extension
-        //};
-        //var path = await Http.SendJsonAsync<string>(HttpMethod.Post, "/api/Post/AddImage", image);
-        //ContentValue += $"{Environment.NewLine}![comment to the image]({path})";
-
-
-        //var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
+        var image = new Image()
+        {
+            PostId = post.PostId,
+            Data = memoryStream.ToArray(),
+            Extension = Extension
+        };
+        var path = await Http.SendJsonAsync<string>(HttpMethod.Post, "/api/Post/AddImage", image);
+        ContentValue += $"{Environment.NewLine}![comment to the image]({path})";
     }
-    //class Image
-    //{
-    //    public int PostId { get; set; }
-    //    public byte[] Data { get; set; }
-    //    public string Extension { get; set; }
-    //}
+    class Image
+    {
+        public int PostId { get; set; }
+        public byte[] Data { get; set; }
+        public string Extension { get; set; }
+    }
 }

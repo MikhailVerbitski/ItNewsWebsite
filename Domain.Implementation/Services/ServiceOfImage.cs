@@ -1,9 +1,7 @@
-﻿using Data.Contracts.Models.Entities;
-using Data.Implementation;
+﻿using Data.Implementation;
 using Data.Implementation.Repositories;
-using Domain.Contracts.Models;
+using Domain.Contracts.Models.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Linq;
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace Domain.Contracts.Models.ViewModels.Account
+﻿namespace Domain.Contracts.Models.ViewModels.Account
 {
     public class RegisterViewModel
     {
@@ -8,16 +6,10 @@ namespace Domain.Contracts.Models.ViewModels.Account
 
         public string LastName { get; set; }
 
+        public string Email { get; set; }
+
         public string Login { get; set; }
 
-        public string Email { get; set; }
-        
         public string Password { get; set; }
-
-        //public string ConfirmPassword { get; set; }
-
-        public IFormFile Avatar { get; set; }
-
-        public string ReturnUrl { get; set; }
     }
 }

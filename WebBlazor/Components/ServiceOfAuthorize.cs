@@ -1,9 +1,9 @@
 ﻿using Blazor.Extensions.Storage;
 using Microsoft.AspNetCore.Blazor;
 using Microsoft.AspNetCore.Blazor.Services;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using WebBlazor.Models.ViewModels;
 
 namespace WebBlazor.Components
 {
@@ -55,11 +55,12 @@ namespace WebBlazor.Components
             //Task.Run(async () => { authorize = await Authorize; System.Console.WriteLine(authorize); });
             return Authorize;
         }
-        public async Task Login(WebBlazor.Models.ViewModels.TokenViewModel tokenViewModel)
+        public async Task<TokenViewModel> Login(WebBlazor.Models.ViewModels.Account.LoginViewModel loginViewModel)
         {
-            var result = await Http.PostJsonAsync<Token>("/api/Token/Login", tokenViewModel);
-            await localStorage.SetItem<string>("token", result.token);
+            var result = await Http.PostJsonAsync<TokenViewModel>("/api/Token/Login", loginViewModel);
+            await localStorage.SetItem<string>("token", result.Token);
             await TryToAuthorize();
+            return result;
         }
         public void Logout()
         {

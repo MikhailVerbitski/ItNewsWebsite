@@ -5,37 +5,66 @@
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 
-<h1>Login</h1>
+<h1>Log in</h1>
+@if (ServerErrors != null)
+{
+    <div class="validationsummary">
+        <ul>
+            @foreach (var error in ServerErrors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+    <br />
+}
 <div class="pure-form pure-form-stacked">
-    <fieldset>
 
-        <label for="email">Email</label>
-        <input id="email" type="email" placeholder="Email" bind="@Email" />
-        <span class="pure-form-message">This is a required field.</span>
+    <label for="Login"><font size="5">Login</font></label>
+    <input id="Login" type="email" placeholder="Login" bind="@login.Login" />
+    <ValidationError Subject="@login" Property="@nameof(login.Login)" />
+    <br />
 
-        <label for="password">Password</label>
-        <input id="password" type="password" placeholder="Password" bind="@Password" />
+    <label for="password"><font size="5">Password</font></label>
+    <input id="password" type="password" placeholder="Password" bind="@login.Password" />
+    <ValidationError Subject="@login" Property="@nameof(login.Password)" />
+    <br />
 
-        <label for="remember" class="pure-checkbox">Remember me</label>
-        <input id="remember" type="checkbox">
+    <div class="grid-login-remember">
+        <label for="remember" class="pure-checkbox" style="margin: 0;"><font size="3">Remember me</font></label>
+        <input id="remember" type="checkbox" bind="@login.RememberMe" style="width: auto;"/>
+    </div>
+    <ValidationError Subject="@login" Property="@nameof(login.RememberMe)" />
+    <br />
 
-        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Login</button>
-    </fieldset>
+    <button onclick="@SubmitForm" class="pure-button pure-button-primary">Login</button>
 </div>
 
 @functions{
-    public string Email { get; set; } = "";
-    public string Password { get; set; } = "";
+    private List<string> ServerErrors { get; set; }
+    private bool DisplayValidationSummary { get; set; } = false;
+    WebBlazor.Models.ViewModels.Account.LoginValidationViewModel login { get; set; } = new Models.ViewModels.Account.LoginValidationViewModel();
 
     private async Task SubmitForm()
     {
-        WebBlazor.Models.ViewModels.TokenViewModel tokenViewModel = new Models.ViewModels.TokenViewModel
+        if(!login.HasErrors)
         {
-            Email = Email,
-            Password = Password
-        };
-        await serviceOfAuthorize.Login(tokenViewModel);
-        UriHelper.NavigateTo("/");
-        await WebBlazor.JsInteropClasses.Reload.ReloadPage();
+            WebBlazor.Models.ViewModels.Account.LoginViewModel requestLogin = new Models.ViewModels.Account.LoginViewModel()
+            {
+                Login = login.Login,
+                Password = login.Password,
+                RememberMe = login.RememberMe
+            };
+            var response = await serviceOfAuthorize.Login(requestLogin);
+            if (response.Errors != null)
+            {
+                ServerErrors = response.Errors.ToList();
+            }
+            else
+            {
+                UriHelper.NavigateTo("/");
+                await WebBlazor.JsInteropClasses.Reload.ReloadPage();
+            }
+        }
     }
 }

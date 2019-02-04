@@ -1,39 +1,90 @@
 ﻿@page "/Registration"
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject HttpClient Http
-
+@addTagHelper *, Blazor.Validation
 
 <h1>Registration</h1>
+@if (DisplayValidationSummary)
+{
+    <div>
+        <ValidationSummary Subject="@user" />
+        <br />
+    </div>
+}
+@if (ServerErrors != null)
+{
+    <div class="validationsummary">
+        <ul>
+            @foreach (var error in ServerErrors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+    <br />
+}
 <div class="pure-form pure-form-stacked">
-    <fieldset>
 
-        <label for="email">Email</label>
-        <input id="email" type="email" placeholder="Email" bind="@Email"/>
-        <span class="pure-form-message">This is a required field.</span>
+    <label for="FirstName"><font size="5">First Name</font></label>
+    <input id="FirstName" type="text" bind="@user.FirstName" />
+    <ValidationError Subject="@user" Property="@nameof(user.FirstName)" />
+    <br />
 
-        <label for="password">Password</label>
-        <input id="password" type="password" placeholder="Password" bind="@Password"/>
-        
-        <label for="remember" class="pure-checkbox">
-            <input id="remember" type="checkbox"> Remember me
-        </label>
+    <label for="LastName"><font size="5">Last Name</font></label>
+    <input id="LastName" type="text" bind="@user.LastName" />
+    <ValidationError Subject="@user" Property="@nameof(user.LastName)" />
+    <br />
 
-        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Registration</button>
-    </fieldset>
+    <label for="Login"><font size="5">Login</font></label>
+    <input id="Login" type="text" bind="@user.Login" />
+    <ValidationError Subject="@user" Property="@nameof(user.Login)" />
+    <br />
+
+    <label for="Email"><font size="5">Email</font></label>
+    <input id="Email" type="text" bind="@user.Email" />
+    <ValidationError Subject="@user" Property="@nameof(user.Email)" />
+    <br />
+
+    <label for="Password"><font size="5">Password</font></label>
+    <input id="Password" type="password" bind="@user.Password" />
+    <ValidationError Subject="@user" Property="@nameof(user.Password)" />
+    <br />
+
+    <label for="ConfirmPassword"><font size="5">Confirm password</font></label>
+    <input id="ConfirmPassword" type="password" bind="@user.ConfirmPassword" />
+    <ValidationError Subject="@user" Property="@nameof(user.ConfirmPassword)" />
+    <br />
+
+    <button onclick="@SubmitForm" class="pure-button pure-button-primary">Registration</button>
 </div>
 
 @functions{
-    public string Email { get; set; } = "";
-    public string Password { get; set; } = "";
+    WebBlazor.Models.ViewModels.Account.RegisterValidationViewModel user { get; set; } = new Models.ViewModels.Account.RegisterValidationViewModel();
+    private bool DisplayValidationSummary { get; set; } = false;
+    private List<string> ServerErrors { get; set; }
 
     private async Task SubmitForm()
     {
-        WebBlazor.Models.ViewModels.TokenViewModel tokenViewModel = new Models.ViewModels.TokenViewModel
+        ServerErrors = null;
+        if (!user.HasErrors)
         {
-            Email = Email,
-            Password = Password
-        };
-        await Http.PostJsonAsync("/api/Token/Registration", tokenViewModel);
-        UriHelper.NavigateTo("/Login");
+            var registerUser = new WebBlazor.Models.ViewModels.Account.RegisterViewModel()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Login = user.Login,
+                Email = user.Email,
+                Password = user.Password
+            };
+            try
+            {
+                ServerErrors = await Http.PostJsonAsync<List<string>>("/api/Token/Registration", registerUser);
+            }
+            catch
+            {
+                UriHelper.NavigateTo("/Login");
+            }
+        }
+        DisplayValidationSummary = true;
     }
 }

@@ -3,6 +3,7 @@ using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
+using Domain.Contracts.Models.ViewModels;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Microsoft.AspNetCore.Hosting;

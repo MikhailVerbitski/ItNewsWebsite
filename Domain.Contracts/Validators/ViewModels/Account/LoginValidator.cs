@@ -8,7 +8,7 @@ namespace Domain.Contracts.Validators.ViewModels.Account
         public LoginValidator()
         {
             RuleFor(a => a.Login).NotEmpty();
-            RuleFor(a => a.Password).NotEmpty();
+            RuleFor(a => a.Password).NotEmpty().Length(6, 20);
         }
     }
 }

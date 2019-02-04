@@ -5,7 +5,9 @@ using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Domain.Implementation.Services
@@ -40,6 +42,10 @@ namespace Domain.Implementation.Services
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
         }
 
+        public ApplicationUserEntity Get(Expression<Func<ApplicationUserEntity, bool>> property)
+        {
+            return repositoryOfApplicationUser.Read(property);
+        }
         public async Task TryToRegistration(string login)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.UserName == login);

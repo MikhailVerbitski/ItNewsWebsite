@@ -5,19 +5,22 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Domain.Implementation.Services;
-using WebApi.Models;
 using WebApi.Server.Interface;
 using System.Collections.Generic;
 using Data.Implementation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Domain.Contracts.Models.ViewModels.Account;
+using Domain.Contracts.Validators.ViewModels.Account;
+using System.Linq;
+using Domain.Contracts.Models.ViewModels;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/Token/[action]")]
-    public class TokenController : ControllerBase
+    public class TokenController : Controller
     {
         private readonly IJwtTokenService _tokenService;
         private readonly UserManager<ApplicationUserEntity> userManager;
@@ -41,49 +44,60 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Registration([FromBody] TokenViewModel tokenViewModel)
+        public async Task<JsonResult> Registration([FromBody] RegisterViewModel registerViewModel)
         {
-            if(!ModelState.IsValid)
+            var validator = new RegisterValidator();
+            var validatorResult = validator.Validate(registerViewModel);
+            if (validatorResult.IsValid)
             {
-                return BadRequest();
+                var applicationUser = mapper.Map<RegisterViewModel, ApplicationUserEntity>(registerViewModel);
+                var result = await userManager.CreateAsync(applicationUser, registerViewModel.Password);
+                if (!result.Succeeded)
+                {
+                    return Json(result.Errors.Select(a => a.Description).ToList());
+                }
+                await serviceOfAccount.TryToRegistration(registerViewModel.Login);
+                return Json(Ok());
             }
-            var applicationUser = new ApplicationUserEntity()
+            else
             {
-                UserName = tokenViewModel.Email,
-                Email = tokenViewModel.Email
-            };
-            var result = await userManager.CreateAsync(applicationUser, tokenViewModel.Password);
-            if(!result.Succeeded)
-            {
-                return StatusCode(500);
+                return Json(validatorResult.Errors.Select(a => a.ErrorMessage).ToList());
             }
-            await serviceOfAccount.TryToRegistration(tokenViewModel.Email);
-            return Ok();
         }
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] TokenViewModel tokenViewModel)
+        public async Task<JsonResult> Login([FromBody] LoginViewModel loginViewModel)
         {
-            if (!ModelState.IsValid)
+            var response = new TokenViewModel();
+
+            var validator = new LoginValidator();
+            var validatorResult = validator.Validate(loginViewModel);
+            if (validatorResult.IsValid)
             {
-                return BadRequest();
+                var user = serviceOfAccount.Get(a => a.UserName == loginViewModel.Login);
+                var correctUser = await userManager.CheckPasswordAsync(user, loginViewModel.Password);
+
+                if (!correctUser)
+                {
+                    response.Errors = new List<string>();
+                    (response.Errors as List<string>).Add("Username or password is incorrect!");
+                    return Json(response);
+                }
+
+                IList<string> roles = await userManager.GetRolesAsync(user);
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, (roles.Contains("admin") ? "admin" : "user")),
+                    new Claim("UserId" , user.Id)
+                };
+
+                response.Token = _tokenService.BuildToken(user.Email, claims);
             }
-            var user = await userManager.FindByEmailAsync(tokenViewModel.Email);
-            var correctUser = await userManager.CheckPasswordAsync(user, tokenViewModel.Password);
-
-            if (!correctUser)
+            else
             {
-                return BadRequest("Username or password is incorrect!");
+                response.Errors = validatorResult.Errors.Select(a => a.ErrorMessage).ToList();
             }
-
-            IList<string> roles = await userManager.GetRolesAsync(user);
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, (roles.Contains("admin") ? "admin" : "user")),
-                new Claim("UserId" , user.Id)
-            };
-
-            return Ok(new { token = _tokenService.BuildToken(tokenViewModel.Email, claims) });
+            return Json(response);
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user")]
         [HttpGet]

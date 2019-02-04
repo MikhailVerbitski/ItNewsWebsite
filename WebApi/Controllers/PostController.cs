@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
-using Domain.Contracts.Models;
+using Domain.Contracts.Models.ViewModels;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

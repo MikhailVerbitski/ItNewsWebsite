@@ -49,6 +49,7 @@ namespace Domain.Implementation.Services
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
         }
 
+
         public IEnumerable<UserMiniViewModel> GetUserByProperty(string propetry)
         {
             return GetUsers(a => a.FirstName.Contains(propetry) || a.LastName.Contains(propetry) || a.UserName.Contains(propetry));

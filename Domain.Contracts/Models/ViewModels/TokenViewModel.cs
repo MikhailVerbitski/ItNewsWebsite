@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace WebBlazor.Models.ViewModels
+namespace Domain.Contracts.Models.ViewModels
 {
     public class TokenViewModel
     {
