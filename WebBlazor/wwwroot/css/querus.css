@@ -29,4 +29,7 @@
     .logo {
         justify-self: center;
     }
+    .account {
+        margin: 190px 0 40px 0;
+    }
 }
