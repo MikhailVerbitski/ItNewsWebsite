@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
+using Domain.Contracts.Models.ViewModels.User;
 using Domain.Implementation.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace WebApi.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user")]
     [ApiController]
     [Route("api/User/[action]")]
     public class UserController : Controller
@@ -40,6 +45,12 @@ namespace WebApi.Controllers
         {
             var user = serviceOfUser.GetUserViewModel(login);
             return Json(user);
+        }
+        [HttpPost]
+        public void Update([FromBody] UserUpdateViewModel userUpdateViewModel)
+        {
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            serviceOfUser.Update(userId, userUpdateViewModel);
         }
     }
 }

@@ -17,37 +17,43 @@ else
             <br />
             <div id="grid-user-profile-userData">
                 <font size="5">First name:</font>
-                <font size="5">@User.FirstName</font>
-                <button onclick="@(() => ChangeProperty(a => a.FirstName))">change</button>
+                <font style="display: @((!ChangeKeys[0]) ? "" : "none")" size="5">@User.FirstName</font>
+                <input style="display: @((ChangeKeys[0]) ? "" : "none")" bind="@User.FirstName" />
+                <button onclick="@(() => ChangeProperty(0))">change</button>
 
                 <font size="5">Last name:</font>
-                <font size="5">@User.LastName</font>
-                <button onclick="@(() => ChangeProperty(a => a.LastName))">change</button>
+                <font style="display: @((!ChangeKeys[1]) ? "" : "none")" size="5">@User.LastName</font>
+                <input style="display: @((ChangeKeys[1]) ? "" : "none")" bind="@User.LastName" />
+                <button onclick="@(() => ChangeProperty(1))">change</button>
 
                 <font size="5" color="@User.RoleColor">Role:</font>
                 <font size="5" color="@User.RoleColor">@User.Role</font>
-                <button onclick="@(() => ChangeProperty(a => a.Role))">change</button>
+                <button onclick="@(() => ChangeProperty(2))">change</button>
 
                 <font size="5">Count of likes:</font>
                 <font size="5">@User.CountOfLikes</font>
                 <div></div>
 
-                <font size="5">Phone number:</font>
-                <font size="5">@User.PhoneNumber</font>
-                <button onclick="@(() => ChangeProperty(a => a.PhoneNumber))">change</button>
-
                 <font size="5">Login:</font>
-                <font size="5">@User.Login</font>
-                <button onclick="@(() => ChangeProperty(a => a.Login))">change</button>
+                <font style="display: @((!ChangeKeys[3]) ? "" : "none")" size="5">@User.Login</font>
+                <input style="display: @((ChangeKeys[3]) ? "" : "none")" bind="@User.Login" />
+                <button onclick="@(() => ChangeProperty(3))">change</button>
+
+                <font size="5">New password:</font>
+                <input bind="@User.Password" />
+                <button onclick="@(() => ChangeProperty(null))">change</button>
 
                 <font size="5">Email:</font>
-                <font size="5">@User.Email</font>
-                <button onclick="@(() => ChangeProperty(a => a.Email))">change</button>
+                <font style="display: @((!ChangeKeys[4]) ? "" : "none")" size="5">@User.Email</font>
+                <input style="display: @((ChangeKeys[4]) ? "" : "none")" bind="@User.Email" />
+                <button onclick="@(() => ChangeProperty(4))">change</button>
 
                 <font size="5">Registration date:</font>
                 <font size="5">@User.Created.ToLongDateString()</font>
                 <div></div>
             </div>
+            <br/>
+            <button style="display: @((ButtonSaveChange) ? "" : "none")" class="pure-button pure-button-primary" onclick="@SaveChange">Save change</button>
         </div>
         <div class="grid-scroll">
             <h2>Posts</h2>
@@ -79,13 +85,33 @@ else
 @functions{
     [Parameter] private string login { get; set; }
     private UserViewModel User { get; set; }
+    private bool[] ChangeKeys = new bool[5];
+    private bool ButtonSaveChange = false;
 
     protected async override Task OnInitAsync()
     {
         User = await serviceOfAuthorize.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?login={login}");
     }
-    private void ChangeProperty(System.Linq.Expressions.Expression<Func<UserViewModel, object>> property)
+    private void ChangeProperty(int? key)
     {
-
+        ButtonSaveChange = true;
+        if(key.HasValue)
+        {
+            ChangeKeys[key.Value] = !ChangeKeys[key.Value];
+        }
+    }
+    private async void SaveChange()
+    {
+        ButtonSaveChange = false;
+        var userUpdate = new UserUpdateViewModel()
+        {
+            ApplicationUserId = User.ApplicationUserId,
+            FirstName = User.FirstName,
+            LastName = User.LastName,
+            Email = User.Email,
+            Login = User.Login,
+            Password = User.Password
+        };
+        await serviceOfAuthorize.PostJsonAsync<object>("/api/User/Update", userUpdate);
     }
 }

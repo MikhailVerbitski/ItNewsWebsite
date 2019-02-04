@@ -63,25 +63,24 @@ namespace Domain.Implementation.Services
                 .ToList();
         }
 
-        public async void EditUser(string applicationUserIdCurrent, UserEditViewModel userEditViewModel)
+        public async void Update(string applicationUserIdCurrent, UserUpdateViewModel userUpdateViewModel)
         {
-            var applicationUser = mapper.Map<UserEditViewModel, ApplicationUserEntity>(userEditViewModel);
-            //applicationUser.Avatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, userEditViewModel.Avatar, true);
-            
+            var applicationUser = mapper.Map<UserUpdateViewModel, ApplicationUserEntity>(userUpdateViewModel);
             repositoryOfApplicationUser.Update(applicationUser,
-                a => a.UserName,
+                a => a.FirstName,
                 a => a.LastName,
                 a => a.UserName,
-                a => a.Email,
-                a => a.PhoneNumber,
-                a => a.Avatar);
+                a => a.Email);
 
-            await serviceOfAccount.ChangePassword(userEditViewModel.ApplicationUserId, userEditViewModel.Password);
-            var tasksOfAddsRoles = userEditViewModel
-                .Roles
-                .Where(a => a.Selected)
-                .Select(a => serviceOfAccount.AddUserRole(userEditViewModel.ApplicationUserId, a.Text));
-            Task.WaitAll(tasksOfAddsRoles.ToArray());
+            if (userUpdateViewModel.Password != null && userUpdateViewModel.Password != "")
+            {
+                await serviceOfAccount.ChangePassword(applicationUser.Id, userUpdateViewModel.Password);
+            }
+            //var tasksOfAddsRoles = userEditViewModel
+            //    .Roles
+            //    .Where(a => a.Selected)
+            //    .Select(a => serviceOfAccount.AddUserRole(userEditViewModel.ApplicationUserId, a.Text));
+            //Task.WaitAll(tasksOfAddsRoles.ToArray());
         }
 
         public async Task<UserEditViewModel> GetUserEditViewModel(string applicationUserId)
