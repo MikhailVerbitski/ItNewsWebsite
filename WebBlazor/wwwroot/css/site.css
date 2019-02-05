@@ -194,3 +194,11 @@
 .account {
     margin: 80px 25% 40px 25%;
 }
+
+.post-edit-delete {
+    justify-self: self-end;
+    align-self: self-end;
+}
+.post-edit-delete font {
+    opacity: 0.6;
+}

@@ -1,5 +1,6 @@
 ﻿@page "/UserPage/{login}"
 @using WebBlazor.Models.ViewModels.User
+@using WebBlazor.Models.ViewModels.Post
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 @inject Components.ServiceOfImage serviceOfImage
 
@@ -71,7 +72,7 @@ else
                 <br />
                 <ListViewTemplate Items="User.Posts.ToList()">
                     <ItemTemplate>
-                        <PostMini post="@context" />
+                        <PostMini deletePost="@((post) => DeletePost(post))" post="@context" />
                     </ItemTemplate>
                 </ListViewTemplate>
             </div>
@@ -128,5 +129,10 @@ else
     {
         User.Avatar = await serviceOfImage.LoadUserImage(files);
         this.ShouldRender();
+    }
+    private void DeletePost(PostMiniViewModel post)
+    {
+        User.Posts = User.Posts.Except(new[] { post }).ToList();
+        StateHasChanged();
     }
 }

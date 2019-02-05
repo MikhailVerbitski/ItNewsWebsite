@@ -130,7 +130,8 @@ namespace Data.Implementation
             Post
                 .HasMany(a => a.Images)
                 .WithOne(a => a.Post)
-                .HasForeignKey(a => a.PostId);
+                .HasForeignKey(a => a.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
             Post
                 .HasMany(a => a.PostRatings)
                 .WithOne(a => a.Post)

@@ -15,17 +15,22 @@ else
     <div id="container-posts">
         <ListViewTemplate Items="@ListOfPosts">
             <ItemTemplate>
-                <PostCompact post="@context" />
+                <PostCompact deletePost="@((post) => DeletePost(post))" post="@context" />
             </ItemTemplate>
         </ListViewTemplate>
     </div>
 }
 
 @functions {
-    private List<PostCompactViewModel> ListOfPosts;
+    public  List<PostCompactViewModel> ListOfPosts { get; set; }
 
     protected override async Task OnInitAsync()
     {
         ListOfPosts = await serviceOfAuthorize.GetJsonAsync<List<PostCompactViewModel>>("/api/Post/ListPostsCompactViewModel");
     }
-}   
+    private void DeletePost(PostCompactViewModel post)
+    {
+        ListOfPosts = ListOfPosts.Except(new[] { post }).ToList();
+        StateHasChanged();
+    }
+}

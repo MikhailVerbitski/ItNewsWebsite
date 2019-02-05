@@ -64,7 +64,7 @@ else
     {
         postViewModel = await serviceOfAuthorize.GetJsonAsync<PostViewModel>($"/api/Post/PostViewModel?postId={Id}");
         comments = postViewModel.Comments.ToList();
-        Tags = postViewModel.Tags.ToList();
+        Tags = postViewModel.Tags.Select(a => a.Name).ToList();
     }
     private async Task SubmitCommentForm()
     {

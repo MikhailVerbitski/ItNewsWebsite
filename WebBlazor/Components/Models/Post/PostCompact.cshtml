@@ -1,5 +1,6 @@
 ﻿@using WebBlazor.Models.ViewModels.Post
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject Components.ServiceOfAuthorize serviceOfAuthorize
 
 <div>
     <div class="grid-post-head">
@@ -14,7 +15,10 @@
 <br />
 <div class="grid-cols-two">
     <UserMini User="@post.AuthorUserMiniViewModel" />
-    <a ></a>
+    <div class="post-edit-delete">
+        <font size="2"><a href="/CreatePost/@post.PostId">Edit</a></font>
+        <font size="2"><a onclick="@Delete">Delete</a></font>
+    </div>
 </div>
 <br />
 <hr />
@@ -22,7 +26,13 @@
 <br />
 
 @functions {
-    [Parameter] PostCompactViewModel post { get; set; }
+    [Parameter] private PostCompactViewModel post { get; set; }
+    [Parameter] private Action<PostCompactViewModel> deletePost { get; set; }
 
     private void OpenPost() => UriHelper.NavigateTo($"/Post/{post.PostId}");
+    private async Task Delete()
+    {
+        await serviceOfAuthorize.GetAsync($"api/Post/Delete?postId={post.PostId}");
+        deletePost(post);
+    }
 }

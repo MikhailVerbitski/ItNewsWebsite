@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
@@ -56,6 +57,12 @@ namespace WebApi.Controllers
         public void Update([FromBody] PostUpdateViewModel postCreateEditViewModel)
         {
             serviceOfPost.Update(postCreateEditViewModel);
+        }
+        [HttpGet]
+        public async Task Delete(int postId)
+        {
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            await serviceOfPost.Delete(currentUserId, postId);
         }
         [HttpGet]
         public JsonResult PutEstimate(int postId, byte score)

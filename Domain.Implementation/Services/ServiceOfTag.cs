@@ -27,9 +27,9 @@ namespace Domain.Implementation.Services
             var tagViewModels = mapper.Map<IEnumerable<TagEntity>, IEnumerable<TagViewModel>>(tagEntities);
             return tagViewModels.ToList();
         }
-        public IEnumerable<string> GetTagsForPost(PostEntity postEntity)
+        public IEnumerable<TagViewModel> GetTagsForPost(PostEntity postEntity)
         {
-            var tags = postEntity.Tags.Select(a => repositoryOfTag.Read(b => b.Id == a.TagId).Name);
+            var tags = postEntity.Tags.Select(a => repositoryOfTag.Read(b => b.Id == a.TagId)).Select(a => mapper.Map<TagEntity, TagViewModel>(a));
             return tags;
         }
         private IEnumerable<TagEntity> MapTagViewModelToTagEntity(IEnumerable<TagViewModel> tagViewModels) => tagViewModels.Select(a =>
