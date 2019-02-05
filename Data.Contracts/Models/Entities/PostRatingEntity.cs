@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Data.Contracts.Models.Entities
+﻿namespace Data.Contracts.Models.Entities
 {
     public class PostRatingEntity
     {
@@ -10,12 +6,12 @@ namespace Data.Contracts.Models.Entities
 
         public int? PostId { get; set; }
 
-        public PostEntity Post { get; set; }
-
         public int? UserProfileId { get; set; }
 
-        public UserProfileEntity UserProfile { get; set; }
-
         public byte Score { get; set; }
+
+        public virtual PostEntity Post { get; set; }
+
+        public virtual UserProfileEntity UserProfile { get; set; }
     }
 }

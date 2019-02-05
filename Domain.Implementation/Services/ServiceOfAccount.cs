@@ -54,7 +54,7 @@ namespace Domain.Implementation.Services
             {
                 var resultAddRole = await userManager.AddToRoleAsync(applicationUser, "user");
             }
-            if(applicationUser.UserProfileId == null /*|| registerViewModel.Avatar != null*/)
+            if(applicationUser.UserProfileId == null)
             {
                 if (applicationUser.UserProfileId == null)
                 {
@@ -65,11 +65,6 @@ namespace Domain.Implementation.Services
                     applicationUser.UserProfile = userProfile;
                     applicationUser.Created = System.DateTime.Now;
                 }
-                //if (registerViewModel.Avatar != null)
-                //{
-                //    //var pathAvatar = serviceOfImage.LoadImage("Avatars", applicationUser.Id, registerViewModel.Avatar);
-                //    //applicationUser.Avatar = pathAvatar;
-                //}
                 repositoryOfApplicationUser.Update(applicationUser);
             }
         }

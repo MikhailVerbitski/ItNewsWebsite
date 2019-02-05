@@ -8,6 +8,6 @@
 
         public int? PostId { get; set; }
 
-        public PostEntity Post { get; set; }
+        public virtual PostEntity Post { get; set; }
     }
 }

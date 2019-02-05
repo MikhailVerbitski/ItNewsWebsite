@@ -8,7 +8,7 @@ namespace Domain.Contracts.Models.ViewModels.Comment
     {
         public int CountOfLikes { get; set; }
 
-        public virtual IEnumerable<UserMiniViewModel> Likes { get; set; }
+        public IEnumerable<UserMiniViewModel> Likes { get; set; }
 
         public bool IsUserLiked { get; set; }
 

@@ -7,7 +7,6 @@ using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,20 +80,6 @@ namespace Domain.Implementation.Services
             //    .Where(a => a.Selected)
             //    .Select(a => serviceOfAccount.AddUserRole(userEditViewModel.ApplicationUserId, a.Text));
             //Task.WaitAll(tasksOfAddsRoles.ToArray());
-        }
-
-        public async Task<UserEditViewModel> GetUserEditViewModel(string applicationUserId)
-        {
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            var userEditViewModel = mapper.Map<ApplicationUserEntity, UserEditViewModel>(applicationUser);
-            var userRoles = await userManager.GetRolesAsync(applicationUser);
-            userEditViewModel.Roles = roleManager.Roles.Select(a => new SelectListItem()
-            {
-                Text = a.Name,
-                Value = a.Id,
-                Selected = userRoles.Contains(a.Name)
-            }).ToList();
-            return userEditViewModel;
         }
 
         public async Task<Tuple<string, string>> GetUserRole(ApplicationUserEntity applicationUserEntity)

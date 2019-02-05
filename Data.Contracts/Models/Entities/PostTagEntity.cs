@@ -6,10 +6,10 @@
 
         public int? PostId { get; set; }
 
-        public PostEntity Post { get; set; }
-
         public int? TagId { get; set; }
 
-        public TagEntity Tag { get; set; }
+        public virtual PostEntity Post { get; set; }
+
+        public virtual TagEntity Tag { get; set; }
     }
 }

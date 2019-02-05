@@ -6,6 +6,6 @@ namespace Domain.Contracts.Models.ViewModels.Post
     {
         public double Score { get; set; }
 
-        public virtual UserMiniViewModel AuthorUserMiniViewModel { get; set; }
+        public UserMiniViewModel AuthorUserMiniViewModel { get; set; }
     }
 }

@@ -13,10 +13,10 @@ namespace Data.Contracts.Models.Entities
         
         public int? UserProfileId { get; set; }
 
-        public virtual UserProfileEntity UserProfile { get; set; }
-
         public string Avatar { get; set; }
 
-        public DateTime Created { get; set; }
+        public virtual DateTime Created { get; set; }
+
+        public virtual UserProfileEntity UserProfile { get; set; }
     }
 }

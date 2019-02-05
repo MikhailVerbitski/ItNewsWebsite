@@ -10,6 +10,6 @@ namespace Data.Contracts.Models.Entities
 
         public int CountOfUsage { get; set; }
 
-        public IEnumerable<PostEntity> Posts { get; set; }
+        public virtual IEnumerable<PostEntity> Posts { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace WebBlazor.Models.ViewModels.Comment
     {
         public int CommentId { get; set; }
 
-        public virtual UserMiniViewModel AuthorUserMiniViewModel { get; set; }
+        public UserMiniViewModel AuthorUserMiniViewModel { get; set; }
 
         public string Content { get; set; }
 

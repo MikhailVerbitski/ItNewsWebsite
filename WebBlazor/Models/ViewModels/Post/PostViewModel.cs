@@ -21,7 +21,7 @@ namespace WebBlazor.Models.ViewModels.Post
 
         public byte? UserScore { get; set; }
 
-        public virtual UserMiniViewModel AuthorUserMiniViewModel { get; set; }
+        public UserMiniViewModel AuthorUserMiniViewModel { get; set; }
 
         public string Content { get; set; }
 

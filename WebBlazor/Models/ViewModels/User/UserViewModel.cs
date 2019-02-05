@@ -29,8 +29,8 @@ namespace WebBlazor.Models.ViewModels.User
 
         public DateTime Created { get; set; }
 
-        public virtual IEnumerable<PostMiniViewModel> Posts { get; set; }
+        public IEnumerable<PostMiniViewModel> Posts { get; set; }
 
-        public virtual IEnumerable<CommentMiniViewModel> Comments { get; set; }
+        public IEnumerable<CommentMiniViewModel> Comments { get; set; }
     }
 }

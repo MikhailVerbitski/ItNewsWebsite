@@ -6,9 +6,9 @@
 
         public int? CommentId { get; set; }
 
-        public virtual CommentEntity Comment { get; set; }
-
         public int? UserProfileId { get; set; }
+
+        public virtual CommentEntity Comment { get; set; }
 
         public virtual UserProfileEntity UserProfile { get; set; }
     }
