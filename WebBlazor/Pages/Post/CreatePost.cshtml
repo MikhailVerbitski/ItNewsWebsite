@@ -4,6 +4,7 @@
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject HttpClient Http
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
+@inject Components.ServiceOfImage serviceOfImage
 @using WebBlazor.Models.ViewModels.Tag;
 @using WebBlazor.Models.ViewModels.Post;
 @using Markdig;
@@ -88,7 +89,8 @@
 
     private PostUpdateViewModel post = new PostUpdateViewModel()
     {
-        Tags = new List<TagViewModel>()
+        Tags = new List<TagViewModel>(),
+        Images = new List<string>()
     };
 
     protected override async Task OnInitAsync()
@@ -164,26 +166,8 @@
     }
     private async Task LoadImage()
     {
-        //System.IO.Path.GetExtension()
-
-        var Extension = ".png";
-
-        var images = await fileReadService.CreateReference(files).EnumerateFilesAsync();
-        var memoryStream = await images.First().CreateMemoryStreamAsync();
-
-        var image = new Image()
-        {
-            PostId = post.PostId,
-            Data = memoryStream.ToArray(),
-            Extension = Extension
-        };
-        var path = await Http.SendJsonAsync<string>(HttpMethod.Post, "/api/Post/AddImage", image);
+        var path = await serviceOfImage.LoadPostImage(files, post.PostId);
+        (post.Images as List<string>).Add(path);
         ContentValue += $"{Environment.NewLine}![comment to the image]({path})";
-    }
-    class Image
-    {
-        public int PostId { get; set; }
-        public byte[] Data { get; set; }
-        public string Extension { get; set; }
     }
 }

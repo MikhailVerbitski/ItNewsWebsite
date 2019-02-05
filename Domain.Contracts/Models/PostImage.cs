@@ -1,6 +1,6 @@
-﻿namespace Domain.Contracts.Models.ViewModels
+﻿namespace Domain.Contracts.Models
 {
-    public class ImageViewModel
+    public class PostImage
     {
         public int PostId { get; set; }
         public byte[] Data { get; set; }

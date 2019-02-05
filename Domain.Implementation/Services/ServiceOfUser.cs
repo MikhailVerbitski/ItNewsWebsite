@@ -2,6 +2,7 @@
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
+using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
@@ -61,7 +62,14 @@ namespace Domain.Implementation.Services
                 .Select(a => GetUserMiniViewModel(a))
                 .ToList();
         }
-
+        public string ChangeUserImage(string applicationUserCurrent, UserImage image)
+        {
+            var path = serviceOfImage.LoadImage(applicationUserCurrent, image);
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserCurrent);
+            applicationUser.Avatar = path;
+            repositoryOfApplicationUser.Update(applicationUser, a => a.Avatar);
+            return path;
+        }
         public async void Update(string applicationUserIdCurrent, UserUpdateViewModel userUpdateViewModel)
         {
             var applicationUser = mapper.Map<UserUpdateViewModel, ApplicationUserEntity>(userUpdateViewModel);

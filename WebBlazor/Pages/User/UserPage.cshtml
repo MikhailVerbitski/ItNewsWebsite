@@ -1,6 +1,7 @@
 ﻿@page "/UserPage/{login}"
 @using WebBlazor.Models.ViewModels.User
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
+@inject Components.ServiceOfImage serviceOfImage
 
 @if (User == null)
 {
@@ -14,7 +15,15 @@ else
                 <p><a href="/UserPage/@(User.Login)"><h1>@User.FirstName @User.LastName</h1></a></p>
                 <img src="@((User.Avatar == null) ? "/img/default-user-profile-image.png" : User.Avatar)" asp-append-version="true" height="100" width="100" />
             </div>
+
             <br />
+
+            <label for="file" class="pure-button">Change image</label>
+            <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
+
+            <br />
+            <br />
+
             <div id="grid-user-profile-userData">
                 <font size="5">First name:</font>
                 <font style="display: @((!ChangeKeys[0]) ? "" : "none")" size="5">@User.FirstName</font>
@@ -52,7 +61,7 @@ else
                 <font size="5">@User.Created.ToLongDateString()</font>
                 <div></div>
             </div>
-            <br/>
+            <br />
             <button style="display: @((ButtonSaveChange) ? "" : "none")" class="pure-button pure-button-primary" onclick="@SaveChange">Save change</button>
         </div>
         <div class="grid-scroll">
@@ -87,6 +96,7 @@ else
     private UserViewModel User { get; set; }
     private bool[] ChangeKeys = new bool[5];
     private bool ButtonSaveChange = false;
+    private ElementRef files;
 
     protected async override Task OnInitAsync()
     {
@@ -113,5 +123,10 @@ else
             Password = User.Password
         };
         await serviceOfAuthorize.PostJsonAsync<object>("/api/User/Update", userUpdate);
+    }
+    private async void LoadImage()
+    {
+        User.Avatar = await serviceOfImage.LoadUserImage(files);
+        this.ShouldRender();
     }
 }

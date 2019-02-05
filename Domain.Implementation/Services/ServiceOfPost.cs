@@ -3,7 +3,6 @@ using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
-using Domain.Contracts.Models.ViewModels;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +23,7 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfPostRating repositoryOfPostRating;
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfSection repositoryOfSection;
+        private readonly RepositoryOfImage repositoryOfImage;
 
         private readonly ServiceOfComment serviceOfComment;
         private readonly ServiceOfImage serviceOfImage;
@@ -46,6 +46,7 @@ namespace Domain.Implementation.Services
             repositoryOfPostRating = new RepositoryOfPostRating(context);
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             repositoryOfSection = new RepositoryOfSection(context);
+            repositoryOfImage = new RepositoryOfImage(context);
 
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
@@ -90,6 +91,18 @@ namespace Domain.Implementation.Services
                 postEntity.SectionId = section.Id;
             }
             postEntity = repositoryOfPost.Create(postEntity);
+            if(postCreateEditViewModel.Images != null && postCreateEditViewModel.Images.Count() > 0)
+            {
+                postEntity.Images = postCreateEditViewModel.Images.Select(a =>
+                {
+                    return repositoryOfImage.Create(new ImageEntity()
+                    {
+                        Path = a /*serviceOfImage.RenameImage("Post", a, postEntity.Id.ToString())*/,
+                        PostId = postEntity.Id
+                    });
+                })
+                .ToList();
+            }
             if(postCreateEditViewModel != null && postCreateEditViewModel.Tags != null)
             {
                 postEntity.Tags = serviceOfTag.AddTagsPost(postCreateEditViewModel.Tags, postCreateEditViewModel.PostId);
@@ -202,6 +215,6 @@ namespace Domain.Implementation.Services
             var post = repositoryOfPost.Read(a => a.Id == postId);
             return (post.SumOfScore / (double)post.CountOfScore);
         }
-        public string AddImage(ImageViewModel image) => serviceOfImage.LoadImage("Post", image);
+        public string AddImage(string applicationUserCurrent, PostImage image) => serviceOfImage.LoadImage(applicationUserCurrent, image);
     }
 }

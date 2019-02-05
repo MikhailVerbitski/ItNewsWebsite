@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
+using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.User;
 using Domain.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -51,6 +52,13 @@ namespace WebApi.Controllers
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
             serviceOfUser.Update(userId, userUpdateViewModel);
+        }
+        [HttpPost]
+        public JsonResult ChangeImage([FromBody] UserImage image)
+        {
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var path = serviceOfUser.ChangeUserImage(currentUserId, image);
+            return Json(path);
         }
     }
 }

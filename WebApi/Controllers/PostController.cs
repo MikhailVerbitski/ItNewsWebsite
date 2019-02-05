@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
-using Domain.Contracts.Models.ViewModels;
+using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -120,9 +120,10 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddImage([FromBody] ImageViewModel image)
+        public JsonResult AddImage([FromBody] PostImage image)
         {
-            var path = serviceOfPost.AddImage(image);
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var path = serviceOfPost.AddImage(currentUserId, image);
             return Json(path);
         }
     }
