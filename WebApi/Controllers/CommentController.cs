@@ -17,8 +17,12 @@ namespace WebApi.Controllers
     [Route("api/Comment/[action]")]
     public class CommentController : Controller
     {
-        UserManager<ApplicationUserEntity> userManager;
-        private readonly ServiceOfComment serviceOfComment;
+        public  readonly ServiceOfComment serviceOfComment;
+        private readonly ServiceOfPost serviceOfPost;
+        private readonly ServiceOfAccount serviceOfAccount;
+        private readonly ServiceOfImage serviceOfImage;
+        private readonly ServiceOfTag serviceOfTag;
+        private readonly ServiceOfUser serviceOfUser;
 
         public CommentController(
             UserManager<ApplicationUserEntity> userManager,
@@ -28,8 +32,17 @@ namespace WebApi.Controllers
             IMapper mapper
             )
         {
-            this.userManager = userManager;
-            serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
+            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
+            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
+            serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
+            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag);
+            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost);
+            serviceOfTag = new ServiceOfTag(context, mapper);
+
+            serviceOfComment.serviceOfUser = serviceOfUser;
+            serviceOfPost.serviceOfUser = serviceOfUser;
+            serviceOfPost.serviceOfTag = serviceOfTag;
+            serviceOfUser.serviceOfPost = serviceOfPost;
         }
         [HttpPost]
         public JsonResult CreateComment([FromBody] CommentCreateEditViewModel commentViewModel)

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
@@ -21,6 +22,10 @@ namespace WebApi.Controllers
         private readonly ServiceOfSection serviceOfSection;
         private readonly ServiceOfUser serviceOfUser;
         private readonly ServiceOfTag serviceOfTag;
+        private readonly ServiceOfPost serviceOfPost;
+        private readonly ServiceOfComment serviceOfComment;
+        private readonly ServiceOfAccount serviceOfAccount;
+        private readonly ServiceOfImage serviceOfImage;
 
         public UserController(
             UserManager<ApplicationUserEntity> userManager,
@@ -30,9 +35,17 @@ namespace WebApi.Controllers
             IHostingEnvironment hostingEnvironment
             )
         {
-            serviceOfSection = new ServiceOfSection(context, mapper);
-            serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
             serviceOfTag = new ServiceOfTag(context, mapper);
+            serviceOfSection = new ServiceOfSection(context, mapper);
+            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
+            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
+            serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
+            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag);
+            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost);
+
+            serviceOfComment.serviceOfUser = serviceOfUser;
+            serviceOfPost.serviceOfUser = serviceOfUser;
+            serviceOfPost.serviceOfUser = serviceOfUser;
         }
 
         [HttpGet]
@@ -44,14 +57,15 @@ namespace WebApi.Controllers
         [HttpGet]
         public JsonResult GetUserViewModel(string login)
         {
-            var user = serviceOfUser.GetUserViewModel(login);
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var user = serviceOfUser.GetUserViewModel(userId, login);
             return Json(user);
         }
         [HttpPost]
-        public void Update([FromBody] UserUpdateViewModel userUpdateViewModel)
+        public async Task Update([FromBody] UserUpdateViewModel userUpdateViewModel)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            serviceOfUser.Update(userId, userUpdateViewModel);
+            await serviceOfUser.Update(userId, userUpdateViewModel);
         }
         [HttpPost]
         public JsonResult ChangeImage([FromBody] UserImage image)

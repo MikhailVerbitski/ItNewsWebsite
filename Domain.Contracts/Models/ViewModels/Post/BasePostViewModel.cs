@@ -11,5 +11,7 @@ namespace Domain.Contracts.Models.ViewModels.Post
         public string BriefDesctiption { get; set; }
 
         public DateTime Created { get; set; }
+
+        public bool BelongsToUser { get; set; }
     }
 }

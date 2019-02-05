@@ -17,6 +17,8 @@ namespace WebBlazor.Models.ViewModels.Comment
 
         public string PostHeader { get; set; }
 
+        public bool BelongsToUser { get; set; }
+
         public DateTime Created { get; set; }
     }
 }

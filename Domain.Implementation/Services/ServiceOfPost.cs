@@ -5,8 +5,6 @@ using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,19 +24,22 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfSection repositoryOfSection;
         private readonly RepositoryOfImage repositoryOfImage;
 
-        private readonly ServiceOfComment serviceOfComment;
-        private readonly ServiceOfImage serviceOfImage;
-        private readonly ServiceOfUser serviceOfUser;
-        private readonly ServiceOfTag serviceOfTag;
+        public ServiceOfComment serviceOfComment { get; set; }
+        public ServiceOfAccount serviceOfAccount { get; set; }
+        public ServiceOfImage serviceOfImage { get; set; }
+        public ServiceOfUser serviceOfUser { get; set; }
+        public ServiceOfTag serviceOfTag { get; set; }
 
-        Tuple<Type, Func<PostEntity, string, BasePostViewModel>>[] Config;
+        Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[] Config;
 
         public ServiceOfPost(
             ApplicationDbContext context, 
-            RoleManager<IdentityRole> roleManager,
-            UserManager<ApplicationUserEntity> userManager,
-            IHostingEnvironment hostingEnvironment,
-            IMapper mapper
+            IMapper mapper,
+            ServiceOfImage serviceOfImage,
+            ServiceOfAccount serviceOfAccount,
+            ServiceOfComment serviceOfComment,
+            ServiceOfUser serviceOfUser,
+            ServiceOfTag serviceOfTag
             )
         {
             this.mapper = mapper;
@@ -49,17 +50,24 @@ namespace Domain.Implementation.Services
             repositoryOfSection = new RepositoryOfSection(context);
             repositoryOfImage = new RepositoryOfImage(context);
 
-            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
-            serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
-            serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
-            serviceOfTag = new ServiceOfTag(context, mapper);
+            this.serviceOfImage = serviceOfImage;
+            this.serviceOfAccount = serviceOfAccount;
+            this.serviceOfComment = serviceOfComment;
+            this.serviceOfUser = serviceOfUser;
+            this.serviceOfTag = serviceOfTag;
 
-            Config = new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>[]
+            //serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
+            //serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
+            //serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
+            //serviceOfTag = new ServiceOfTag(context, mapper);
+            //serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
+
+            Config = new Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[]
             {
-                new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostCompactViewModel), GetPostCompactViewModel),
-                new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostUpdateViewModel), GetPostUpdateViewModel),
-                new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostMiniViewModel), GetPostMiniViewModel),
-                new Tuple<Type, Func<PostEntity, string, BasePostViewModel>>(typeof(PostViewModel), GetPostViewModel)
+                new Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>(typeof(PostCompactViewModel), GetPostCompactViewModel),
+                new Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>(typeof(PostUpdateViewModel), GetPostUpdateViewModel),
+                new Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>(typeof(PostMiniViewModel), GetPostMiniViewModel),
+                new Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>(typeof(PostViewModel), GetPostViewModel)
             };
         }
 
@@ -76,13 +84,18 @@ namespace Domain.Implementation.Services
             postEntity.Tags = serviceOfTag.TagsPostUpdate(postCreateEditViewModel.Tags, lastPostEntity.Tags, postCreateEditViewModel.PostId);
             repositoryOfPost.Update(postEntity);
         }
-        public PostUpdateViewModel Create(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel)
+        public async Task<PostUpdateViewModel> Create(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel)
         {
-            PostEntity postEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags);
+            PostEntity postEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags, a => a.UserProfile);
             if(postEntity != null)
             {
-                Update(postCreateEditViewModel, postEntity);
-                return postCreateEditViewModel;
+                var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+                if (await serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId))
+                {
+                    Update(postCreateEditViewModel, postEntity);
+                    return postCreateEditViewModel;
+                }
+                return null;
             }
 
             postEntity = (postCreateEditViewModel == null)
@@ -173,40 +186,52 @@ namespace Domain.Implementation.Services
             return postViewModel;
         }
         
-        private PostUpdateViewModel GetPostUpdateViewModel(PostEntity postEntity, string applicationUserIdCurrent)
+        private PostUpdateViewModel GetPostUpdateViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
+            postViewModel.BelongsToUser = serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
             return postViewModel;
         }
-        private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, string applicationUserIdCurrent)
+        private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostMiniViewModel>(postEntity);
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
+            postViewModel.BelongsToUser = serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
             return postViewModel;
         }
-        private PostCompactViewModel GetPostCompactViewModel(PostEntity postEntity, string applicationUserIdCurrent)
+        private PostCompactViewModel GetPostCompactViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostCompactViewModel>(postEntity);
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
+            postViewModel.BelongsToUser = serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
             return postViewModel;
         }
-        private PostViewModel GetPostViewModel(PostEntity postEntity, string applicationUserIdCurrent)
+        private PostViewModel GetPostViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostViewModel>(postEntity);
             var applicationUserPost = repositoryOfApplicationUser
                 .Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
-            postViewModel.Comments = serviceOfComment.Get<CommentViewModel>(postEntity.Id, applicationUserIdCurrent);
-            postViewModel.CurrentUserId = applicationUserIdCurrent;
+            postViewModel.Comments = serviceOfComment.GetMany<CommentViewModel>(postEntity, applicationUserCurrent);
+            postViewModel.CurrentUserId = applicationUserCurrent.Id;
+            postViewModel.BelongsToUser = serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
             return postViewModel;
         }
 
-        private TPostViewModel GetViewModelWithProperty<TPostViewModel>(PostEntity postEntity, string applicationUserIdCurrent)
-            where TPostViewModel : BasePostViewModel 
-            => Config.Single(a => a.Item1 == typeof(TPostViewModel)).Item2(postEntity, applicationUserIdCurrent) as TPostViewModel;
+        public TPostViewModel GetViewModelWithProperty<TPostViewModel>(PostEntity postEntity, string applicationUserIdCurrent)
+            where TPostViewModel : BasePostViewModel
+        {
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile);
+            return GetViewModelWithProperty<TPostViewModel>(postEntity, applicationUser);
+        }
+        public TPostViewModel GetViewModelWithProperty<TPostViewModel>(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
+            where TPostViewModel : BasePostViewModel
+        {
+            return Config.Single(a => a.Item1 == typeof(TPostViewModel)).Item2(postEntity, applicationUserCurrent) as TPostViewModel;
+        }
 
         private void Delete<TPostViewModel>(TPostViewModel postViewModel) where TPostViewModel: BaseCommentViewModel
         {

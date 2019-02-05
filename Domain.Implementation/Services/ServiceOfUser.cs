@@ -6,8 +6,6 @@ using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,37 +16,41 @@ namespace Domain.Implementation.Services
 {
     public class ServiceOfUser
     {
-        private readonly RoleManager<IdentityRole> roleManager;
         private readonly IMapper mapper;
-        private readonly UserManager<ApplicationUserEntity> userManager;
 
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
         private readonly RepositoryOfPost repositoryOfPost;
 
-        private readonly ServiceOfImage serviceOfImage;
-        private readonly ServiceOfAccount serviceOfAccount;
+        public ServiceOfImage serviceOfImage { get; set; }
+        public ServiceOfAccount serviceOfAccount { get; set; }
+        public ServiceOfComment serviceOfComment { get; set; }
+        public ServiceOfPost serviceOfPost { get; set; }
 
         public ServiceOfUser(
-            ApplicationDbContext context, 
-            RoleManager<IdentityRole> roleManager,
-            UserManager<ApplicationUserEntity> userManager,
-            IMapper mapper, 
-            IHostingEnvironment hostingEnvironment
+            ApplicationDbContext context,
+            IMapper mapper,
+            ServiceOfImage serviceOfImage,
+            ServiceOfAccount serviceOfAccount,
+            ServiceOfComment serviceOfComment,
+            ServiceOfPost serviceOfPost
             )
         {
-            this.roleManager = roleManager;
             this.mapper = mapper;
-            this.userManager = userManager;
 
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             repositoryOfUserProfile = new RepositoryOfUserProfile(context);
             repositoryOfPost = new RepositoryOfPost(context);
 
-            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
-            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
+            this.serviceOfImage = serviceOfImage;
+            this.serviceOfAccount = serviceOfAccount;
+            this.serviceOfComment = serviceOfComment;
+            this.serviceOfPost = serviceOfPost;
+            //serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
+            //serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
+            //serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
+            //serviceOfPost = new ServiceOfPost(context, roleManager, userManager, hostingEnvironment, mapper);
         }
-
 
         public IEnumerable<UserMiniViewModel> GetUserByProperty(string propetry)
         {
@@ -70,29 +72,33 @@ namespace Domain.Implementation.Services
             repositoryOfApplicationUser.Update(applicationUser, a => a.Avatar);
             return path;
         }
-        public async void Update(string applicationUserIdCurrent, UserUpdateViewModel userUpdateViewModel)
+        public async Task Update(string applicationUserIdCurrent, UserUpdateViewModel userUpdateViewModel)
         {
-            var applicationUser = mapper.Map<UserUpdateViewModel, ApplicationUserEntity>(userUpdateViewModel);
-            repositoryOfApplicationUser.Update(applicationUser,
-                a => a.FirstName,
-                a => a.LastName,
-                a => a.UserName,
-                a => a.Email);
-
-            if (userUpdateViewModel.Password != null && userUpdateViewModel.Password != "")
+            var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            if(await serviceOfAccount.IsThereAccess(applicationUserCurrent, userUpdateViewModel.ApplicationUserId))
             {
-                await serviceOfAccount.ChangePassword(applicationUser.Id, userUpdateViewModel.Password);
+                var applicationUser = mapper.Map<UserUpdateViewModel, ApplicationUserEntity>(userUpdateViewModel);
+                repositoryOfApplicationUser.Update(applicationUser,
+                    a => a.FirstName,
+                    a => a.LastName,
+                    a => a.UserName,
+                    a => a.Email);
+
+                if (userUpdateViewModel.Password != null && userUpdateViewModel.Password != "")
+                {
+                    await serviceOfAccount.ChangePassword(applicationUser.Id, userUpdateViewModel.Password);
+                }
+                //var tasksOfAddsRoles = userEditViewModel
+                //    .Roles
+                //    .Where(a => a.Selected)
+                //    .Select(a => serviceOfAccount.AddUserRole(userEditViewModel.ApplicationUserId, a.Text));
+                //Task.WaitAll(tasksOfAddsRoles.ToArray());
             }
-            //var tasksOfAddsRoles = userEditViewModel
-            //    .Roles
-            //    .Where(a => a.Selected)
-            //    .Select(a => serviceOfAccount.AddUserRole(userEditViewModel.ApplicationUserId, a.Text));
-            //Task.WaitAll(tasksOfAddsRoles.ToArray());
         }
 
         public async Task<Tuple<string, string>> GetUserRole(ApplicationUserEntity applicationUserEntity)
         {
-            var roles = await userManager.GetRolesAsync(applicationUserEntity);
+            var roles = await serviceOfAccount.GetUserRoles(applicationUserEntity);
             if (roles.Contains("admin"))
             {
                 return new Tuple<string, string>("admin", "#FF0101");
@@ -121,9 +127,12 @@ namespace Domain.Implementation.Services
             return userMiniViewModel;
         }
 
-        public UserViewModel GetUserViewModel(string login)
+        public UserViewModel GetUserViewModel(string applicationUserIdCurrent, string login)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.UserName == login);
+            var applicationUserCurrent = (applicationUserIdCurrent == applicationUser.Id) 
+                ? applicationUser 
+                : repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
             var userProfile = repositoryOfUserProfile.Read(a => a.Id == applicationUser.UserProfileId.Value,
                 a => a.Posts,
                 a => a.Comments);
@@ -131,23 +140,8 @@ namespace Domain.Implementation.Services
             var role = GetUserRole(applicationUser).Result;
             userViewModel.Role = role.Item1;
             userViewModel.RoleColor = role.Item2;
-
-            var userMiniViewModel = GetUserMiniViewModel(applicationUser);
-            var commentMiniViewModels = userProfile.Comments.Select(a =>
-            {
-                var comment = mapper.Map<CommentEntity, CommentMiniViewModel>(a);
-                comment.AuthorUserMiniViewModel = userMiniViewModel;
-                comment.PostHeader = repositoryOfPost.Read(b => b.Id == comment.PostId).Header;
-                return comment;
-            });
-            userViewModel.Comments = commentMiniViewModels.ToList();
-            var postCompactViewModels = userProfile.Posts.Select(a =>
-            {
-                var post = mapper.Map<PostEntity, PostCompactViewModel>(a);
-                post.AuthorUserMiniViewModel = userMiniViewModel;
-                return post;
-            });
-            userViewModel.Posts = postCompactViewModels.ToList();
+            userViewModel.Comments = userProfile.Comments.Select(a => serviceOfComment.GetViewModelWithProperty<CommentMiniViewModel>(a, applicationUserCurrent)).ToList();
+            userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty<PostCompactViewModel>(a, applicationUserCurrent)).ToList();
             return userViewModel;
         }
     }

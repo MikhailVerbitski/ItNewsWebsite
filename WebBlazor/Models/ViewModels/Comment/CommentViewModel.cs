@@ -20,6 +20,8 @@ namespace WebBlazor.Models.ViewModels.Comment
 
         public bool IsUserLiked { get; set; }
 
+        public bool BelongsToUser { get; set; }
+
         public DateTime Created { get; set; }
     }
 }

@@ -19,6 +19,8 @@ namespace WebBlazor.Models.ViewModels.Post
 
         public string BriefDesctiption { get; set; }
 
+        public bool BelongsToUser { get; set; }
+
         public List<TagViewModel> Tags { get; set; }
 
         public IEnumerable<string> Images { get; set; }

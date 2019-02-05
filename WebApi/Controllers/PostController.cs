@@ -20,9 +20,13 @@ namespace WebApi.Controllers
     public class PostController : Controller
     {
         private readonly UserManager<ApplicationUserEntity> userManager;
-        private readonly ServiceOfPost serviceOfPost;
         private readonly ServiceOfSection serviceOfSection;
         private readonly ServiceOfTag serviceOfTag;
+        private readonly ServiceOfPost serviceOfPost;
+        private readonly ServiceOfComment serviceOfComment;
+        private readonly ServiceOfAccount serviceOfAccount;
+        private readonly ServiceOfImage serviceOfImage;
+        private readonly ServiceOfUser serviceOfUser;
 
         public PostController(
             UserManager<ApplicationUserEntity> userManager,
@@ -33,17 +37,25 @@ namespace WebApi.Controllers
             )
         {
             this.userManager = userManager;
-            serviceOfPost = new ServiceOfPost(context, roleManager, userManager, hostingEnvironment, mapper);
-            serviceOfSection = new ServiceOfSection(context, mapper);
+            
             serviceOfTag = new ServiceOfTag(context, mapper);
+            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
+            serviceOfSection = new ServiceOfSection(context, mapper);
+            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
+            serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
+            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag);
+            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost);
+
+            serviceOfComment.serviceOfUser = serviceOfUser;
+            serviceOfPost.serviceOfUser = serviceOfUser;
         }
         
 
         [HttpPost]
-        public JsonResult Create(PostUpdateViewModel post)
+        public async Task<JsonResult> Create(PostUpdateViewModel post)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            post = serviceOfPost.Create(userId, post);
+            post = await serviceOfPost.Create(userId, post);
             return Json(post);
         }
         [HttpGet]

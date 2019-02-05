@@ -11,5 +11,7 @@ namespace WebBlazor.Models.ViewModels.Comment
         public string Content { get; set; } 
 
         public int? PostId { get; set; }
+
+        public bool BelongsToUser { get; set; }
     }
 }

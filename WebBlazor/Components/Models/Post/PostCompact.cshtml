@@ -15,10 +15,13 @@
 <br />
 <div class="grid-cols-two">
     <UserMini User="@post.AuthorUserMiniViewModel" />
-    <div class="post-edit-delete">
-        <font size="2"><a href="/CreatePost/@post.PostId">Edit</a></font>
-        <font size="2"><a onclick="@Delete">Delete</a></font>
-    </div>
+    @if (post.BelongsToUser)
+    {
+        <div class="post-edit-delete">
+            <font size="2"><a href="/CreatePost/@post.PostId">Edit</a></font>
+            <font size="2"><a onclick="@Delete">Delete</a></font>
+        </div>
+    }
 </div>
 <br />
 <hr />

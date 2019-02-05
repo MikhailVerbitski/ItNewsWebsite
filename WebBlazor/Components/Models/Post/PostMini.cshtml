@@ -12,10 +12,13 @@
 <div class="grid-comment-footer">
     <p class="container-date">@DateConverter.GetTime(post.Created)</p>
     <div></div>
-    <div class="post-edit-delete">
-        <font size="2"><a href="/CreatePost/@post.PostId">Edit</a></font>
-        <font size="2"><a onclick="@Delete">Delete</a></font>
-    </div>
+    @if (post.BelongsToUser)
+    {
+        <div class="post-edit-delete">
+            <font size="2"><a href="/CreatePost/@post.PostId">Edit</a></font>
+            <font size="2"><a onclick="@Delete">Delete</a></font>
+        </div>
+    }
 </div>
 <hr />
 <br />

@@ -15,6 +15,8 @@ namespace WebBlazor.Models.ViewModels.Post
 
         public string BriefDesctiption { get; set; }
 
+        public bool BelongsToUser { get; set; }
+
         public DateTime Created { get; set; }
     }
 }
