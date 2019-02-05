@@ -9,7 +9,7 @@ namespace WebBlazor.Models.ViewModels.Post
 
         public string Header { get; set; }
 
-        public int Score { get; set; }
+        public double Score { get; set; }
 
         public virtual UserMiniViewModel AuthorUserMiniViewModel { get; set; }
 

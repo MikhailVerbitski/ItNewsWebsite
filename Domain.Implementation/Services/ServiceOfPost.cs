@@ -145,14 +145,12 @@ namespace Domain.Implementation.Services
         {
             var postViewModel = mapper.Map<PostEntity, PostMiniViewModel>(postEntity);
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
-            postViewModel.Score = GetRatin(postEntity, applicationUserPost.UserProfileId.Value);
             return postViewModel;
         }
         private PostCompactViewModel GetPostCompactViewModel(PostEntity postEntity, string applicationUserIdCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostCompactViewModel>(postEntity);
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
-            postViewModel.Score = GetRatin(postEntity, applicationUserPost.UserProfileId.Value);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
             return postViewModel;
         }
@@ -162,9 +160,9 @@ namespace Domain.Implementation.Services
             var applicationUserPost = repositoryOfApplicationUser
                 .Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
-            postViewModel.Score = GetRatin(postEntity, applicationUserPost.UserProfileId.Value);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
             postViewModel.Comments = serviceOfComment.Get<CommentViewModel>(postEntity.Id, applicationUserIdCurrent);
+            postViewModel.CurrentUserId = applicationUserIdCurrent;
             return postViewModel;
         }
 
@@ -203,11 +201,6 @@ namespace Domain.Implementation.Services
             }
             var post = repositoryOfPost.Read(a => a.Id == postId);
             return (post.SumOfScore / (double)post.CountOfScore);
-        }
-        private int GetRatin(PostEntity postEntity, int UserProfileId)
-        {
-            var postRating = repositoryOfPostRating.Read(a => a.PostId == postEntity.Id && a.UserProfileId == UserProfileId);
-            return postRating != null ? postRating.Score : -1;
         }
         public string AddImage(ImageViewModel image) => serviceOfImage.LoadImage("Post", image);
     }

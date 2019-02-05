@@ -7,6 +7,8 @@ namespace WebBlazor.Models.ViewModels.Post
 {
     public class PostViewModel
     {
+        public string CurrentUserId { get; set; }
+
         public int PostId { get; set; }
 
         public string Header { get; set; }

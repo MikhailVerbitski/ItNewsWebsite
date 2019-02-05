@@ -6,6 +6,8 @@ namespace Domain.Contracts.Models.ViewModels.Post
 {
     public class PostViewModel : BasePostViewModel
     {
+        public string CurrentUserId { get; set; }
+
         public int SectionId { get; set; }
 
         public string Section { get; set; }

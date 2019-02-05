@@ -44,19 +44,25 @@
     }
     public async Task Dislike()
     {
-        await serviceOfAuthorize.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
-        comment.IsUserLiked = !comment.IsUserLiked;
-        comment.CountOfLikes--;
+        if(post.CurrentUserId != comment.AuthorUserMiniViewModel.ApplicationUserId)
+        {
+            await serviceOfAuthorize.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+            comment.IsUserLiked = !comment.IsUserLiked;
+            comment.CountOfLikes--;
 
-        UserRatingChange(-1);
+            UserRatingChange(-1);
+        }
     }
     public async Task Like()
     {
-        await serviceOfAuthorize.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
-        comment.IsUserLiked = !comment.IsUserLiked;
-        comment.CountOfLikes++;
+        if (post.CurrentUserId != comment.AuthorUserMiniViewModel.ApplicationUserId)
+        {
+            await serviceOfAuthorize.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+            comment.IsUserLiked = !comment.IsUserLiked;
+            comment.CountOfLikes++;
 
-        UserRatingChange(1);
+            UserRatingChange(1);
+        }
     }
     private void UserRatingChange(int plus)
     {

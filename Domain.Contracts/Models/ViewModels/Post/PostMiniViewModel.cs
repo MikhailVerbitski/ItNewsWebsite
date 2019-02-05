@@ -4,6 +4,6 @@ namespace Domain.Contracts.Models.ViewModels.Post
 {
     public class PostMiniViewModel : BasePostViewModel
     {
-        public int Score { get; set; }
+        public double Score { get; set; }
     }
 }
