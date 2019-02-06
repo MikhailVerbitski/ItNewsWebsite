@@ -1,15 +1,14 @@
 ﻿@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @inject JsInteropClasses.ServiceOfTheme serviceOfTheme
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div class="logo"><a href="/" style="margin-left:3vh; padding-bottom: 0;"><font size="5">ItNews</font></a></div>
-
-<div onclick="@ChangeTheme" class="theme-button"><img src="@serviceOfTheme.PahtIcon"/></div>
-
+<div onclick="@ChangeTheme" class="theme-button"><img src="@serviceOfTheme.PahtIcon" /></div>
 <div class="account-nav">
     <ul class="pure-menu-list">
         @if (serviceOfAuthorize.IsAuthorize)
         {
-            <li class="pure-menu-item"><a href="/UserPage/@serviceOfAuthorize.UserLogin" class="pure-menu-link">@serviceOfAuthorize.UserLogin</a></li>
+            <li class="pure-menu-item"><a href="/UserPage/@serviceOfAuthorize.DataAboutUser?.Login" class="pure-menu-link">@serviceOfAuthorize.DataAboutUser?.Login</a></li>
             <li class="pure-menu-item"><a href="/Login" class="pure-menu-link" onclick="@serviceOfAuthorize.Logout">Login out</a></li>
         }
         else
@@ -21,7 +20,7 @@
 </div>
 <div class="pure-form" id="search">
     <input type="text" class="pure-input-rounded" bind="@SearchWords" />
-    <div><a href="/SearchUsers/@SearchWords">Search</a></div>
+    <div onclick="@(() => UriHelper.NavigateTo($"/SearchUsers/{SearchWords}"))">Search</div>
 </div>
 
 @functions{

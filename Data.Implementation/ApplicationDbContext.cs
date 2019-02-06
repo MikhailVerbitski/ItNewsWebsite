@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Data.Implementation
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUserEntity, RoleEntity, string>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -25,12 +25,12 @@ namespace Data.Implementation
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<IdentityRole>().HasData(new IdentityRole[]
+            builder.Entity<RoleEntity>().HasData(new RoleEntity[]
             {
-                new IdentityRole() { Name = "admin", NormalizedName = "ADMIN" },
-                new IdentityRole(){ Name = "user", NormalizedName = "USER" }
+                new RoleEntity() { Name = "admin", NormalizedName = "ADMIN", Priority = 3, Color = "#FF0101" },
+                new RoleEntity() { Name = "writer", NormalizedName = "WRITER", Priority = 2, Color = "#005999" },
+                new RoleEntity() { Name = "user", NormalizedName = "USER", Priority = 1, Color = "#BEA500" }
             });
-
 
             var sectionNames = new string[] { "Java", "C#", "C++", "Algorithms", "Machine Learning" };
             var sections = Enumerable

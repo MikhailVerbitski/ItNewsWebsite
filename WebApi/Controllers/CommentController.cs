@@ -23,20 +23,22 @@ namespace WebApi.Controllers
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfTag serviceOfTag;
         private readonly ServiceOfUser serviceOfUser;
+        private readonly ServiceOfRole serviceOfRole;
 
         public CommentController(
             UserManager<ApplicationUserEntity> userManager,
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<RoleEntity> roleManager,
             ApplicationDbContext context,
             IHostingEnvironment hostingEnvironment,
             IMapper mapper
             )
         {
+            serviceOfRole = new ServiceOfRole(context, userManager, mapper);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
             serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
-            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag);
-            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost);
+            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag, serviceOfRole);
+            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost, serviceOfRole);
             serviceOfTag = new ServiceOfTag(context, mapper);
 
             serviceOfComment.serviceOfUser = serviceOfUser;

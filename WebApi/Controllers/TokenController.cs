@@ -31,7 +31,7 @@ namespace WebApi.Controllers
             ApplicationDbContext context,
             IJwtTokenService tokenService, 
             UserManager<ApplicationUserEntity> userManager,
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<RoleEntity> roleManager,
             IHostingEnvironment hostingEnvironment,
             IMapper mapper
             )

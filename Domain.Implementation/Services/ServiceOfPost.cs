@@ -29,6 +29,7 @@ namespace Domain.Implementation.Services
         public ServiceOfImage serviceOfImage { get; set; }
         public ServiceOfUser serviceOfUser { get; set; }
         public ServiceOfTag serviceOfTag { get; set; }
+        public ServiceOfRole serviceOfRole { get; set; }
 
         Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[] Config;
 
@@ -39,7 +40,8 @@ namespace Domain.Implementation.Services
             ServiceOfAccount serviceOfAccount,
             ServiceOfComment serviceOfComment,
             ServiceOfUser serviceOfUser,
-            ServiceOfTag serviceOfTag
+            ServiceOfTag serviceOfTag,
+            ServiceOfRole serviceOfRole
             )
         {
             this.mapper = mapper;
@@ -55,6 +57,7 @@ namespace Domain.Implementation.Services
             this.serviceOfComment = serviceOfComment;
             this.serviceOfUser = serviceOfUser;
             this.serviceOfTag = serviceOfTag;
+            this.serviceOfRole = serviceOfRole;
 
             Config = new Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[]
             {
@@ -65,10 +68,19 @@ namespace Domain.Implementation.Services
             };
         }
 
-        public void Update(PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
+        public async Task Update(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
         {
+            var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile);
+            await Update(applicationUserCurrent, postCreateEditViewModel, lastPostEntity);
+        }
+        public async Task Update(ApplicationUserEntity applicationUserCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
+        {
+            lastPostEntity = (lastPostEntity == null) ? repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags, a => a.UserProfile) : lastPostEntity;
             var postEntity = mapper.Map<PostUpdateViewModel, PostEntity>(postCreateEditViewModel);
-            lastPostEntity = (lastPostEntity == null) ? repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags) : lastPostEntity;
+            if (!await serviceOfRole.IsThereAccess(new[] { 2, 3 }, applicationUserCurrent, lastPostEntity.UserProfile.ApplicationUserId, true))
+            {
+                return;
+            }
             if (postCreateEditViewModel.Section != null)
             {
                 var section = repositoryOfSection.Read(a => a.Name == postCreateEditViewModel.Section);
@@ -80,18 +92,16 @@ namespace Domain.Implementation.Services
         }
         public async Task<PostUpdateViewModel> Create(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel)
         {
+            var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            if(!await serviceOfRole.IsThereAccess(new[] { 2, 3 }, applicationUserCurrent, null, false))
+            {
+                return null;
+            }
             PostEntity postEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags, a => a.UserProfile);
             if(postEntity != null)
             {
-                var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
-                if (await serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId))
-                {
-                    Update(postCreateEditViewModel, postEntity);
-                    return postCreateEditViewModel;
-                }
                 return null;
             }
-
             postEntity = (postCreateEditViewModel == null)
                 ? new PostEntity()
                 : postEntity = mapper.Map<PostUpdateViewModel, PostEntity>(postCreateEditViewModel);
@@ -130,16 +140,12 @@ namespace Domain.Implementation.Services
             {
                 return;
             }
-            if(applicationUserIdCurrent != post.UserProfile.ApplicationUserId)
+            var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            if (await serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, post.UserProfile.ApplicationUserId, true))
             {
-                var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
-                var role = await serviceOfUser.GetUserRole(applicationUser);
-                if (role.Item1 != "admin")
-                {
-                    return;
-                }
+                repositoryOfPost.Delete(post);
             }
-            repositoryOfPost.Delete(post);
+            return;
         }
 
         public IEnumerable<TPostViewModel> Get<TPostViewModel>(
@@ -186,7 +192,7 @@ namespace Domain.Implementation.Services
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
             postViewModel.BelongsToUser = (applicationUserCurrent == null) 
                 ? false 
-                : serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
+                : serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
             return postViewModel;
         }
         private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -195,7 +201,7 @@ namespace Domain.Implementation.Services
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
+                : serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
             return postViewModel;
         }
         private PostCompactViewModel GetPostCompactViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -205,7 +211,7 @@ namespace Domain.Implementation.Services
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
+                : serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
             return postViewModel;
         }
         private PostViewModel GetPostViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -219,7 +225,7 @@ namespace Domain.Implementation.Services
             postViewModel.CurrentUserId = (applicationUserCurrent == null) ? null : applicationUserCurrent.Id;
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
+                : serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
             return postViewModel;
         }
 

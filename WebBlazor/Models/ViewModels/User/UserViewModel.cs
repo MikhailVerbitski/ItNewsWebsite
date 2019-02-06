@@ -15,10 +15,6 @@ namespace WebBlazor.Models.ViewModels.User
 
         public string Avatar { get; set; }
 
-        public string Role { get; set; }
-
-        public string RoleColor { get; set; }
-
         public int CountOfLikes { get; set; }
 
         public string Email { get; set; }
@@ -28,6 +24,8 @@ namespace WebBlazor.Models.ViewModels.User
         public string Password { get; set; }
 
         public bool IsCurrentUser { get; set; }
+
+        public UserRole Role { get; set; }
 
         public DateTime Created { get; set; }
 

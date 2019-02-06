@@ -27,24 +27,26 @@ namespace WebApi.Controllers
         private readonly ServiceOfAccount serviceOfAccount;
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfUser serviceOfUser;
+        private readonly ServiceOfRole serviceOfRole;
 
         public PostController(
             UserManager<ApplicationUserEntity> userManager,
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<RoleEntity> roleManager,
             ApplicationDbContext context,
             IMapper mapper,
             IHostingEnvironment hostingEnvironment
             )
         {
             this.userManager = userManager;
-            
+
+            serviceOfRole = new ServiceOfRole(context, userManager, mapper);
             serviceOfTag = new ServiceOfTag(context, mapper);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfSection = new ServiceOfSection(context, mapper);
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
             serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
-            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag);
-            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost);
+            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag, serviceOfRole);
+            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost, serviceOfRole);
 
             serviceOfComment.serviceOfUser = serviceOfUser;
             serviceOfPost.serviceOfUser = serviceOfUser;
@@ -65,9 +67,11 @@ namespace WebApi.Controllers
             return Json(post);
         }
         [HttpPost]
-        public void Update([FromBody] PostUpdateViewModel postCreateEditViewModel)
+        public async Task<IActionResult> Update([FromBody] PostUpdateViewModel postCreateEditViewModel)
         {
-            serviceOfPost.Update(postCreateEditViewModel);
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            await serviceOfPost.Update(userId, postCreateEditViewModel);
+            return Ok();
         }
         [HttpGet]
         public async Task Delete(int postId)

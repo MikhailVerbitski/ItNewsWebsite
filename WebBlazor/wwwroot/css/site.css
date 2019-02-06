@@ -16,11 +16,6 @@
     opacity: 0.78;
 }
 
-.content-head {
-    background-color: #F0F4F3;
-    box-shadow: 0 0 5px white;
-}
-
 .content-radius-top {
     border-radius: 7px 7px 0 0 ;
 }
@@ -35,7 +30,7 @@
 .content-body {
     background-color: #F0F4F3;
     box-shadow: 0 0 5px white;
-    margin-top:10px;
+    margin-bottom: 10px;
     width: 100%;
 }
 

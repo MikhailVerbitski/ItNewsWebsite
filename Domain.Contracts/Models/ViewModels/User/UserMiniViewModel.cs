@@ -12,13 +12,11 @@ namespace Domain.Contracts.Models.ViewModels.User
 
         public string Avatar { get; set; }
 
-        public string Role { get; set; }
-
-        public string RoleColor { get; set; }
-
         public int CountOfLikes { get; set; }
 
         public string Login { get; set; }
+
+        public UserRole Role { get; set; }
 
         public DateTime Created { get; set; }
     }

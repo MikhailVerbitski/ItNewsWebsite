@@ -49,8 +49,8 @@ else
                     <div></div>
                 }
 
-                <font size="5" color="@User.RoleColor">Role:</font>
-                <font size="5" color="@User.RoleColor">@User.Role</font>
+                <font size="5" color="@User.Role.Color">Role:</font>
+                <font size="5" color="@User.Role.Color">@User.Role.Name</font>
                 @if (User.IsCurrentUser)
                 {
                     <button onclick="@(() => ChangeProperty(2))">change</button>
@@ -137,7 +137,7 @@ else
     private bool ButtonSaveChange = false;
     private ElementRef files;
 
-    protected async override Task OnInitAsync()
+    protected async override Task OnParametersSetAsync()
     {
         User = await serviceOfAuthorize.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?login={login}");
     }

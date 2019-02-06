@@ -33,8 +33,8 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddIdentity<ApplicationUserEntity, IdentityRole>(a =>
+            
+            services.AddIdentity<ApplicationUserEntity, RoleEntity>(a =>
             {
                 a.Password.RequireNonAlphanumeric = false;
                 a.Password.RequireLowercase = false;
@@ -49,6 +49,7 @@ namespace WebApi
                 a.AddProfile(new AutomapperPostProfile());
                 a.AddProfile(new AutomapperUserProfile());
                 a.AddProfile(new AutomapperTagProfile());
+                a.AddProfile(new AutomapperRoleProfile());
             });
             IMapper mapper = mappingConfig.CreateMapper();
 

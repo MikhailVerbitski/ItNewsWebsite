@@ -9,10 +9,13 @@
 <div class="grid-content">
     <div class="content">
         <div class="side-bar">
-            <div class="content-head content-radius-top">
-                <a href="/CreatePost" class="pure-button create-post-link content-radius-top"><font size="4">Create new post</font></a>
-            </div>
-            <div class="content-body">
+            @if (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)
+            {
+                <div class="content-body content-radius-top">
+                    <a href="/CreatePost" class="pure-button create-post-link content-radius-top"><font size="4">Create new post</font></a>
+                </div>
+            }
+            <div class="content-body @((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1) ? "" : "content-radius-top")">
                 <div id="keywords"></div>
             </div>
             <div class="content-body content-radius-bott" style="padding: 20px;">
@@ -35,28 +38,33 @@
             </div>
         </div>
     </div>
-    <div class="content-head content content-radius" id="posts">
+    <div class="content-body content content-radius" id="posts">
         @Body
     </div>
 </div>
 
 @functions{
     private List<PostMiniViewModel> TheFirstFiveWithTheHighestRating;
+    private List<TagForCloud> tagsForCloud;
 
     protected async override Task OnInitAsync()
     {
         TheFirstFiveWithTheHighestRating = await serviceOfAuthorize.GetJsonAsync<List<PostMiniViewModel>>("api/Post/TheFirstSeveralWithTheHighestRating?take=5");
-    }
-    protected async override Task OnAfterRenderAsync()
-    {
         var tags = await serviceOfAuthorize.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
-        var tagsForCloud = tags.Select(a => new TagForCloud()
+        tagsForCloud = tags.Select(a => new TagForCloud()
         {
             text = a.Name,
             weight = a.CountOfUsage,
             link = $"/PostsByTag/{a.Id}"
-        });
-        var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
-        await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
+        })
+        .ToList();
+    }
+    protected async override Task OnAfterRenderAsync()
+    {
+        if(tagsForCloud != null)
+        {
+            var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
+            await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
+        }
     }
 }

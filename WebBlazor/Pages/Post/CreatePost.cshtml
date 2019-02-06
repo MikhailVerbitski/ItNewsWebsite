@@ -28,48 +28,53 @@
 <h2 style="text-align: center; padding:20px;">Constructor</h2>
 <div id="createPost-top">
     <div class="pure-form pure-form-stacked">
-        <fieldset>
-            <label for="header">Header</label>
-            <input id="header" type="text" bind="@(post.Header)" />
+        <label for="header">Header</label>
+        <input id="header" type="text" bind="@(post.Header)" />
 
-            <label for="selection">Selection: </label>
-            <select bind="@section">
-                @if (Selections != null)
+        <label for="selection">Selection: </label>
+        <select bind="@section">
+            @if (Selections != null)
+            {
+                foreach (var item in Selections)
                 {
-                    foreach (var item in Selections)
-                    {
-                        <option>@item</option>
-                    }
+                    <option>@item</option>
                 }
-            </select>
-            <div>
-                <label for="file" class="pure-button">Load image</label>
-                <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
-                <label for="content">Content</label>
-                <textarea id="content" rows="10" bind="@ContentValue" />
+            }
+        </select>
+        <div>
+            <label for="file" class="pure-button">Load image</label>
+            <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
+            <label for="content">Content</label>
+            <textarea id="content" rows="10" bind="@ContentValue" />
+        </div>
+        <label for="tagInput">Tags:</label>
+        <div id="grid-tag">
+            <div style="display: inline-block;">
+                <ListViewTemplateWithIf Items="@(post.Tags)">
+                    <ItemTemplate>
+                        <div style="display: inline-block; margin-top: 4px;" class="tag" onclick="@(() => DeselectTag(context))">@(context.Name)</div>
+                    </ItemTemplate>
+                </ListViewTemplateWithIf>
             </div>
-            <label for="tagInput">Tags:</label>
-            <div id="grid-tag">
-                <div style="display: inline-block;">
-                    <ListViewTemplateWithIf Items="@(post.Tags)">
-                        <ItemTemplate>
-                            <div style="display: inline-block; margin-top: 4px;" class="tag" onclick="@(() => DeselectTag(context))">@(context.Name)</div>
-                        </ItemTemplate>
-                    </ListViewTemplateWithIf>
-                </div>
-                <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress" />
-                <datalist id="listTags">
-                    <ListViewTemplateWithIf Items="@(post.Tags)">
-                        <ItemTemplate>
-                            <option>@(context.Name)</option>
-                        </ItemTemplate>
-                    </ListViewTemplateWithIf>
-                </datalist>
-            </div>
-            <br />
+            <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress" />
+            <datalist id="listTags">
+                <ListViewTemplateWithIf Items="@(post.Tags)">
+                    <ItemTemplate>
+                        <option>@(context.Name)</option>
+                    </ItemTemplate>
+                </ListViewTemplateWithIf>
+            </datalist>
+        </div>
+        <br />
+        @if (IsEditPost)
+        {
+            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary">Update</button>
+        }
+        else
+        {
             <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary">Send</button>
             <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary">Update the draft</button>
-        </fieldset>
+        }
     </div>
 </div>
 
@@ -93,6 +98,8 @@
         Images = new List<string>()
     };
 
+    private bool IsEditPost = false;
+
     protected override async Task OnInitAsync()
     {
         Selections = await serviceOfAuthorize.GetJsonAsync<List<string>>("api/Post/GetListOfSelections");
@@ -106,6 +113,7 @@
         if (Id != null && Int32.TryParse(Id, out id))
         {
             post = await serviceOfAuthorize.GetJsonAsync<PostUpdateViewModel>($"api/Post/Edit?postId={id}");
+            IsEditPost = true;
         }
     }
     private async Task UpdateCreate(bool isFinished = false)
@@ -115,16 +123,16 @@
         post.Section = section;
         post.BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build());
         post.IsFinished = isFinished;
-        if (isFinished)
+        if (isFinished && !IsEditPost)
         {
             post = await serviceOfAuthorize.SendJsonAsync<PostUpdateViewModel>(HttpMethod.Post, "api/Post/Create", post);
             UriHelper.NavigateTo($"/Post/{post.PostId}");
         }
         else
         {
-            await serviceOfAuthorize.SendJsonAsync<object>(HttpMethod.Post, "api/Post/Update", post);
-            UriHelper.NavigateTo($"/");
+            await serviceOfAuthorize.PostJsonAsync<object>("api/Post/Update", post);
         }
+        UriHelper.NavigateTo("/");
     }
     private void SelectTag(TagViewModel tagViewModel)
     {

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Data.Contracts.Models.Entities;
 
 namespace Data.Implementation.Repositories
 {
-    public class RepositoryOfRole : DefaultRepository<IdentityRole<string>>
+    public class RepositoryOfRole : DefaultRepository<RoleEntity>
     {
         public RepositoryOfRole(ApplicationDbContext context) : base(context)
         {

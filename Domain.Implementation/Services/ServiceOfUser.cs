@@ -26,6 +26,7 @@ namespace Domain.Implementation.Services
         public ServiceOfAccount serviceOfAccount { get; set; }
         public ServiceOfComment serviceOfComment { get; set; }
         public ServiceOfPost serviceOfPost { get; set; }
+        public ServiceOfRole serviceOfRole { get; set; }
 
         public ServiceOfUser(
             ApplicationDbContext context,
@@ -33,7 +34,8 @@ namespace Domain.Implementation.Services
             ServiceOfImage serviceOfImage,
             ServiceOfAccount serviceOfAccount,
             ServiceOfComment serviceOfComment,
-            ServiceOfPost serviceOfPost
+            ServiceOfPost serviceOfPost, 
+            ServiceOfRole serviceOfRole
             )
         {
             this.mapper = mapper;
@@ -46,6 +48,7 @@ namespace Domain.Implementation.Services
             this.serviceOfAccount = serviceOfAccount;
             this.serviceOfComment = serviceOfComment;
             this.serviceOfPost = serviceOfPost;
+            this.serviceOfRole = serviceOfRole;
         }
 
         public IEnumerable<UserMiniViewModel> GetUserByProperty(string propetry)
@@ -71,7 +74,7 @@ namespace Domain.Implementation.Services
         public async Task Update(string applicationUserIdCurrent, UserUpdateViewModel userUpdateViewModel)
         {
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
-            if(await serviceOfAccount.IsThereAccess(applicationUserCurrent, userUpdateViewModel.ApplicationUserId))
+            if(await serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, userUpdateViewModel.ApplicationUserId, true))
             {
                 var applicationUser = mapper.Map<UserUpdateViewModel, ApplicationUserEntity>(userUpdateViewModel);
                 repositoryOfApplicationUser.Update(applicationUser,
@@ -92,34 +95,10 @@ namespace Domain.Implementation.Services
             }
         }
 
-        public async Task<Tuple<string, string>> GetUserRole(ApplicationUserEntity applicationUserEntity)
-        {
-            var roles = await serviceOfAccount.GetUserRoles(applicationUserEntity);
-            if (roles.Contains("admin"))
-            {
-                return new Tuple<string, string>("admin", "#FF0101");
-            }
-            else if (roles.Contains("user"))
-            {
-                return new Tuple<string, string>("user", "#BEA500");
-            }
-            else
-            {
-                return new Tuple<string, string>("not found", "#000000");
-            }
-        }
-        public async Task<Tuple<string, string>> GetUserRole(string applicationUserId)
-        {
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            return await GetUserRole(applicationUser);
-        }
-
         public UserMiniViewModel GetUserMiniViewModel(ApplicationUserEntity applicationUserPost)
         {
             var userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserPost);
-            var role = GetUserRole(applicationUserPost).Result;
-            userMiniViewModel.Role = role.Item1;
-            userMiniViewModel.RoleColor = role.Item2;
+            userMiniViewModel.Role = serviceOfRole.GetUserRole(applicationUserPost).Result;
             return userMiniViewModel;
         }
         public async Task<UserViewModel> GetUserViewModel(string applicationUserIdCurrent, string login)
@@ -134,12 +113,10 @@ namespace Domain.Implementation.Services
                 a => a.Posts,
                 a => a.Comments);
             var userViewModel = mapper.Map<ApplicationUserEntity, UserViewModel>(applicationUser);
-            var role = GetUserRole(applicationUser).Result;
-            userViewModel.Role = role.Item1;
-            userViewModel.RoleColor = role.Item2;
+            userViewModel.Role = await serviceOfRole.GetUserRole(applicationUser);
             userViewModel.Comments = userProfile.Comments.Select(a => serviceOfComment.GetViewModelWithProperty<CommentMiniViewModel>(a, applicationUserCurrent)).ToList();
             userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty<PostCompactViewModel>(a, applicationUserCurrent)).ToList();
-            userViewModel.IsCurrentUser = await serviceOfAccount.IsThereAccess(applicationUserCurrent, applicationUser.Id);
+            userViewModel.IsCurrentUser = await serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, true);
             return userViewModel;
         }
     }

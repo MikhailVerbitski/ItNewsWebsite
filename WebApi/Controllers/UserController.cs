@@ -26,22 +26,24 @@ namespace WebApi.Controllers
         private readonly ServiceOfComment serviceOfComment;
         private readonly ServiceOfAccount serviceOfAccount;
         private readonly ServiceOfImage serviceOfImage;
+        private readonly ServiceOfRole serviceOfRole;
 
         public UserController(
             UserManager<ApplicationUserEntity> userManager,
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<RoleEntity> roleManager,
             ApplicationDbContext context,
             IMapper mapper,
             IHostingEnvironment hostingEnvironment
             )
         {
+            serviceOfRole = new ServiceOfRole(context, userManager, mapper);
             serviceOfTag = new ServiceOfTag(context, mapper);
             serviceOfSection = new ServiceOfSection(context, mapper);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
             serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
-            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag);
-            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost);
+            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag, serviceOfRole);
+            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost, serviceOfRole);
 
             serviceOfComment.serviceOfUser = serviceOfUser;
             serviceOfPost.serviceOfUser = serviceOfUser;
@@ -77,9 +79,14 @@ namespace WebApi.Controllers
             return Json(path);
         }
         [HttpGet]
-        public JsonResult GetUserLogin()
+        public async Task<JsonResult> GetDataAboutCurrentUser()
         {
-            return Json(User.Claims.FirstOrDefault(a => a.Type == System.Security.Claims.ClaimsIdentity.DefaultNameClaimType)?.Value);
+            var data = new DataAboutCurrentUser()
+            {
+                Login = User.Claims.FirstOrDefault(a => a.Type == System.Security.Claims.ClaimsIdentity.DefaultNameClaimType)?.Value,
+                Priority = await serviceOfRole.GetUserPriority(User.Claims.SingleOrDefault(a => a.Type == "UserId").Value)
+            };
+            return Json(data);
         }
     }
 }
