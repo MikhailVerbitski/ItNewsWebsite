@@ -2,7 +2,7 @@
 
 #navbar {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto auto auto;
     position: fixed;
     top: 0; 
     background-color: #EFE7CC;
@@ -201,4 +201,13 @@
 }
 .post-edit-delete font {
     opacity: 0.6;
+}
+
+.theme-button {
+    justify-self: self-end;
+    align-self: center;
+}
+
+.content-account {
+    padding: 20px 30px;
 }

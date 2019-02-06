@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, admin")]
     [ApiController]
     [Route("api/Post/[action]")]
     public class PostController : Controller

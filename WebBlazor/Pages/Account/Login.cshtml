@@ -5,40 +5,43 @@
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 
-<h1>Log in</h1>
-@if (ServerErrors != null)
-{
-    <div class="validationsummary">
-        <ul>
-            @foreach (var error in ServerErrors)
-            {
-                <li>@error</li>
-            }
-        </ul>
+<div class="content-head content content-radius content-account">
+    <h1>Log in</h1>
+    @if (ServerErrors != null)
+    {
+        <div class="validationsummary">
+            <ul>
+                @foreach (var error in ServerErrors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+        <br />
+    }
+    <div class="pure-form pure-form-stacked">
+
+        <label for="Login"><font size="5">Login</font></label>
+        <input id="Login" type="text" placeholder="Login" bind="@login.Login" />
+        <ValidationError Subject="@login" Property="@nameof(login.Login)" />
+        <br />
+
+        <label for="password"><font size="5">Password</font></label>
+        <input id="password" type="password" placeholder="Password" bind="@login.Password" />
+        <ValidationError Subject="@login" Property="@nameof(login.Password)" />
+        <br />
+
+        <div class="grid-login-remember">
+            <label for="remember" class="pure-checkbox" style="margin: 0;"><font size="3">Remember me</font></label>
+            <input id="remember" type="checkbox" bind="@login.RememberMe" style="width: auto;" />
+        </div>
+        <ValidationError Subject="@login" Property="@nameof(login.RememberMe)" />
+        <br />
+
+        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Login</button>
     </div>
-    <br />
-}
-<div class="pure-form pure-form-stacked">
-
-    <label for="Login"><font size="5">Login</font></label>
-    <input id="Login" type="text" placeholder="Login" bind="@login.Login" />
-    <ValidationError Subject="@login" Property="@nameof(login.Login)" />
-    <br />
-
-    <label for="password"><font size="5">Password</font></label>
-    <input id="password" type="password" placeholder="Password" bind="@login.Password" />
-    <ValidationError Subject="@login" Property="@nameof(login.Password)" />
-    <br />
-
-    <div class="grid-login-remember">
-        <label for="remember" class="pure-checkbox" style="margin: 0;"><font size="3">Remember me</font></label>
-        <input id="remember" type="checkbox" bind="@login.RememberMe" style="width: auto;"/>
-    </div>
-    <ValidationError Subject="@login" Property="@nameof(login.RememberMe)" />
-    <br />
-
-    <button onclick="@SubmitForm" class="pure-button pure-button-primary">Login</button>
 </div>
+
 
 @functions{
     private List<string> ServerErrors { get; set; }

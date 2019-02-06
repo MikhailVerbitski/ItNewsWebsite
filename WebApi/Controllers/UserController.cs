@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, admin")]
     [ApiController]
     [Route("api/User/[action]")]
     public class UserController : Controller
@@ -75,6 +75,11 @@ namespace WebApi.Controllers
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
             var path = serviceOfUser.ChangeUserImage(currentUserId, image);
             return Json(path);
+        }
+        [HttpGet]
+        public JsonResult GetUserLogin()
+        {
+            return Json(User.Claims.FirstOrDefault(a => a.Type == System.Security.Claims.ClaimsIdentity.DefaultNameClaimType)?.Value);
         }
     }
 }

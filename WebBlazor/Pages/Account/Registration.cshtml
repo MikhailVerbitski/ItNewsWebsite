@@ -4,26 +4,27 @@
 @inject Components.ServiceOfImage serviceOfImage
 @addTagHelper *, Blazor.Validation
 
-<h1>Registration</h1>
-@if (DisplayValidationSummary)
-{
-    <div>
-        <ValidationSummary Subject="@user" />
+<div class="content-head content content-radius content-account">
+    <h1>Registration</h1>
+    @if (DisplayValidationSummary)
+    {
+        <div>
+            <ValidationSummary Subject="@user" />
+            <br />
+        </div>
+    }
+    @if (ServerErrors != null)
+    {
+        <div class="validationsummary">
+            <ul>
+                @foreach (var error in ServerErrors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
         <br />
-    </div>
-}
-@if (ServerErrors != null)
-{
-    <div class="validationsummary">
-        <ul>
-            @foreach (var error in ServerErrors)
-            {
-                <li>@error</li>
-            }
-        </ul>
-    </div>
-    <br />
-}
+    }
     <div class="pure-form pure-form-stacked">
 
         <label for="FirstName"><font size="5">First Name</font></label>
@@ -58,34 +59,35 @@
 
         <button onclick="@SubmitForm" class="pure-button pure-button-primary">Registration</button>
     </div>
+</div>
 
-@functions{
-    WebBlazor.Models.ViewModels.Account.RegisterValidationViewModel user { get; set; } = new Models.ViewModels.Account.RegisterValidationViewModel();
-    private bool DisplayValidationSummary { get; set; } = false;
-    private List<string> ServerErrors { get; set; }
+    @functions{
+        WebBlazor.Models.ViewModels.Account.RegisterValidationViewModel user { get; set; } = new Models.ViewModels.Account.RegisterValidationViewModel();
+        private bool DisplayValidationSummary { get; set; } = false;
+        private List<string> ServerErrors { get; set; }
 
-    private async Task SubmitForm()
-    {
-        ServerErrors = null;
-        if (!user.HasErrors)
+        private async Task SubmitForm()
         {
-            var registerUser = new WebBlazor.Models.ViewModels.Account.RegisterViewModel()
+            ServerErrors = null;
+            if (!user.HasErrors)
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Login = user.Login,
-                Email = user.Email,
-                Password = user.Password
-            };
-            try
-            {
-                ServerErrors = await Http.PostJsonAsync<List<string>>("/api/Token/Registration", registerUser);
+                var registerUser = new WebBlazor.Models.ViewModels.Account.RegisterViewModel()
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Login = user.Login,
+                    Email = user.Email,
+                    Password = user.Password
+                };
+                try
+                {
+                    ServerErrors = await Http.PostJsonAsync<List<string>>("/api/Token/Registration", registerUser);
+                }
+                catch
+                {
+                    UriHelper.NavigateTo("/Login");
+                }
             }
-            catch
-            {
-                UriHelper.NavigateTo("/Login");
-            }
+            DisplayValidationSummary = true;
         }
-        DisplayValidationSummary = true;
     }
-}

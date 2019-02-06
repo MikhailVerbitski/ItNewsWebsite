@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace WebApi.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, admin")]
     [ApiController]
     [Route("api/Comment/[action]")]
     public class CommentController : Controller

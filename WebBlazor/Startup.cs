@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Blazor.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 using WebBlazor.Components;
+using WebBlazor.JsInteropClasses;
 
 namespace WebBlazor
 {
@@ -15,6 +16,7 @@ namespace WebBlazor
             services.AddSingleton<IFileReaderService>(sp => new FileReaderService());
             services.AddSingleton<ServiceOfAuthorize>();
             services.AddScoped<ServiceOfImage>();
+            services.AddScoped<ServiceOfTheme>();
         }
 
         public void Configure(IBlazorApplicationBuilder app)
