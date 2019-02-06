@@ -56,12 +56,6 @@ namespace Domain.Implementation.Services
             this.serviceOfUser = serviceOfUser;
             this.serviceOfTag = serviceOfTag;
 
-            //serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
-            //serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
-            //serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
-            //serviceOfTag = new ServiceOfTag(context, mapper);
-            //serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
-
             Config = new Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[]
             {
                 new Tuple<Type, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>(typeof(PostCompactViewModel), GetPostCompactViewModel),

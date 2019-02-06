@@ -57,10 +57,10 @@ namespace WebApi.Controllers
         }
         [AllowAnonymous]
         [HttpGet]
-        public JsonResult GetUserViewModel(string login)
+        public async Task<JsonResult> GetUserViewModel(string login)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var user = serviceOfUser.GetUserViewModel(userId, login);
+            var user = await serviceOfUser.GetUserViewModel(userId, login);
             return Json(user);
         }
         [HttpPost]

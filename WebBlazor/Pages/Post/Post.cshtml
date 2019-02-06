@@ -34,11 +34,14 @@ else
         </div>
         <br />
         <br />
-        <div class="pure-form pure-form-stacked">
-            <label for="Content">Comment</label>
-            <textarea id="Content" class="pure-input-1" name="Content" bind="@CommentContent" />
-            <button onclick="@SubmitCommentForm" id="SubmitComment" class="pure-button pure-button-primary">Send</button>
-        </div>
+        @if (serviceOfAuthorize.IsAuthorize)
+        {
+            <div class="pure-form pure-form-stacked">
+                <label for="Content">Comment</label>
+                <textarea id="Content" class="pure-input-1" name="Content" bind="@CommentContent" />
+                <button onclick="@SubmitCommentForm" id="SubmitComment" class="pure-button pure-button-primary">Send</button>
+            </div>
+        }
     </div>
     <br />
     <hr />

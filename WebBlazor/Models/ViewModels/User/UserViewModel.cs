@@ -27,6 +27,8 @@ namespace WebBlazor.Models.ViewModels.User
 
         public string Password { get; set; }
 
+        public bool IsCurrentUser { get; set; }
+
         public DateTime Created { get; set; }
 
         public IEnumerable<PostMiniViewModel> Posts { get; set; }

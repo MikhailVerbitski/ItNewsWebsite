@@ -2,6 +2,7 @@ using Blazor.Extensions.Storage;
 using Blazor.FileReader;
 using Microsoft.AspNetCore.Blazor.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 using WebBlazor.Components;
 
 namespace WebBlazor
@@ -18,6 +19,7 @@ namespace WebBlazor
 
         public void Configure(IBlazorApplicationBuilder app)
         {
+            app.UseLocalTimeZone();
             app.AddComponent<App>("app");
         }
     }

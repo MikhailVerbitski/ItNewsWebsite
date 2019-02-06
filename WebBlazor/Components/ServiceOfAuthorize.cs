@@ -18,9 +18,9 @@ namespace WebBlazor.Components
         private readonly HttpClient Http;
         private readonly IUriHelper UriHelper;
 
+        private Task CreateHeader { get; set; }
         public bool IsAuthorize { get; set; } = false;
-        public event Action UpdateNavbar;
-        private Task CreateHeader;
+        public event Action UpdateAfterAuthorization;
 
         public ServiceOfAuthorize(LocalStorage localStorage, HttpClient Http, IUriHelper UriHelper)
         {
@@ -29,22 +29,6 @@ namespace WebBlazor.Components
             this.UriHelper = UriHelper;
 
             CreateHeader = CheckAuthorization();
-        }
-        public async Task<TokenViewModel> Login(WebBlazor.Models.ViewModels.Account.LoginViewModel loginViewModel)
-        {
-            var result = await Http.PostJsonAsync<TokenViewModel>("/api/Token/Login", loginViewModel);
-            await localStorage.SetItem<string>("token", result.Token);
-            IsAuthorize = true;
-            UpdateNavbar.Invoke();
-            return result;
-        }
-        public async Task Logout()
-        {
-            await localStorage.RemoveItem("token");
-            Http.DefaultRequestHeaders.Remove("Authorization");
-            IsAuthorize = false;
-            UpdateNavbar.Invoke();
-            Console.WriteLine("logout");
         }
         private async Task CheckAuthorization()
         {
@@ -56,8 +40,24 @@ namespace WebBlazor.Components
             Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
             var response = await Http.GetAsync("/api/Token/TokenVerification");
             IsAuthorize = response.IsSuccessStatusCode;
-            UpdateNavbar.Invoke();
+            UpdateAfterAuthorization.Invoke();
             return;
+        }
+        public async Task<TokenViewModel> Login(WebBlazor.Models.ViewModels.Account.LoginViewModel loginViewModel)
+        {
+            var result = await Http.PostJsonAsync<TokenViewModel>("/api/Token/Login", loginViewModel);
+            await localStorage.SetItem<string>("token", result.Token);
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {result.Token}");
+            IsAuthorize = true;
+            UpdateAfterAuthorization.Invoke();
+            return result;
+        }
+        public async Task Logout()
+        {
+            await localStorage.RemoveItem("token");
+            Http.DefaultRequestHeaders.Remove("Authorization");
+            IsAuthorize = false;
+            UpdateAfterAuthorization.Invoke();
         }
         public async Task<T> GetJsonAsync<T>(string requestUri) where T: class
         {

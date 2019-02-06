@@ -46,10 +46,6 @@ namespace Domain.Implementation.Services
             this.serviceOfAccount = serviceOfAccount;
             this.serviceOfComment = serviceOfComment;
             this.serviceOfPost = serviceOfPost;
-            //serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
-            //serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
-            //serviceOfComment = new ServiceOfComment(context, roleManager, userManager, hostingEnvironment, mapper);
-            //serviceOfPost = new ServiceOfPost(context, roleManager, userManager, hostingEnvironment, mapper);
         }
 
         public IEnumerable<UserMiniViewModel> GetUserByProperty(string propetry)
@@ -126,8 +122,7 @@ namespace Domain.Implementation.Services
             userMiniViewModel.RoleColor = role.Item2;
             return userMiniViewModel;
         }
-
-        public UserViewModel GetUserViewModel(string applicationUserIdCurrent, string login)
+        public async Task<UserViewModel> GetUserViewModel(string applicationUserIdCurrent, string login)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.UserName == login);
             var applicationUserCurrent = (applicationUserIdCurrent == null) 
@@ -144,6 +139,7 @@ namespace Domain.Implementation.Services
             userViewModel.RoleColor = role.Item2;
             userViewModel.Comments = userProfile.Comments.Select(a => serviceOfComment.GetViewModelWithProperty<CommentMiniViewModel>(a, applicationUserCurrent)).ToList();
             userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty<PostCompactViewModel>(a, applicationUserCurrent)).ToList();
+            userViewModel.IsCurrentUser = await serviceOfAccount.IsThereAccess(applicationUserCurrent, applicationUser.Id);
             return userViewModel;
         }
     }

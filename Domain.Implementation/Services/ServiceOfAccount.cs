@@ -95,6 +95,10 @@ namespace Domain.Implementation.Services
         }
         public async Task<bool> IsThereAccess(ApplicationUserEntity applicationUserCurrent, string applicationUserIdRequest)
         {
+            if(applicationUserCurrent == null)
+            {
+                return false;
+            }
             var CurrentUserIsAdmin = (await userManager.GetRolesAsync(applicationUserCurrent)).Contains("admin");
             if(applicationUserCurrent.Id != applicationUserIdRequest)
             {

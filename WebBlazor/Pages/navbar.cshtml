@@ -24,7 +24,7 @@
 
     protected override void OnInit()
     {
-        serviceOfAuthorize.UpdateNavbar += (() => this.StateHasChanged());
+        serviceOfAuthorize.UpdateAfterAuthorization += (() => this.StateHasChanged());
     }
     private async Task Logout()
     {

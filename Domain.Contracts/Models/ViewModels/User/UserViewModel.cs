@@ -27,6 +27,8 @@ namespace Domain.Contracts.Models.ViewModels.User
 
         public string Password { get; set; }
 
+        public bool IsCurrentUser { get; set; }
+
         public DateTime Created { get; set; }
 
         public IEnumerable<PostCompactViewModel> Posts { get; set; }

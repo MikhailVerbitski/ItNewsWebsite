@@ -39,7 +39,6 @@ namespace Domain.Implementation.Services
             repositoryOfUserProfile = new RepositoryOfUserProfile(context);
 
             this.serviceOfUser = serviceOfUser;
-            //serviceOfUser = new ServiceOfUser(context, roleManager, userManager, mapper, hostingEnvironment);
 
             Config = new[]
             {
