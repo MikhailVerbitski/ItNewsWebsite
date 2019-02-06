@@ -1,6 +1,7 @@
 ﻿using Blazor.Extensions.Storage;
 using Microsoft.AspNetCore.Blazor;
 using Microsoft.AspNetCore.Blazor.Services;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebBlazor.Models.ViewModels;
@@ -16,120 +17,159 @@ namespace WebBlazor.Components
         private readonly LocalStorage localStorage;
         private readonly HttpClient Http;
         private readonly IUriHelper UriHelper;
-        
-        public Task<bool> Authorize { get; set; }
+
+        public bool IsAuthorize { get; set; } = false;
+        public event Action UpdateNavbar;
+        private Task CreateHeader;
 
         public ServiceOfAuthorize(LocalStorage localStorage, HttpClient Http, IUriHelper UriHelper)
         {
             this.localStorage = localStorage;
             this.Http = Http;
             this.UriHelper = UriHelper;
-        }
-        private async Task<bool> AddTokenInHeader()
-        {
-            var response = await Http.GetAsync("/api/Token/TokenVerification");
-            if (!response.IsSuccessStatusCode)
-            {
-                if (!Http.DefaultRequestHeaders.Contains("Authorization"))
-                {
-                    var token = await localStorage.GetItem<string>("token");
-                    if (token == null)
-                    {
-                        UriHelper.NavigateTo("/Login");
-                        return false;
-                    }
-                    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-                    await AddTokenInHeader();
-                }
-                else
-                {
-                    UriHelper.NavigateTo("/Login");
-                    return false;
-                }
-            }
-            return true;
-        }
-        public Task<bool> TryToAuthorize()
-        {
-            Authorize = Task.Run(async () => await AddTokenInHeader());
-            //Task.Run(async () => { authorize = await Authorize; System.Console.WriteLine(authorize); });
-            return Authorize;
+
+            CreateHeader = CheckAuthorization();
         }
         public async Task<TokenViewModel> Login(WebBlazor.Models.ViewModels.Account.LoginViewModel loginViewModel)
         {
             var result = await Http.PostJsonAsync<TokenViewModel>("/api/Token/Login", loginViewModel);
             await localStorage.SetItem<string>("token", result.Token);
-            await TryToAuthorize();
+            IsAuthorize = true;
+            UpdateNavbar.Invoke();
             return result;
         }
-        public void Logout()
+        public async Task Logout()
         {
-            localStorage.RemoveItem("token");
+            await localStorage.RemoveItem("token");
             Http.DefaultRequestHeaders.Remove("Authorization");
+            IsAuthorize = false;
+            UpdateNavbar.Invoke();
+            Console.WriteLine("logout");
+        }
+        private async Task CheckAuthorization()
+        {
+            var token = await localStorage.GetItem<string>("token");
+            if (token == null)
+            {
+                IsAuthorize = false;
+            }
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            var response = await Http.GetAsync("/api/Token/TokenVerification");
+            IsAuthorize = response.IsSuccessStatusCode;
+            UpdateNavbar.Invoke();
+            return;
         }
         public async Task<T> GetJsonAsync<T>(string requestUri) where T: class
         {
-            if (await Authorize)
+            await CreateHeader;
+            try
             {
-                try
+                return await Http.GetJsonAsync<T>(requestUri);
+            }
+            catch
+            {
+                if (Http.DefaultRequestHeaders.Contains("Authorization"))
                 {
-                    return await Http.GetJsonAsync<T>(requestUri);
+                    await Logout();
+                    UriHelper.NavigateTo("/Login");
+                    return null;
                 }
-                catch
+                else
                 {
-                    await TryToAuthorize();
+                    var token = await localStorage.GetItem<string>("token");
+                    if (token == null)
+                    {
+                        UriHelper.NavigateTo("/Login");
+                        return null;
+                    }
+                    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                    return await GetJsonAsync<T>(requestUri);
                 }
             }
-            UriHelper.NavigateTo("/Login");
-            return null;
         }
         public async Task<T> PostJsonAsync<T>(string requestUri, object content) where T : class
         {
-            if (await Authorize)
+            await CreateHeader;
+            try
             {
-                try
+                return await Http.PostJsonAsync<T>(requestUri,content);
+            }
+            catch
+            {
+                if (Http.DefaultRequestHeaders.Contains("Authorization"))
                 {
-                    return await Http.PostJsonAsync<T>(requestUri,content);
+                    await Logout();
+                    UriHelper.NavigateTo("/Login");
+                    return null;
                 }
-                catch
+                else
                 {
-                    await TryToAuthorize();
+                    var token = await localStorage.GetItem<string>("token");
+                    if (token == null)
+                    {
+                        UriHelper.NavigateTo("/Login");
+                        return null;
+                    }
+                    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                    return await PostJsonAsync<T>(requestUri, content);
                 }
             }
-            UriHelper.NavigateTo("/Login");
-            return null;
         }
         public async Task<T> SendJsonAsync<T>(HttpMethod method, string requestUri, object content) where T : class
         {
-            if (await Authorize)
+            await CreateHeader;
+            try
             {
-                try
+                return await Http.SendJsonAsync<T>(method, requestUri, content);
+            }
+            catch
+            {
+                if (Http.DefaultRequestHeaders.Contains("Authorization"))
                 {
-                    return await Http.SendJsonAsync<T>(method, requestUri, content);
+                    await Logout();
+                    UriHelper.NavigateTo("/Login");
+                    return null;
                 }
-                catch
+                else
                 {
-                    await TryToAuthorize();
+                    var token = await localStorage.GetItem<string>("token");
+                    if (token == null)
+                    {
+                        UriHelper.NavigateTo("/Login");
+                        return null;
+                    }
+                    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                    return await SendJsonAsync<T>(method, requestUri, content);
                 }
             }
-            UriHelper.NavigateTo("/Login");
-            return null;
         }
         public async Task<HttpResponseMessage> GetAsync(string requestUri)
         {
-            if (await Authorize)
+            await CreateHeader;
+            try
             {
-                try
+                return await Http.GetAsync(requestUri);
+            }
+            catch
+            {
+                if (Http.DefaultRequestHeaders.Contains("Authorization"))
                 {
-                    return await Http.GetAsync(requestUri);
+                    await Logout();
+                    UriHelper.NavigateTo("/Login");
+                    return null;
                 }
-                catch
+                else
                 {
-                    await TryToAuthorize();
+                    var token = await localStorage.GetItem<string>("token");
+                    if (token == null)
+                    {
+                        UriHelper.NavigateTo("/Login");
+                        return null;
+                    }
+                    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                    return await GetAsync(requestUri);
                 }
             }
-            UriHelper.NavigateTo("/Login");
-            return null;
         }
     }
 }

@@ -50,7 +50,6 @@ namespace WebApi.Controllers
             serviceOfPost.serviceOfUser = serviceOfUser;
         }
         
-
         [HttpPost]
         public async Task<JsonResult> Create(PostUpdateViewModel post)
         {
@@ -83,45 +82,51 @@ namespace WebApi.Controllers
             var rating = serviceOfPost.RatingPost(currentUserId, postId, score);
             return Json(rating);
         }
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult PostViewModel(int postId)
         {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var postViewModel = serviceOfPost.Get<PostViewModel>(currentUserId, postId);
             return Json(postViewModel);
         }
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult ListPostsCompactViewModel(int? take)
         {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, null, a => a.IsFinished == true);
             return Json(posts);
         }
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult ListPostsMiniViewModel(int? take)
         {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var posts = serviceOfPost.Get<PostMiniViewModel>(currentUserId, take, null, a => a.IsFinished == true);
             return Json(posts);
         }
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult ListPostsCompactViewModelByTag(int tagId, int? take)
         {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, null, a => a.Tags.Any(b => b.TagId == tagId), a => a.IsFinished == true);
             return Json(posts);
         }
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult TheFirstSeveralWithTheHighestRating(int? take)
         {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var posts = serviceOfPost.Get<PostMiniViewModel>(currentUserId, take, a => -((a.CountOfScore == 0) ? 0 : (int)(a.SumOfScore / a.CountOfScore)), a => a.IsFinished == true);
             return Json(posts);
         }
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult ListPostsCompactViewModelTop(int? take)
         {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, a => -((a.CountOfScore == 0) ? 0 : (int)(a.SumOfScore / a.CountOfScore)), a => a.IsFinished == true);
             return Json(posts);
         }
@@ -131,6 +136,7 @@ namespace WebApi.Controllers
             var listOfSelections = serviceOfSection.Get().Select(a => a.Text);
             return Json(listOfSelections);
         }
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult GetListOfTags()
         {

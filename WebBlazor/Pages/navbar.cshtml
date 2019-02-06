@@ -3,7 +3,7 @@
 <div class="logo"><a href="/" style="margin-left:3vh; padding-bottom: 0;"><font size="5">ItNews</font></a></div>
 <div class="account-nav">
     <ul class="pure-menu-list">
-        @if (IsAuthorize)
+        @if (serviceOfAuthorize.IsAuthorize)
         {
             <li class="pure-menu-item"><a href="/Login" class="pure-menu-link" onclick="@Logout">Login out</a></li>
         }
@@ -19,18 +19,15 @@
     <div><a href="/SearchUsers/@SearchWords">Search</a></div>
 </div>
 
-
 @functions{
     private string SearchWords { get; set; }
-    private bool IsAuthorize { get; set; }
 
-    protected override async Task OnInitAsync()
+    protected override void OnInit()
     {
-        IsAuthorize = await serviceOfAuthorize.TryToAuthorize();
+        serviceOfAuthorize.UpdateNavbar += (() => this.StateHasChanged());
     }
-    private void Logout()
+    private async Task Logout()
     {
-        serviceOfAuthorize.Logout();
-        IsAuthorize = false;
+        await serviceOfAuthorize.Logout();
     }
 }

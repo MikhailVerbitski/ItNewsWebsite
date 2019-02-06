@@ -119,9 +119,9 @@ namespace Domain.Implementation.Services
             var commentViewModel = mapper.Map<CommentEntity, CommentViewModel>(commentEntity);
             var applicationUserForComment = repositoryOfUserProfile.Read(a => a.Id == commentEntity.UserProfileId, a => a.ApplicationUser).ApplicationUser;
             UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserForComment);
-            commentViewModel.BelongsToUser = applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
+            commentViewModel.BelongsToUser = (applicationUserCurrent == null) ? false : applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
             commentViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserForComment);
-            commentViewModel.IsUserLiked = IsCommentLike(commentEntity, applicationUserCurrent.UserProfileId.Value);
+            commentViewModel.IsUserLiked = (applicationUserCurrent == null) ? false : IsCommentLike(commentEntity, applicationUserCurrent.UserProfileId.Value);
             return commentViewModel;
         }
         private CommentMiniViewModel GetCommentMiniViewModel(CommentEntity commentEntity, ApplicationUserEntity applicationUserCurrent)
@@ -129,7 +129,7 @@ namespace Domain.Implementation.Services
             var commentViewModel = mapper.Map<CommentEntity, CommentMiniViewModel>(commentEntity);
             var applicationUserForComment = repositoryOfUserProfile.Read(a => a.Id == commentEntity.UserProfileId, a => a.ApplicationUser).ApplicationUser;
             UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserForComment);
-            commentViewModel.BelongsToUser = applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
+            commentViewModel.BelongsToUser = (applicationUserCurrent == null) ? false : applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
             commentViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserForComment);
             return commentViewModel;
         }
@@ -138,7 +138,7 @@ namespace Domain.Implementation.Services
             var commentViewModel = mapper.Map<CommentEntity, CommentCreateEditViewModel>(commentEntity);
             var applicationUserForComment = repositoryOfUserProfile.Read(a => a.Id == commentEntity.UserProfileId, a => a.ApplicationUser).ApplicationUser;
             UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserForComment);
-            commentViewModel.BelongsToUser = applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
+            commentViewModel.BelongsToUser = (applicationUserCurrent == null) ? false : applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
             commentViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserForComment);
             return commentViewModel;
         }

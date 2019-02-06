@@ -48,16 +48,18 @@ namespace WebApi.Controllers
             serviceOfPost.serviceOfUser = serviceOfUser;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult GetUserByProperty(string property)
         {
             var users = serviceOfUser.GetUserByProperty(property);
             return Json(users);
         }
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult GetUserViewModel(string login)
         {
-            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var user = serviceOfUser.GetUserViewModel(userId, login);
             return Json(user);
         }

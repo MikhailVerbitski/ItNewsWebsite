@@ -190,14 +190,18 @@ namespace Domain.Implementation.Services
         {
             var postViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
-            postViewModel.BelongsToUser = serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
+            postViewModel.BelongsToUser = (applicationUserCurrent == null) 
+                ? false 
+                : serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
             return postViewModel;
         }
         private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostMiniViewModel>(postEntity);
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
-            postViewModel.BelongsToUser = serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
+            postViewModel.BelongsToUser = (applicationUserCurrent == null)
+                ? false
+                : serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
             return postViewModel;
         }
         private PostCompactViewModel GetPostCompactViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -205,7 +209,9 @@ namespace Domain.Implementation.Services
             var postViewModel = mapper.Map<PostEntity, PostCompactViewModel>(postEntity);
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
-            postViewModel.BelongsToUser = serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
+            postViewModel.BelongsToUser = (applicationUserCurrent == null)
+                ? false
+                : serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
             return postViewModel;
         }
         private PostViewModel GetPostViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -216,15 +222,19 @@ namespace Domain.Implementation.Services
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
             postViewModel.Comments = serviceOfComment.GetMany<CommentViewModel>(postEntity, applicationUserCurrent);
-            postViewModel.CurrentUserId = applicationUserCurrent.Id;
-            postViewModel.BelongsToUser = serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
+            postViewModel.CurrentUserId = (applicationUserCurrent == null) ? null : applicationUserCurrent.Id;
+            postViewModel.BelongsToUser = (applicationUserCurrent == null)
+                ? false
+                : serviceOfAccount.IsThereAccess(applicationUserCurrent, postEntity.UserProfile.ApplicationUserId).Result;
             return postViewModel;
         }
 
         public TPostViewModel GetViewModelWithProperty<TPostViewModel>(PostEntity postEntity, string applicationUserIdCurrent)
             where TPostViewModel : BasePostViewModel
         {
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile);
+            var applicationUser = (applicationUserIdCurrent == null) 
+                ? null
+                : repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile);
             return GetViewModelWithProperty<TPostViewModel>(postEntity, applicationUser);
         }
         public TPostViewModel GetViewModelWithProperty<TPostViewModel>(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)

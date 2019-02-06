@@ -130,9 +130,11 @@ namespace Domain.Implementation.Services
         public UserViewModel GetUserViewModel(string applicationUserIdCurrent, string login)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.UserName == login);
-            var applicationUserCurrent = (applicationUserIdCurrent == applicationUser.Id) 
-                ? applicationUser 
-                : repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            var applicationUserCurrent = (applicationUserIdCurrent == null) 
+                ? null 
+                : (applicationUserIdCurrent == applicationUser.Id) 
+                    ? applicationUser 
+                    : repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
             var userProfile = repositoryOfUserProfile.Read(a => a.Id == applicationUser.UserProfileId.Value,
                 a => a.Posts,
                 a => a.Comments);
