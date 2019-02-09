@@ -6,6 +6,7 @@ using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,9 @@ namespace Domain.Implementation.Services
     public class ServiceOfUser
     {
         private readonly IMapper mapper;
+        ApplicationDbContext context;
 
+        private readonly RepositoryOfIdentityUserRole repositoryOfIdentityUserRole;
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
         private readonly RepositoryOfPost repositoryOfPost;
@@ -39,7 +42,9 @@ namespace Domain.Implementation.Services
             )
         {
             this.mapper = mapper;
+            this.context = context;
 
+            repositoryOfIdentityUserRole = new RepositoryOfIdentityUserRole(context);
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             repositoryOfUserProfile = new RepositoryOfUserProfile(context);
             repositoryOfPost = new RepositoryOfPost(context);
@@ -87,11 +92,10 @@ namespace Domain.Implementation.Services
                 {
                     await serviceOfAccount.ChangePassword(applicationUser.Id, userUpdateViewModel.Password);
                 }
-                //var tasksOfAddsRoles = userEditViewModel
-                //    .Roles
-                //    .Where(a => a.Selected)
-                //    .Select(a => serviceOfAccount.AddUserRole(userEditViewModel.ApplicationUserId, a.Text));
-                //Task.WaitAll(tasksOfAddsRoles.ToArray());
+                if(await serviceOfRole.GetUserPriority(applicationUserCurrent) == 3)
+                {
+                    await serviceOfRole.ChangeRole(applicationUser, userUpdateViewModel.Role);
+                }
             }
         }
 
@@ -104,10 +108,10 @@ namespace Domain.Implementation.Services
         public async Task<UserViewModel> GetUserViewModel(string applicationUserIdCurrent, string login)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.UserName == login);
-            var applicationUserCurrent = (applicationUserIdCurrent == null) 
-                ? null 
-                : (applicationUserIdCurrent == applicationUser.Id) 
-                    ? applicationUser 
+            var applicationUserCurrent = (applicationUserIdCurrent == null)
+                ? null
+                : (applicationUserIdCurrent == applicationUser.Id)
+                    ? applicationUser
                     : repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
             var userProfile = repositoryOfUserProfile.Read(a => a.Id == applicationUser.UserProfileId.Value,
                 a => a.Posts,
@@ -115,7 +119,7 @@ namespace Domain.Implementation.Services
             var userViewModel = mapper.Map<ApplicationUserEntity, UserViewModel>(applicationUser);
             userViewModel.Role = await serviceOfRole.GetUserRole(applicationUser);
             userViewModel.Comments = userProfile.Comments.Select(a => serviceOfComment.GetViewModelWithProperty<CommentMiniViewModel>(a, applicationUserCurrent)).ToList();
-            userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty<PostCompactViewModel>(a, applicationUserCurrent)).ToList();
+            userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty(nameof(PostCompactViewModel), a, applicationUserCurrent) as PostCompactViewModel).ToList();
             userViewModel.IsCurrentUser = await serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, true);
             return userViewModel;
         }

@@ -96,6 +96,10 @@
     display:grid;
     grid-template-rows: auto 1fr;
 }
+.grid-scroll-user-posts {
+    display: grid;
+    grid-template-rows: auto auto auto 1fr;
+}
 
 .grid-login-remember{
     display: grid;

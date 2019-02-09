@@ -1,11 +1,8 @@
 ﻿@page "/Login"
-@using Blazor.Extensions.Storage;
-@inject LocalStorage localStorage
-@inject HttpClient Http
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 
-<div class="content-head content content-radius content-account">
+<div class="content-body content content-radius content-account">
     <h1>Log in</h1>
     @if (ServerErrors != null)
     {

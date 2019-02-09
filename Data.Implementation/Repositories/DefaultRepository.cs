@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
 namespace Data.Implementation.Repositories
@@ -26,19 +27,32 @@ namespace Data.Implementation.Repositories
         public virtual T Read(Expression<Func<T, bool>> keySelector, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
-            var result = (keySelector != null) ? dbQuery.SingleOrDefault(keySelector) : null;
+            var result = (keySelector != null) ? dbQuery.FirstOrDefault(keySelector) : null;
+            return result;
+        }
+        public virtual T Read(string keySelector, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
+            var result = (keySelector != null) ? dbQuery.FirstOrDefault(keySelector) : null;
             return result;
         }
         public virtual IEnumerable<T> ReadMany(Expression<Func<T, bool>>[] whereProperties, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
-            if(whereProperties != null)
+            if (whereProperties != null)
             {
                 foreach (var item in whereProperties)
                 {
                     dbQuery = dbQuery.Where(item);
                 }
             }
+            return dbQuery;
+        }
+        public virtual IEnumerable<T> ReadMany(string where, string orderBy, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
+            dbQuery = (where != null && where != string.Empty) ? dbQuery.Where(where) : dbQuery;
+            dbQuery = (orderBy != null && orderBy != string.Empty) ? dbQuery.OrderBy(orderBy) : dbQuery;
             return dbQuery;
         }
         public virtual void Update(T entity, params Expression<Func<T, object>>[] properties)

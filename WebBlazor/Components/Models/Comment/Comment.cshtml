@@ -1,5 +1,4 @@
-﻿@page "/Comment"
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
+﻿@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using WebBlazor.Models.ViewModels.Comment;
 @using WebBlazor.Models.ViewModels.Post;
 @using WebBlazor.Models.ViewModels.User;
@@ -18,13 +17,16 @@
         <div class="grid-comment-footer">
             <p class="container-date">@DateConverter.GetTime(comment.Created)</p>
             <div></div>
-            @if (comment.IsUserLiked)
+            @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser != null)
             {
-                <button onclick="@Dislike" class="pure-button"><font color="#FF3347">♥ @comment.CountOfLikes</font></button>
-            }
-            else
-            {
-                <button onclick="@Like" class="pure-button">♥ @comment.CountOfLikes</button>
+                @if (comment.IsUserLiked)
+                {
+                    <button onclick="@Dislike" class="pure-button"><font color="#FF3347">♥ @comment.CountOfLikes</font></button>
+                }
+                else
+                {
+                    <button onclick="@Like" class="pure-button">♥ @comment.CountOfLikes</button>
+                }
             }
         </div>
     </div>

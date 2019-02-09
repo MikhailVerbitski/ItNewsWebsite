@@ -5,7 +5,7 @@
 <div>
     <div class="grid-post-head">
         <a href="/Post/@post.PostId"><h2>@post.Header</h2></a>
-        <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" /></span>
+        <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null)"/></span>
         <div></div>
         <span>@post.Created.ToLongDateString()</span>
     </div>
@@ -32,7 +32,6 @@
     [Parameter] private PostCompactViewModel post { get; set; }
     [Parameter] private Action<PostCompactViewModel> deletePost { get; set; }
 
-    private void OpenPost() => UriHelper.NavigateTo($"/Post/{post.PostId}");
     private async Task Delete()
     {
         await serviceOfAuthorize.GetAsync($"api/Post/Delete?postId={post.PostId}");

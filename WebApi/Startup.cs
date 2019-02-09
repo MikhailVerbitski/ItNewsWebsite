@@ -18,6 +18,8 @@ using System.Net.Mime;
 using System.Text;
 using WebApi.Server.Service;
 using WebApi.Server.Interface;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 namespace WebApi
 {
@@ -32,6 +34,8 @@ namespace WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLocalization(option => option.ResourcesPath = "Resources");
+
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             
             services.AddIdentity<ApplicationUserEntity, RoleEntity>(a =>
@@ -99,6 +103,22 @@ namespace WebApi
                 var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 context.Database.EnsureCreated();
             }
+
+
+            var supportedCultures = new[]
+            {
+                new CultureInfo("en"),
+                new CultureInfo("ru"),
+            };
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en"),
+                // Formatting numbers, dates, etc.
+                SupportedCultures = supportedCultures,
+                // UI strings that we have localized.
+                SupportedUICultures = supportedCultures
+            });
+
 
             var folders = hostingEnvironment.ContentRootPath.Split('\\');
             var SolutionPath = string.Join('\\', folders.Take(folders.Length - 1));

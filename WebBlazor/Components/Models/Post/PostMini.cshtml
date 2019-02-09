@@ -4,7 +4,7 @@
 
 <div class="grid-post-head">
     <a href="/Post/@post.PostId"><h3>@post.Header</h3></a>
-    <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" /></span>
+    <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null)"/></span>
     <div></div>
 </div>
 <p>@post.BriefDesctiption</p>

@@ -14,6 +14,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.7.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.1" />
+    <PackageReference Include="Microsoft.JSInterop" Version="0.7.0" />
+    <PackageReference Include="ReverseMarkdown" Version="3.0.0" />
     <PackageReference Include="Tewr.Blazor.FileReader" Version="0.7.1" />
     <PackageReference Include="Toolbelt.Blazor.TimeZoneKit" Version="2.1.0" />
 
@@ -23,12 +25,6 @@
   <ItemGroup>
     <Folder Include="Images\Avatars\" />
     <Folder Include="Images\Post\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Resources.en-US.resx">
-      <CustomToolNamespace></CustomToolNamespace>
-    </EmbeddedResource>
   </ItemGroup>
 
 

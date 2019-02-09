@@ -13,7 +13,6 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
-                .ForMember(a => a.SectionId, a => a.MapFrom(b => b.SectionId))
                 .ForMember(a => a.UserProfileId, a => a.MapFrom(b => b.UserProfileId))
                 .ForMember(a => a.IsFinished, a => a.MapFrom(b => b.IsFinished))
                 .ForAllOtherMembers(a => a.Ignore());
@@ -47,7 +46,6 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.BriefDesctiption, a => a.MapFrom(b => b.BriefDesctiption))
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
-                .ForMember(a => a.SectionId, a => a.MapFrom(b => b.SectionId))
                 .ForMember(a => a.UserProfileId, a => a.MapFrom(b => b.UserProfileId))
                 .ForMember(a => a.IsFinished, a => a.MapFrom(b => b.IsFinished))
                 .ForAllOtherMembers(a => a.Ignore());

@@ -9,10 +9,8 @@ namespace WebBlazor.Models.ViewModels.Post
 
         public string Header { get; set; }
 
-        public int? SectionId { get; set; }
-
         public string Section { get; set; }
-        
+
         public int UserProfileId { get; set; }
 
         public string Content { get; set; }

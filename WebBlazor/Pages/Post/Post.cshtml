@@ -29,7 +29,7 @@ else
             <UserMini User="@postViewModel.AuthorUserMiniViewModel" />
             <div>
                 <span>Rating</span>
-                <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@true" />
+                <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null)" />
             </div>
         </div>
         <br />
@@ -65,7 +65,12 @@ else
 
     protected async override Task OnParametersSetAsync()
     {
-        postViewModel = await serviceOfAuthorize.GetJsonAsync<PostViewModel>($"/api/Post/PostViewModel?postId={Id}");
+        postViewModel = await serviceOfAuthorize.PostJsonAsync<PostViewModel>($"/api/Post/Read", new
+        {
+            type = "PostViewModel",
+            count = 1,
+            where= $"Id=={Id}"
+        });
         comments = postViewModel.Comments.ToList();
         Tags = postViewModel.Tags.Select(a => a.Name).ToList();
     }

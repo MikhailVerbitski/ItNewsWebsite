@@ -10,11 +10,12 @@
 @using Markdig;
 
 <div id="container-post">
+    <ValidationSummary Subject="@post" />
     <h1 style="text-align: center;">@(post.Header)</h1>
-    <h3>Section: <Tag tag="@section" /></h3>
+    <h3>Section: <Tag tag="@(post.Section)" /></h3>
     <br />
     <p class="post-content">
-        <Markdown Content="@ContentValue" />
+        <Markdown Content="@(post.Content)" />
     </p>
     <br />
     <span>Tags:</span>
@@ -30,9 +31,10 @@
     <div class="pure-form pure-form-stacked">
         <label for="header">Header</label>
         <input id="header" type="text" bind="@(post.Header)" />
+        <ValidationError Subject="@post" Property="@nameof(post.Header)" />
 
         <label for="selection">Selection: </label>
-        <select bind="@section">
+        <select bind="@(post.Section)">
             @if (Selections != null)
             {
                 foreach (var item in Selections)
@@ -45,7 +47,8 @@
             <label for="file" class="pure-button">Load image</label>
             <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
             <label for="content">Content</label>
-            <textarea id="content" rows="10" bind="@ContentValue" />
+            <textarea id="content" rows="10" bind="@(post.Content)" />
+            <ValidationError Subject="@post" Property="@nameof(post.Content)" />
         </div>
         <label for="tagInput">Tags:</label>
         <div id="grid-tag">
@@ -58,7 +61,7 @@
             </div>
             <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress" />
             <datalist id="listTags">
-                <ListViewTemplateWithIf Items="@(post.Tags)">
+                <ListViewTemplateWithIf Items="@ServerTags">
                     <ItemTemplate>
                         <option>@(context.Name)</option>
                     </ItemTemplate>
@@ -73,7 +76,7 @@
         else
         {
             <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary">Send</button>
-            <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary">Update the draft</button>
+            <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary">Send as draft</button>
         }
     </div>
 </div>
@@ -81,19 +84,18 @@
 @functions{
     [Parameter] private string Id { get; set; }
 
-    private string ContentValue { get; set; } = "# Content";
-    private string section { get; set; }
     private string strTags { get; set; }
     private string bindStrForInput { get; set; }
 
     private IEnumerable<string> Selections { get; set; }
-    private IEnumerable<TagViewModel> ServerTags { get; set; }
+    private List<TagViewModel> ServerTags { get; set; }
 
-    private List<TagViewModel> TagsForSelect;
     private ElementRef files;
 
-    private PostUpdateViewModel post = new PostUpdateViewModel()
+    private PostUpdateValidationViewModel post = new PostUpdateValidationViewModel()
     {
+        Header = "New Post",
+        Content = "# Content",
         Tags = new List<TagViewModel>(),
         Images = new List<string>()
     };
@@ -102,46 +104,60 @@
 
     protected override async Task OnInitAsync()
     {
-        Selections = await serviceOfAuthorize.GetJsonAsync<List<string>>("api/Post/GetListOfSelections");
-        section = Selections.First();
-        ServerTags = await serviceOfAuthorize.GetJsonAsync<IEnumerable<TagViewModel>>("api/Post/GetListOfTags");
-        TagsForSelect = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
+        Selections = (Selections == null) ? await serviceOfAuthorize.GetJsonAsync<List<string>>("api/Post/GetListOfSelections") : Selections;
+        post.Section = Selections.First();
+        ServerTags = (ServerTags == null) ? await serviceOfAuthorize.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags") : ServerTags;
+        ServerTags = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
     }
     protected async override Task OnParametersSetAsync()
     {
         int id;
         if (Id != null && Int32.TryParse(Id, out id))
         {
-            post = await serviceOfAuthorize.GetJsonAsync<PostUpdateViewModel>($"api/Post/Edit?postId={id}");
+            //post = await serviceOfAuthorize.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Edit?postId={id}");
+            post = await serviceOfAuthorize.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Read?type=PostUpdateViewModel&where=Id=={id}");
+            post.Content = new ReverseMarkdown.Converter().Convert(post.Content);
             IsEditPost = true;
+            await OnInitAsync();
         }
     }
     private async Task UpdateCreate(bool isFinished = false)
     {
-        post.Content = Markdig.Markdown.ToHtml(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build());
-        post.Tags = post.Tags;
-        post.Section = section;
-        post.BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: ContentValue, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build());
-        post.IsFinished = isFinished;
-        if (isFinished && !IsEditPost)
+        if (!post.HasErrors)
         {
-            post = await serviceOfAuthorize.SendJsonAsync<PostUpdateViewModel>(HttpMethod.Post, "api/Post/Create", post);
-            UriHelper.NavigateTo($"/Post/{post.PostId}");
+            var postUpdate = new PostUpdateViewModel()
+            {
+                BelongsToUser = post.BelongsToUser,
+                BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: post.Content, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
+                Content = Markdig.Markdown.ToHtml(markdown: post.Content, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
+                Header = post.Header,
+                Images = post.Images,
+                IsFinished = isFinished,
+                PostId = post.PostId,
+                Section = post.Section,
+                Tags = post.Tags,
+                UserProfileId = post.UserProfileId
+            };
+            if (IsEditPost)
+            {
+                await serviceOfAuthorize.PostJsonAsync<object>("api/Post/Update", postUpdate);
+            }
+            else
+            {
+                postUpdate = await serviceOfAuthorize.SendJsonAsync<PostUpdateViewModel>(HttpMethod.Post, "api/Post/Create", postUpdate);
+                UriHelper.NavigateTo($"/Post/{postUpdate.PostId}");
+            }
+            UriHelper.NavigateTo("/");
         }
-        else
-        {
-            await serviceOfAuthorize.PostJsonAsync<object>("api/Post/Update", post);
-        }
-        UriHelper.NavigateTo("/");
     }
     private void SelectTag(TagViewModel tagViewModel)
     {
         post.Tags.Add(tagViewModel);
-        TagsForSelect.Remove(tagViewModel);
+        ServerTags.Remove(tagViewModel);
     }
     private void DeselectTag(TagViewModel tagViewModel)
     {
-        TagsForSelect.Add(tagViewModel);
+        ServerTags.Add(tagViewModel);
         post.Tags.Remove(tagViewModel);
     }
     private void TagKeyPress(UIKeyboardEventArgs eventArgs)
@@ -158,7 +174,7 @@
         {
             strTags += eventArgs.Key;
         }
-        var tag = TagsForSelect.Where(a => a.Name == strTags || a.Name == bindStrForInput).SingleOrDefault();
+        var tag = ServerTags.Where(a => a.Name == strTags || a.Name == bindStrForInput).SingleOrDefault();
         if (tag != null)
         {
             SelectTag(tag);
@@ -176,6 +192,6 @@
     {
         var path = await serviceOfImage.LoadPostImage(files, post.PostId);
         (post.Images as List<string>).Add(path);
-        ContentValue += $"{Environment.NewLine}![comment to the image]({path})";
+        post.Content += $"{Environment.NewLine}![comment to the image]({path})";
     }
 }

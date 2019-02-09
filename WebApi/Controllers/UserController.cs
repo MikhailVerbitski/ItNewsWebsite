@@ -36,7 +36,7 @@ namespace WebApi.Controllers
             IHostingEnvironment hostingEnvironment
             )
         {
-            serviceOfRole = new ServiceOfRole(context, userManager, mapper);
+            serviceOfRole = new ServiceOfRole(context, userManager, roleManager, mapper);
             serviceOfTag = new ServiceOfTag(context, mapper);
             serviceOfSection = new ServiceOfSection(context, mapper);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
@@ -87,6 +87,12 @@ namespace WebApi.Controllers
                 Priority = await serviceOfRole.GetUserPriority(User.Claims.SingleOrDefault(a => a.Type == "UserId").Value)
             };
             return Json(data);
+        }
+        [HttpGet]
+        public JsonResult GetRoles()
+        {
+            var roles = serviceOfRole.GetRoles();
+            return Json(roles);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace WebApi.Controllers
         {
             this.userManager = userManager;
 
-            serviceOfRole = new ServiceOfRole(context, userManager, mapper);
+            serviceOfRole = new ServiceOfRole(context, userManager, roleManager, mapper);
             serviceOfTag = new ServiceOfTag(context, mapper);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfSection = new ServiceOfSection(context, mapper);
@@ -57,13 +57,6 @@ namespace WebApi.Controllers
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
             post = await serviceOfPost.Create(userId, post);
-            return Json(post);
-        }
-        [HttpGet]
-        public JsonResult Edit(int postId)
-        {
-            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            var post = serviceOfPost.Get<PostUpdateViewModel>(userId, postId);
             return Json(post);
         }
         [HttpPost]
@@ -86,53 +79,25 @@ namespace WebApi.Controllers
             var rating = serviceOfPost.RatingPost(currentUserId, postId, score);
             return Json(rating);
         }
-        [AllowAnonymous]
-        [HttpGet]
-        public JsonResult PostViewModel(int postId)
+
+        public class RequestParams
         {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var postViewModel = serviceOfPost.Get<PostViewModel>(currentUserId, postId);
-            return Json(postViewModel);
+            public string type { get; set; }
+            public int? count { get; set; }
+            public string where { get; set; }
+            public string orderBy { get; set; }
         }
         [AllowAnonymous]
-        [HttpGet]
-        public JsonResult ListPostsCompactViewModel(int? take)
+        [HttpPost]
+        public JsonResult Read([FromBody]RequestParams readRequest)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, null, a => a.IsFinished == true);
-            return Json(posts);
-        }
-        [AllowAnonymous]
-        [HttpGet]
-        public JsonResult ListPostsMiniViewModel(int? take)
-        {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var posts = serviceOfPost.Get<PostMiniViewModel>(currentUserId, take, null, a => a.IsFinished == true);
-            return Json(posts);
-        }
-        [AllowAnonymous]
-        [HttpGet]
-        public JsonResult ListPostsCompactViewModelByTag(int tagId, int? take)
-        {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, null, a => a.Tags.Any(b => b.TagId == tagId), a => a.IsFinished == true);
-            return Json(posts);
-        }
-        [AllowAnonymous]
-        [HttpGet]
-        public JsonResult TheFirstSeveralWithTheHighestRating(int? take)
-        {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var posts = serviceOfPost.Get<PostMiniViewModel>(currentUserId, take, a => -((a.CountOfScore == 0) ? 0 : (int)(a.SumOfScore / a.CountOfScore)), a => a.IsFinished == true);
-            return Json(posts);
-        }
-        [AllowAnonymous]
-        [HttpGet]
-        public JsonResult ListPostsCompactViewModelTop(int? take)
-        {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var posts = serviceOfPost.Get<PostCompactViewModel>(currentUserId, take, a => -((a.CountOfScore == 0) ? 0 : (int)(a.SumOfScore / a.CountOfScore)), a => a.IsFinished == true);
-            return Json(posts);
+            var post = serviceOfPost.Get(readRequest.type, currentUserId, readRequest.count, readRequest.where, readRequest.orderBy);
+            if(readRequest.count != null && readRequest.count == 1)
+            {
+                return Json(post.FirstOrDefault());
+            }
+            return Json(post);
         }
         [HttpGet]
         public JsonResult GetListOfSelections()

@@ -19,7 +19,7 @@
                 <div id="keywords"></div>
             </div>
             <div class="content-body content-radius-bott" style="padding: 20px;">
-                <a href="/Top"><h1 style="text-align:center;">Top posts</h1></a>
+                <a href="/@("Top:1")"><h1 style="text-align:center;">Top posts</h1></a>
                 <br />
                 @if (TheFirstFiveWithTheHighestRating != null)
                 {
@@ -49,13 +49,19 @@
 
     protected async override Task OnInitAsync()
     {
-        TheFirstFiveWithTheHighestRating = await serviceOfAuthorize.GetJsonAsync<List<PostMiniViewModel>>("api/Post/TheFirstSeveralWithTheHighestRating?take=5");
+        TheFirstFiveWithTheHighestRating = await serviceOfAuthorize.PostJsonAsync<List<PostMiniViewModel>>("api/Post/Read", new
+        {
+            type = "PostMiniViewModel",
+            count = 5,
+            orderBy = "-((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))",
+            where = "IsFinished==true"
+        });
         var tags = await serviceOfAuthorize.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
         tagsForCloud = tags.Select(a => new TagForCloud()
         {
             text = a.Name,
             weight = a.CountOfUsage,
-            link = $"/PostsByTag/{a.Id}"
+            link = $"/ByTag:{a.Id}"
         })
         .ToList();
     }

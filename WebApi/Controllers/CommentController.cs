@@ -33,7 +33,7 @@ namespace WebApi.Controllers
             IMapper mapper
             )
         {
-            serviceOfRole = new ServiceOfRole(context, userManager, mapper);
+            serviceOfRole = new ServiceOfRole(context, userManager, roleManager, mapper);
             serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
             serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);

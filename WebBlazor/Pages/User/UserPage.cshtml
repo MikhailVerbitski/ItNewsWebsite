@@ -50,8 +50,17 @@ else
                 }
 
                 <font size="5" color="@User.Role.Color">Role:</font>
-                <font size="5" color="@User.Role.Color">@User.Role.Name</font>
-                @if (User.IsCurrentUser)
+                <font size="5" color="@User.Role.Color" style="display: @((!ChangeKeys[2]) ? "" : "none")">@User.Role.Name</font>
+                <select style="display: @((ChangeKeys[2]) ? "" : "none")" bind="@SelectedRole">
+                    @if (roles != null)
+                    {
+                        foreach (var item in roles)
+                        {
+                            <option style="color: @item.Color;" @((User.Role.Id == item.Id) ? "selected" : "")>@item.Name</option>
+                        }
+                    }
+                </select>
+                @if (User.IsCurrentUser && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)
                 {
                     <button onclick="@(() => ChangeProperty(2))">change</button>
                 }
@@ -103,8 +112,21 @@ else
             <br />
             <button style="display: @((ButtonSaveChange) ? "" : "none")" class="pure-button pure-button-primary" onclick="@SaveChange">Save change</button>
         </div>
-        <div class="grid-scroll">
+        <div class="grid-scroll-user-posts">
             <h2>Posts</h2>
+            <span>
+                <font size="3">Sort by: </font>
+                <a><font size="2">time</font></a>
+                <a><font size="2">rating</font></a>
+
+                <a><font size="2">Reverse</font></a>
+            </span>
+            <span>
+                <font size="3">Filter by: </font>
+                <a><font size="2">finished</font></a>
+                
+                <a><font size="2">Reverse</font></a>
+            </span>
             <div class="scrollbox">
                 <hr />
                 <br />
@@ -136,10 +158,17 @@ else
     private bool[] ChangeKeys = new bool[5];
     private bool ButtonSaveChange = false;
     private ElementRef files;
+    private List<Models.UserRole> roles { get; set; }
+    private string SelectedRole { get; set; }
 
     protected async override Task OnParametersSetAsync()
     {
         User = await serviceOfAuthorize.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?login={login}");
+        if(serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)
+        {
+            roles = await serviceOfAuthorize.GetJsonAsync<List<Models.UserRole>>("api/User/GetRoles");
+            SelectedRole = roles.Select(a => a.Name).FirstOrDefault();
+        }
     }
     private void ChangeProperty(int? key)
     {
@@ -159,9 +188,13 @@ else
             LastName = User.LastName,
             Email = User.Email,
             Login = User.Login,
-            Password = User.Password
+            Password = User.Password,
+            Role = roles.Where(a => a.Name == SelectedRole).FirstOrDefault()
         };
         await serviceOfAuthorize.PostJsonAsync<object>("/api/User/Update", userUpdate);
+        User.Role = roles.Where(a => a.Name == SelectedRole).FirstOrDefault();
+        for (int i = 0; i < ChangeKeys.Length; i++) ChangeKeys[i] = false;
+        this.StateHasChanged();
     }
     private async void LoadImage()
     {
