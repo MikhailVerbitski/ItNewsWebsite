@@ -1,7 +1,7 @@
 ﻿@page "/Post/{Id:int}"
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
-@using WebBlazor.Models.ViewModels.Post;
-@using WebBlazor.Models.ViewModels.Comment;
+@using Domain.Contracts.Models.ViewModels.Post;
+@using Domain.Contracts.Models.ViewModels.Comment;
 
 @if (postViewModel == null)
 {

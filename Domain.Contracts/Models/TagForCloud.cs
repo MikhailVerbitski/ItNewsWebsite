@@ -1,4 +1,4 @@
-﻿namespace WebBlazor.Models
+﻿namespace Domain.Contracts.Models
 {
     public class TagForCloud
     {

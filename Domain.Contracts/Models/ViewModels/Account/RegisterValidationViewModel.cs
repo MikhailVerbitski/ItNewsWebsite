@@ -3,7 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 
-namespace WebBlazor.Models.ViewModels.Account
+namespace Domain.Contracts.Models.ViewModels.Account
 {
     public class RegisterValidationViewModel : IDataErrorInfo, INotifyDataErrorInfo
     {

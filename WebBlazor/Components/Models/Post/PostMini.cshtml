@@ -1,5 +1,5 @@
-﻿@using WebBlazor.Models.ViewModels.Post
-@using WebBlazor.Models
+﻿@using Domain.Contracts.Models.ViewModels.Post
+@using Domain.Contracts.Models
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 
 <div class="grid-post-head">
@@ -25,7 +25,7 @@
 
 @functions{
     [Parameter] PostMiniViewModel post { get; set; }
-    [Parameter] private Action<PostMiniViewModel> deletePost { get; set; }
+    [Parameter] private Action<BasePostViewModel> deletePost { get; set; }
 
     private async Task Delete()
     {

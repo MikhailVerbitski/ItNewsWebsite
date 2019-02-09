@@ -29,7 +29,7 @@ namespace Domain.Contracts.Models.ViewModels.User
 
         public UserRole Role { get; set; }
 
-        public IEnumerable<PostCompactViewModel> Posts { get; set; }
+        public IEnumerable<PostMiniViewModel> Posts { get; set; }
 
         public IEnumerable<CommentMiniViewModel> Comments { get; set; }
     }

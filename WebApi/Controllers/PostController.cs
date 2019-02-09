@@ -102,7 +102,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public JsonResult GetListOfSelections()
         {
-            var listOfSelections = serviceOfSection.Get().Select(a => a.Text);
+            var listOfSelections = serviceOfSection.Get();
             return Json(listOfSelections);
         }
         [AllowAnonymous]

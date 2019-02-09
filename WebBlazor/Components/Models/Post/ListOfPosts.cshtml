@@ -1,0 +1,99 @@
+﻿@inject Components.ServiceOfAuthorize serviceOfAuthorize
+@using Domain.Contracts.Models.ViewModels.Post
+
+@if (listOfPosts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (count == 0)
+{
+    <p><em>Posts yet :(</em></p>
+}
+else
+{
+    @switch (PostType.Name)
+    {
+        case nameof(PostCompactViewModel):
+            <ListViewTemplate Items="@(listOfPosts as List<PostCompactViewModel>)">
+                <ItemTemplate>
+                    <PostCompact deletePost="@((post) => DeletePost(post))" post="@(context as PostCompactViewModel)" />
+                </ItemTemplate>
+            </ListViewTemplate>
+            break;
+        case nameof(PostMiniViewModel):
+            <ListViewTemplate Items="@(listOfPosts as List<PostMiniViewModel>)">
+                <ItemTemplate>
+                    <PostMini deletePost="@((post) => DeletePost(post))" post="@(context as PostMiniViewModel)" />
+                </ItemTemplate>
+            </ListViewTemplate>
+            break;
+    }
+}
+
+@functions {
+    [Parameter] private Type PostType { get; set; }
+    [Parameter] private string param { get; set; }
+    [Parameter] private object listOfPosts { get; set; }
+    private int count = 0;
+    private bool notFirstTime = false;
+    private KeyValuePair<string, Func<string, RequestParams>>[] config;
+
+    protected override void OnInit()
+    {
+        config = new[] {
+            new KeyValuePair<string,Func<string,RequestParams>>(string.Empty, a => new RequestParams(){ type=PostType.Name, count = null, orderBy = "Created", where = "IsFinished==true"}),
+            new KeyValuePair<string,Func<string,RequestParams>>("ByTag", a => new RequestParams(){ type=PostType.Name, count = null, orderBy = "Created", where = $"IsFinished==true and Tags.Any(Id=={a})"}),
+            new KeyValuePair<string,Func<string,RequestParams>>("Top", a => new RequestParams(){ type=PostType.Name, count = null, orderBy = "-((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))", where = $"IsFinished==true"})
+        };
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        if (listOfPosts == null || notFirstTime)
+        {
+            var parameters = (param == string.Empty || param == null) ? new[] { string.Empty } : param.Split(':');
+            var requestParams = config.Where(a => a.Key == parameters[0]).FirstOrDefault().Value.Invoke((parameters.Length > 1) ? parameters[1] : null);
+            switch (PostType.Name)
+            {
+                case nameof(PostCompactViewModel):
+                    listOfPosts = await serviceOfAuthorize.PostJsonAsync<List<PostCompactViewModel>>("/api/Post/Read", requestParams);
+                    break;
+                case nameof(PostMiniViewModel):
+                    listOfPosts = await serviceOfAuthorize.PostJsonAsync<List<PostMiniViewModel>>("/api/Post/Read", requestParams);
+                    break;
+            }
+        }
+        switch (PostType.Name)
+        {
+            case nameof(PostCompactViewModel):
+                count = (listOfPosts as List<PostCompactViewModel>).Count;
+                break;
+            case nameof(PostMiniViewModel):
+                count = (listOfPosts as List<PostMiniViewModel>).Count;
+                break;
+        }
+        this.StateHasChanged();
+        notFirstTime = true;
+    }
+    private void DeletePost(BasePostViewModel post)
+    {
+        switch (PostType.Name)
+        {
+            case nameof(PostCompactViewModel):
+                listOfPosts = (listOfPosts as List<PostCompactViewModel>).Except(new[] { post as PostCompactViewModel }).ToList();
+                break;
+            case nameof(PostMiniViewModel):
+                listOfPosts = (listOfPosts as List<PostMiniViewModel>).Except(new[] { post as PostMiniViewModel }).ToList();
+                count = (listOfPosts as List<PostMiniViewModel>).Count;
+                break;
+        }
+        StateHasChanged();
+    }
+
+    public class RequestParams
+    {
+        public string type { get; set; }
+        public int? count { get; set; }
+        public string where { get; set; }
+        public string orderBy { get; set; }
+    }
+}

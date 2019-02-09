@@ -1,6 +1,8 @@
 ﻿@page "/Login"
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
+@using Domain.Contracts.Models.ViewModels.Account
+@using Domain.Contracts.Models.ViewModels.Account
 
 <div class="content-body content content-radius content-account">
     <h1>Log in</h1>
@@ -43,13 +45,13 @@
 @functions{
     private List<string> ServerErrors { get; set; }
     private bool DisplayValidationSummary { get; set; } = false;
-    WebBlazor.Models.ViewModels.Account.LoginValidationViewModel login { get; set; } = new Models.ViewModels.Account.LoginValidationViewModel();
+    LoginValidationViewModel login { get; set; } = new LoginValidationViewModel();
 
     private async Task SubmitForm()
     {
-        if(!login.HasErrors)
+        if (!login.HasErrors)
         {
-            WebBlazor.Models.ViewModels.Account.LoginViewModel requestLogin = new Models.ViewModels.Account.LoginViewModel()
+            LoginViewModel requestLogin = new LoginViewModel()
             {
                 Login = login.Login,
                 Password = login.Password,

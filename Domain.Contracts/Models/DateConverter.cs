@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebBlazor.Models
+namespace Domain.Contracts.Models
 {
     public class DateConverter
     {

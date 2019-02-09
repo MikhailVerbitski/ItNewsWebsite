@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using WebBlazor.Models.ViewModels.Tag;
+using Domain.Contracts.Models.ViewModels.Tag;
 
-namespace WebBlazor.Models.ViewModels.Post
+namespace Domain.Contracts.Models.ViewModels.Post
 {
     public class PostUpdateValidationViewModel : IDataErrorInfo, INotifyDataErrorInfo
     {

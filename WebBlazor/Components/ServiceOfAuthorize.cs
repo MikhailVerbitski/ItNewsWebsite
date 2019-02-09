@@ -1,11 +1,12 @@
 ﻿using Blazor.Extensions.Storage;
+using Domain.Contracts.Models;
+using Domain.Contracts.Models.ViewModels;
+using Domain.Contracts.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Blazor;
 using Microsoft.AspNetCore.Blazor.Services;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using WebBlazor.Models;
-using WebBlazor.Models.ViewModels;
 
 namespace WebBlazor.Components
 {
@@ -32,7 +33,7 @@ namespace WebBlazor.Components
 
             CreateHeader = Login();
         }
-        public async Task<TokenViewModel> Login(WebBlazor.Models.ViewModels.Account.LoginViewModel loginViewModel = null)
+        public async Task<TokenViewModel> Login(LoginViewModel loginViewModel = null)
         {
             string token;
             TokenViewModel result = null;

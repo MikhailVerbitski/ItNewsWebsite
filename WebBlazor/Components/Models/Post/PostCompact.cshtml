@@ -1,4 +1,4 @@
-﻿@using WebBlazor.Models.ViewModels.Post
+﻿@using Domain.Contracts.Models.ViewModels.Post
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 
@@ -30,7 +30,7 @@
 
 @functions {
     [Parameter] private PostCompactViewModel post { get; set; }
-    [Parameter] private Action<PostCompactViewModel> deletePost { get; set; }
+    [Parameter] private Action<BasePostViewModel> deletePost { get; set; }
 
     private async Task Delete()
     {

@@ -119,7 +119,7 @@ namespace Domain.Implementation.Services
             var userViewModel = mapper.Map<ApplicationUserEntity, UserViewModel>(applicationUser);
             userViewModel.Role = await serviceOfRole.GetUserRole(applicationUser);
             userViewModel.Comments = userProfile.Comments.Select(a => serviceOfComment.GetViewModelWithProperty<CommentMiniViewModel>(a, applicationUserCurrent)).ToList();
-            userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty(nameof(PostCompactViewModel), a, applicationUserCurrent) as PostCompactViewModel).ToList();
+            userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty(nameof(PostMiniViewModel), a, applicationUserCurrent) as PostMiniViewModel).ToList();
             userViewModel.IsCurrentUser = await serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, true);
             return userViewModel;
         }

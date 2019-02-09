@@ -1,6 +1,7 @@
 ﻿@page "/UserPage/{login}"
-@using WebBlazor.Models.ViewModels.User
-@using WebBlazor.Models.ViewModels.Post
+@using Domain.Contracts.Models.ViewModels.User
+@using Domain.Contracts.Models.ViewModels.Post
+@using Domain.Contracts.Models
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 @inject Components.ServiceOfImage serviceOfImage
 
@@ -124,17 +125,13 @@ else
             <span>
                 <font size="3">Filter by: </font>
                 <a><font size="2">finished</font></a>
-                
+
                 <a><font size="2">Reverse</font></a>
             </span>
             <div class="scrollbox">
                 <hr />
                 <br />
-                <ListViewTemplate Items="User.Posts.ToList()">
-                    <ItemTemplate>
-                        <PostMini deletePost="@((post) => DeletePost(post))" post="@context" />
-                    </ItemTemplate>
-                </ListViewTemplate>
+                <ListOfPosts listOfPosts="@User.Posts.ToList()" PostType="@(User.Posts.GetType().GetGenericArguments().Single())" />
             </div>
         </div>
         <div class="grid-scroll">
@@ -158,22 +155,22 @@ else
     private bool[] ChangeKeys = new bool[5];
     private bool ButtonSaveChange = false;
     private ElementRef files;
-    private List<Models.UserRole> roles { get; set; }
+    private List<UserRole> roles { get; set; }
     private string SelectedRole { get; set; }
 
     protected async override Task OnParametersSetAsync()
     {
         User = await serviceOfAuthorize.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?login={login}");
-        if(serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)
+        if (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)
         {
-            roles = await serviceOfAuthorize.GetJsonAsync<List<Models.UserRole>>("api/User/GetRoles");
+            roles = await serviceOfAuthorize.GetJsonAsync<List<UserRole>>("api/User/GetRoles");
             SelectedRole = roles.Select(a => a.Name).FirstOrDefault();
         }
     }
     private void ChangeProperty(int? key)
     {
         ButtonSaveChange = true;
-        if(key.HasValue)
+        if (key.HasValue)
         {
             ChangeKeys[key.Value] = !ChangeKeys[key.Value];
         }

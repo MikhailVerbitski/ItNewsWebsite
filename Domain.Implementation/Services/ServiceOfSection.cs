@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Data.Implementation;
 using Data.Implementation.Repositories;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,9 +21,9 @@ namespace Domain.Implementation.Services
             repositoryOfPost = new RepositoryOfPost(context);
         }
 
-        public IEnumerable<SelectListItem> Get()
+        public List<string> Get()
         {
-            return repositoryOfSection.ReadMany(null).Select(a => new SelectListItem(a.Name, a.Name));
+            return repositoryOfSection.ReadMany(null).Select(a => a.Name).ToList();
         }
     }
 }

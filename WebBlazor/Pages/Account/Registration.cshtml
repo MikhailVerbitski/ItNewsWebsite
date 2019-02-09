@@ -3,6 +3,7 @@
 @inject HttpClient Http
 @inject Components.ServiceOfImage serviceOfImage
 @addTagHelper *, Blazor.Validation
+@using Domain.Contracts.Models.ViewModels.Account
 
 <div class="content-body content content-radius content-account">
     <h1>Registration</h1>
@@ -62,7 +63,7 @@
 </div>
 
     @functions{
-        WebBlazor.Models.ViewModels.Account.RegisterValidationViewModel user { get; set; } = new Models.ViewModels.Account.RegisterValidationViewModel();
+        RegisterValidationViewModel user { get; set; } = new RegisterValidationViewModel();
         private bool DisplayValidationSummary { get; set; } = false;
         private List<string> ServerErrors { get; set; }
 
@@ -71,7 +72,7 @@
             ServerErrors = null;
             if (!user.HasErrors)
             {
-                var registerUser = new WebBlazor.Models.ViewModels.Account.RegisterViewModel()
+                var registerUser = new RegisterViewModel()
                 {
                     FirstName = user.FirstName,
                     LastName = user.LastName,

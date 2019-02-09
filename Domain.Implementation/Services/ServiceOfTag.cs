@@ -33,21 +33,22 @@ namespace Domain.Implementation.Services
             return tags;
         }
         private IEnumerable<TagEntity> MapTagViewModelToTagEntity(IEnumerable<TagViewModel> tagViewModels) => tagViewModels.Select(a =>
+            {
+                var tag = mapper.Map<TagViewModel, TagEntity>(a);
+                if (tag.Id == 0)
                 {
-                    var tag = mapper.Map<TagViewModel, TagEntity>(a);
-                    if (tag.Id == 0)
-                    {
-                        tag = repositoryOfTag.Create(new TagEntity() { Name = a.Name });
-                    }
-                    return tag;
-                });
-        public IEnumerable<PostTagEntity> AddTagsPost(IEnumerable<TagViewModel> tagViewModels, int postId) => MapTagViewModelToTagEntity(tagViewModels)
-                .Select(a => repositoryOfPostTag.Create(new PostTagEntity()
-                {
-                    PostId = postId,
-                    TagId = a.Id,
-                    Tag = a,
-                }));
+                    tag = repositoryOfTag.Create(new TagEntity() { Name = a.Name });
+                }
+                return tag;
+            });
+        public List<PostTagEntity> AddTagsPost(IEnumerable<TagViewModel> tagViewModels, int postId) => MapTagViewModelToTagEntity(tagViewModels)
+            .Select(a => repositoryOfPostTag.Create(new PostTagEntity()
+            {
+                PostId = postId,
+                TagId = a.Id,
+                Tag = a,
+            }))
+            .ToList();
         public IEnumerable<PostTagEntity> TagsPostUpdate(IEnumerable<TagViewModel> tagViewModels, IEnumerable<PostTagEntity> lastTagEntities, int postId)
         {
             var postTagEntities = MapTagViewModelToTagEntity(tagViewModels);

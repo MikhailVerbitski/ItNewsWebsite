@@ -1,54 +1,15 @@
 ﻿@page "/"
 @page "/{Param}"
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
-@using WebBlazor.Models.ViewModels.Post
 
-@if (ListOfPosts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else if (ListOfPosts.Count() == 0)
-{
-    <p><em>Posts yet :(</em></p>
-}
-else
-{
-    <div id="container-posts">
-        <ListViewTemplate Items="@ListOfPosts">
-            <ItemTemplate>
-                <PostCompact deletePost="@((post) => DeletePost(post))" post="@context" />
-            </ItemTemplate>
-        </ListViewTemplate>
-    </div>
-}
+<div id="container-posts">
+    <ListOfPosts PostType="@(typeof(Domain.Contracts.Models.ViewModels.Post.PostCompactViewModel))" param="@Param" />
+</div>
 
 @functions {
     [Parameter] private string Param { get; set; }
-    private List<PostCompactViewModel> ListOfPosts { get; set; }
 
-    private KeyValuePair<string, Func<string,RequestParams>>[] config = new[] {
-        new KeyValuePair<string,Func<string,RequestParams>>(string.Empty, a => new RequestParams(){ type="PostCompactViewModel", count = null, orderBy = "Created", where = "IsFinished==true"}),
-        new KeyValuePair<string,Func<string,RequestParams>>("ByTag", a => new RequestParams(){ type="PostCompactViewModel", count = null, orderBy = "Created", where = $"IsFinished==true and Tags.Any(Id=={a})"}),
-        new KeyValuePair<string,Func<string,RequestParams>>("Top", a => new RequestParams(){ type="PostCompactViewModel", count = null, orderBy = "-((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))", where = $"IsFinished==true"})
-    };
-
-    protected override async Task OnParametersSetAsync()
+    protected override void OnAfterRender()
     {
-        var parameters = (Param == null) ? new[] { string.Empty } : Param.Split(':');
-        ListOfPosts = await serviceOfAuthorize.PostJsonAsync<List<PostCompactViewModel>>("/api/Post/Read", config.Where(a => a.Key == parameters[0]).FirstOrDefault().Value.Invoke((parameters.Length > 1) ? parameters[1] : null));
         Param = null;
-    }
-    private void DeletePost(PostCompactViewModel post)
-    {
-        ListOfPosts = ListOfPosts.Except(new[] { post }).ToList();
-        StateHasChanged();
-    }
-
-    public class RequestParams
-    {
-        public string type { get; set; }
-        public int? count { get; set; }
-        public string where { get; set; }
-        public string orderBy { get; set; }
     }
 }
