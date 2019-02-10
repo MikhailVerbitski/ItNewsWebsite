@@ -39,7 +39,7 @@ namespace WebApi.Controllers
             _tokenService = tokenService;
             this.userManager = userManager;
             this.mapper = mapper;
-
+            
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
         }
 

@@ -1,4 +1,4 @@
-﻿@page "/UserPage/{login}"
+﻿@page "/UserPage/{Id:int}"
 @using Domain.Contracts.Models.ViewModels.User
 @using Domain.Contracts.Models.ViewModels.Post
 @using Domain.Contracts.Models
@@ -120,7 +120,7 @@ else
                 <a><font size="2" color="@(Param.Contains("Time")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Time") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Time"; }; Param = string.Join(":", mas); } )">time</font></a>
                 <a><font size="2" color="@(Param.Contains("Top")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Top") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Top"; } Param = string.Join(":", mas); })">rating</font></a>
 
-                <a><font size="2" color="@(Param.Contains("r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">Reverse</font></a>
+                <a><font size="2" color="@(Param.Contains(":r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">Reverse</font></a>
             </span>
             <span>
                 <font size="3">Filter by: </font>
@@ -150,18 +150,22 @@ else
 }
 
 @functions{
-    [Parameter] private string login { get; set; }
+    [Parameter] private int Id { get; set; }
     private UserViewModel User { get; set; }
     private bool[] ChangeKeys = new bool[5];
     private bool ButtonSaveChange = false;
     private ElementRef files;
     private List<UserRole> roles { get; set; }
     private string SelectedRole { get; set; }
-    private string Param { get; set; } = "Time:f:fin";
+    private string Param { get; set; }
 
+    protected override void OnInit()
+    {
+        Param = $"Time:User-{Id}:f:fin";
+    }
     protected async override Task OnParametersSetAsync()
     {
-        User = await serviceOfAuthorize.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?login={login}");
+        User = await serviceOfAuthorize.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?userProfileId={Id}");
         if (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)
         {
             roles = await serviceOfAuthorize.GetJsonAsync<List<UserRole>>("api/User/GetRoles");

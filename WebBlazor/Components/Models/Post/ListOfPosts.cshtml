@@ -41,9 +41,30 @@ else
     protected override void OnInit()
     {
         config = new[] {
-            new KeyValuePair<string,Func<string[],RequestParams>>("ByTag", a => new RequestParams(){ type=PostType.Name, count = null, orderBy = "Created", where = $"IsFinished==true and Tags.Any(Id=={a[0]})"}),
-            new KeyValuePair<string,Func<string[],RequestParams>>("Top", a => new RequestParams(){ type=PostType.Name, count = null, orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))", where = (a != null && a.Contains("f")) ? $"IsFinished=={a.Contains("fin")}" : null}),
-            new KeyValuePair<string,Func<string[],RequestParams>>("Time", a => new RequestParams() { type = PostType.Name, count = null, orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}Created.Millisecond", where = (a != null && a.Contains("f")) ? $"IsFinished=={a.Contains("fin")}" : null})
+            new KeyValuePair<string,Func<string[],RequestParams>>("Top", a => new RequestParams()
+            {
+                type =PostType.Name,
+                count = null,
+                orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))",
+                where = (a != null) ?
+                $"{(a.Contains("f") ? $"IsFinished=={a.Contains("fin")} " : "")}" +
+                $"{((a.Contains("f") && (a.Any(b => b.Contains("User")) || (a.Any(b => b.Contains("ByTag"))))) ? "and" : "")}" +
+                $" {(a.Any(b => b.Contains("User")) ? $"UserProfileId == {a.Where(b => b.Contains("User")).FirstOrDefault().Split('-')[1]}" : "")} " +
+                $"{(((a.Any(b => b.Contains("User")) || a.Contains("f")) && a.Any(b => b.Contains("ByTag"))) ? "and" : "")}" +
+                $"{(a.Any(b => b.Contains("ByTag")) ? $" Tags.Any(TagId=={a.Where(b => b.Contains("ByTag")).FirstOrDefault().Split('-')[1]})" : "")}" : null
+            }),
+            new KeyValuePair<string,Func<string[],RequestParams>>("Time", a => new RequestParams()
+            {
+                type = PostType.Name,
+                count = null,
+                orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}Created.Millisecond",
+                where = (a != null) ?
+                $"{(a.Contains("f") ? $"IsFinished=={a.Contains("fin")} " : "")}" +
+                $"{((a.Contains("f") && (a.Any(b => b.Contains("User")) || (a.Any(b => b.Contains("ByTag"))))) ? "and" : "")}" +
+                $" {(a.Any(b => b.Contains("User")) ? $"UserProfileId == {a.Where(b => b.Contains("User")).FirstOrDefault().Split('-')[1]}" : "")} " +
+                $"{(((a.Any(b => b.Contains("User")) || a.Contains("f")) && a.Any(b => b.Contains("ByTag"))) ? "and" : "")}" +
+                $"{(a.Any(b => b.Contains("ByTag")) ? $" Tags.Any(TagId=={a.Where(b => b.Contains("ByTag")).FirstOrDefault().Split('-')[1]})" : "")}" : null
+            })
         };
     }
     protected override async Task OnParametersSetAsync()

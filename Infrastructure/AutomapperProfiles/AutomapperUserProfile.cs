@@ -11,6 +11,7 @@ namespace Infrastructure.AutomapperProfiles
         {
             CreateMap<ApplicationUserEntity, UserMiniViewModel>()
                 .ForMember(a => a.ApplicationUserId, a => a.MapFrom(b => b.Id))
+                .ForMember(a => a.UserProfileId, a => a.MapFrom(b => b.UserProfileId))
                 .ForMember(a => a.Avatar, a => a.MapFrom(b => b.Avatar))
                 .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
                 .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
@@ -20,6 +21,7 @@ namespace Infrastructure.AutomapperProfiles
                 .ForAllOtherMembers(a => a.Ignore());
             CreateMap<ApplicationUserEntity, UserViewModel>()
                 .ForMember(a => a.ApplicationUserId, a => a.MapFrom(b => b.Id))
+                .ForMember(a => a.UserProfileId, a => a.MapFrom(b => b.UserProfileId))
                 .ForMember(a => a.Avatar, a => a.MapFrom(b => b.Avatar))
                 .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
                 .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
@@ -59,7 +61,6 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.UserName, a => a.MapFrom(b => b.Login))
                 .ForMember(a => a.Email, a => a.MapFrom(b => b.Email))
                 .ForAllOtherMembers(a => a.Ignore());
-
         }
     }
 }

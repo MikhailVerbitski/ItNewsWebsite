@@ -9,6 +9,8 @@ namespace Domain.Contracts.Models.ViewModels.User
     {
         public string ApplicationUserId { get; set; }
 
+        public int UserProfileId { get; set; }
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

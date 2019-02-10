@@ -6,7 +6,6 @@ using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,9 +104,9 @@ namespace Domain.Implementation.Services
             userMiniViewModel.Role = serviceOfRole.GetUserRole(applicationUserPost).Result;
             return userMiniViewModel;
         }
-        public async Task<UserViewModel> GetUserViewModel(string applicationUserIdCurrent, string login)
+        public async Task<UserViewModel> GetUserViewModel(string applicationUserIdCurrent, int userProfileId)
         {
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.UserName == login);
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.UserProfileId == userProfileId);
             var applicationUserCurrent = (applicationUserIdCurrent == null)
                 ? null
                 : (applicationUserIdCurrent == applicationUser.Id)
