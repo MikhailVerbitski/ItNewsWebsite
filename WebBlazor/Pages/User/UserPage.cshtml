@@ -117,21 +117,21 @@ else
             <h2>Posts</h2>
             <span>
                 <font size="3">Sort by: </font>
-                <a><font size="2">time</font></a>
-                <a><font size="2">rating</font></a>
+                <a><font size="2" color="@(Param.Contains("Time")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Time") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Time"; }; Param = string.Join(":", mas); } )">time</font></a>
+                <a><font size="2" color="@(Param.Contains("Top")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Top") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Top"; } Param = string.Join(":", mas); })">rating</font></a>
 
-                <a><font size="2">Reverse</font></a>
+                <a><font size="2" color="@(Param.Contains("r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">Reverse</font></a>
             </span>
             <span>
                 <font size="3">Filter by: </font>
-                <a><font size="2">finished</font></a>
-
-                <a><font size="2">Reverse</font></a>
+                <a><font size="2" color="@(!Param.Contains(":f")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas.Contains("f")) { mas.Remove("f"); if (mas.Contains("fin")) { mas.Remove("fin"); } else { mas.Remove("notfin"); } Param = string.Join(":", mas); } })">all</font></a>
+                <a><font size="2" color="@(Param.Contains(":fin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "fin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:fin"; } })">finished</font></a>
+                <a><font size="2" color="@(Param.Contains(":notfin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "notfin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:notfin"; } })">not finished</font></a>
             </span>
             <div class="scrollbox">
                 <hr />
                 <br />
-                <ListOfPosts listOfPosts="@User.Posts.ToList()" PostType="@(User.Posts.GetType().GetGenericArguments().Single())" />
+                <ListOfPosts listOfPosts="@User.Posts.ToList()" PostType="@(User.Posts.GetType().GetGenericArguments().Single())" param="@Param"/>
             </div>
         </div>
         <div class="grid-scroll">
@@ -157,6 +157,7 @@ else
     private ElementRef files;
     private List<UserRole> roles { get; set; }
     private string SelectedRole { get; set; }
+    private string Param { get; set; } = "Time:f:fin";
 
     protected async override Task OnParametersSetAsync()
     {

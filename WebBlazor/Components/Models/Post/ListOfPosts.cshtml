@@ -36,22 +36,22 @@ else
     [Parameter] private object listOfPosts { get; set; }
     private int count = 0;
     private bool notFirstTime = false;
-    private KeyValuePair<string, Func<string, RequestParams>>[] config;
+    private KeyValuePair<string, Func<string[], RequestParams>>[] config;
 
     protected override void OnInit()
     {
         config = new[] {
-            new KeyValuePair<string,Func<string,RequestParams>>(string.Empty, a => new RequestParams(){ type=PostType.Name, count = null, orderBy = "Created", where = "IsFinished==true"}),
-            new KeyValuePair<string,Func<string,RequestParams>>("ByTag", a => new RequestParams(){ type=PostType.Name, count = null, orderBy = "Created", where = $"IsFinished==true and Tags.Any(Id=={a})"}),
-            new KeyValuePair<string,Func<string,RequestParams>>("Top", a => new RequestParams(){ type=PostType.Name, count = null, orderBy = "-((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))", where = $"IsFinished==true"})
+            new KeyValuePair<string,Func<string[],RequestParams>>("ByTag", a => new RequestParams(){ type=PostType.Name, count = null, orderBy = "Created", where = $"IsFinished==true and Tags.Any(Id=={a[0]})"}),
+            new KeyValuePair<string,Func<string[],RequestParams>>("Top", a => new RequestParams(){ type=PostType.Name, count = null, orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))", where = (a != null && a.Contains("f")) ? $"IsFinished=={a.Contains("fin")}" : null}),
+            new KeyValuePair<string,Func<string[],RequestParams>>("Time", a => new RequestParams() { type = PostType.Name, count = null, orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}Created.Millisecond", where = (a != null && a.Contains("f")) ? $"IsFinished=={a.Contains("fin")}" : null})
         };
     }
     protected override async Task OnParametersSetAsync()
     {
-        if (listOfPosts == null || notFirstTime)
+        if ((listOfPosts == null || notFirstTime) && param != null && param != string.Empty)
         {
-            var parameters = (param == string.Empty || param == null) ? new[] { string.Empty } : param.Split(':');
-            var requestParams = config.Where(a => a.Key == parameters[0]).FirstOrDefault().Value.Invoke((parameters.Length > 1) ? parameters[1] : null);
+            var parameters = param.Split(':');
+            var requestParams = config.Where(a => a.Key == parameters[0]).FirstOrDefault().Value.Invoke((parameters.Length > 1) ? parameters.Skip(1).ToArray() : null);
             switch (PostType.Name)
             {
                 case nameof(PostCompactViewModel):
