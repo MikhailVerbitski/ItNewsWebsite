@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
@@ -47,10 +48,10 @@ namespace WebApi.Controllers
             serviceOfUser.serviceOfPost = serviceOfPost;
         }
         [HttpPost]
-        public JsonResult CreateComment([FromBody] CommentCreateEditViewModel commentViewModel)
+        public async Task<JsonResult> CreateComment([FromBody] CommentCreateEditViewModel commentViewModel)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            var newComment = serviceOfComment.Create(userId, commentViewModel);
+            var newComment = await serviceOfComment.Create(userId, commentViewModel);
             return Json(newComment);
         }
 

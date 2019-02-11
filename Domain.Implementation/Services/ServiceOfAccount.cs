@@ -2,13 +2,13 @@
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
-using Domain.Contracts.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using MimeKit;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace Domain.Implementation.Services
@@ -91,6 +91,24 @@ namespace Domain.Implementation.Services
             var result = await userManager.RemoveFromRolesAsync(applicationUser, roles);
             return result;
         }
-        
+        public void SendEmailAsync(string email, string subject, string message)
+        {
+            using (SmtpClient client = new SmtpClient())
+            {
+                using(MailMessage mail = new MailMessage("itnews68@gmail.com", email))
+                {
+                    mail.Subject = subject;
+                    mail.Body = message;
+
+                    client.Host = "smtp.gmail.com";
+                    client.Port = 587;
+                    client.EnableSsl = true;
+                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    client.UseDefaultCredentials = false;
+                    client.Credentials = new NetworkCredential("itnews68@gmail.com", "ItNews123456");
+                    client.Send(mail);
+                }
+            }
+        }
     }
 }

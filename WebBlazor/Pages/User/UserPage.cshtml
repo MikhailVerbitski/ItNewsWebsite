@@ -21,12 +21,15 @@
 
                 <a><font size="2" color="@(Param.Contains(":r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">Reverse</font></a>
             </span>
-            <span>
-                <font size="3">Filter by: </font>
-                <a><font size="2" color="@(!Param.Contains(":f")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas.Contains("f")) { mas.Remove("f"); if (mas.Contains("fin")) { mas.Remove("fin"); } else { mas.Remove("notfin"); } Param = string.Join(":", mas); } })">all</font></a>
-                <a><font size="2" color="@(Param.Contains(":fin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "fin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:fin"; } })">finished</font></a>
-                <a><font size="2" color="@(Param.Contains(":notfin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "notfin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:notfin"; } })">not finished</font></a>
-            </span>
+            @if (serviceOfAuthorize.DataAboutUser != null && (serviceOfAuthorize.DataAboutUser.Priority == 3 || serviceOfAuthorize.DataAboutUser.UserProfileId == Id))
+            {
+                <span>
+                    <font size="3">Filter by: </font>
+                    <a><font size="2" color="@(!Param.Contains(":f")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas.Contains("f")) { mas.Remove("f"); if (mas.Contains("fin")) { mas.Remove("fin"); } else { mas.Remove("notfin"); } Param = string.Join(":", mas); } })">all</font></a>
+                    <a><font size="2" color="@(Param.Contains(":fin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "fin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:fin"; } })">finished</font></a>
+                    <a><font size="2" color="@(Param.Contains(":notfin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "notfin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:notfin"; } })">not finished</font></a>
+                </span>
+            }
             <div class="scrollbox">
                 <hr />
                 <br />

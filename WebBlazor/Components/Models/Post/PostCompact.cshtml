@@ -5,7 +5,7 @@
 <div>
     <div class="grid-post-head">
         <a href="/Post/@post.PostId"><h2>@post.Header</h2></a>
-        <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null)"/></span>
+        <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !post.BelongsToUser)"/></span>
         <div></div>
         <span>@post.Created.ToLongDateString()</span>
     </div>

@@ -7,6 +7,7 @@ using Domain.Contracts.Models.ViewModels.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Domain.Implementation.Services
 {
@@ -48,14 +49,18 @@ namespace Domain.Implementation.Services
             };
         }
 
-        public CommentViewModel Create(string applicationUserId, CommentCreateEditViewModel commentCreateEditViewModel)
+        public async Task<CommentViewModel> Create(string applicationUserIdCurrent, CommentCreateEditViewModel commentCreateEditViewModel)
         {
-            var commentEntity = mapper.Map<CommentCreateEditViewModel, CommentEntity>(commentCreateEditViewModel);
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            commentEntity.UserProfileId = applicationUser.UserProfileId;
-            commentEntity = repositoryOfComment.Create(commentEntity);
-            var commentViewModel = GetViewModelWithProperty<CommentViewModel>(commentEntity, applicationUserId);
-            return commentViewModel as CommentViewModel;
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            if (await serviceOfUser.GetUserPriority(applicationUser) >= 1)
+            {
+                var commentEntity = mapper.Map<CommentCreateEditViewModel, CommentEntity>(commentCreateEditViewModel);
+                commentEntity.UserProfileId = applicationUser.UserProfileId;
+                commentEntity = repositoryOfComment.Create(commentEntity);
+                var commentViewModel = GetViewModelWithProperty<CommentViewModel>(commentEntity, applicationUserIdCurrent);
+                return commentViewModel as CommentViewModel;
+            }
+            return null;
         }
 
         public IEnumerable<TCommentViewModel> GetMany<TCommentViewModel>(int postId, string applicationUserIdCurrent) 
@@ -154,39 +159,50 @@ namespace Domain.Implementation.Services
             return Config.Single(a => a.Item1 == typeof(TCommentViewModel)).Item2(commentEntity, applicationUserEntity) as TCommentViewModel;
         }
 
-        public CommentViewModel Update(CommentCreateEditViewModel commentCreateEditViewModel)
+        public async Task<CommentViewModel> Update(string applicationUserIdCurrent, CommentCreateEditViewModel commentCreateEditViewModel)
         {
-            var commentEntity = mapper.Map<CommentCreateEditViewModel, CommentEntity>(commentCreateEditViewModel);
-            repositoryOfComment.Update(commentEntity);
-            commentEntity = repositoryOfComment.Read(a => a.Id == commentCreateEditViewModel.CommentId);
-            var commentViewModel = mapper.Map<CommentEntity, CommentViewModel>(commentEntity);
-            return commentViewModel;
-        }
-
-        public void LikeComment(string applicationUserId, int commentId)
-        {
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            var commentLike = new CommentLikeEntity()
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            if (await serviceOfUser.GetUserPriority(applicationUser) >= 1)
             {
-                CommentId = commentId,
-                UserProfileId = applicationUser.UserProfileId
-            };
-            var commentLikeEntity = repositoryOfCommentLike.Create(commentLike);
+                var commentEntity = mapper.Map<CommentCreateEditViewModel, CommentEntity>(commentCreateEditViewModel);
+                repositoryOfComment.Update(commentEntity);
+                commentEntity = repositoryOfComment.Read(a => a.Id == commentCreateEditViewModel.CommentId);
+                var commentViewModel = mapper.Map<CommentEntity, CommentViewModel>(commentEntity);
+                return commentViewModel;
+            }
+            return null;
         }
-
-        public void DislikeComment(string applicationUserId, int commentId)
+        public async Task LikeComment(string applicationUserIdCurrent, int commentId)
         {
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            var commentLike = repositoryOfCommentLike.Read(a => a.CommentId == commentId && a.UserProfileId == applicationUser.UserProfileId);
-            repositoryOfCommentLike.Delete(commentLike);
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            if(await serviceOfUser.GetUserPriority(applicationUser) >= 1)
+            {
+                var commentLike = new CommentLikeEntity()
+                {
+                    CommentId = commentId,
+                    UserProfileId = applicationUser.UserProfileId
+                };
+                var commentLikeEntity = repositoryOfCommentLike.Create(commentLike);
+            }
         }
-
-        public void Delete<TCommentViewModel>(TCommentViewModel commentViewModel)
+        public async Task DislikeComment(string applicationUserIdCurrent, int commentId)
         {
-            var commentEntity = mapper.Map<TCommentViewModel, CommentEntity>(commentViewModel);
-            repositoryOfComment.Delete(commentEntity);
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            if (await serviceOfUser.GetUserPriority(applicationUser) >= 1)
+            {
+                var commentLike = repositoryOfCommentLike.Read(a => a.CommentId == commentId && a.UserProfileId == applicationUser.UserProfileId);
+                repositoryOfCommentLike.Delete(commentLike);
+            }
         }
-
+        public async Task Delete<TCommentViewModel>(string applicationUserIdCurrent, TCommentViewModel commentViewModel)
+        {
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            if (await serviceOfUser.GetUserPriority(applicationUser) >= 1)
+            {
+                var commentEntity = mapper.Map<TCommentViewModel, CommentEntity>(commentViewModel);
+                repositoryOfComment.Delete(commentEntity);
+            }
+        }
         public bool IsCommentLike(CommentEntity commentEntity, int userProfileId)
         {
             var commentLikeEntity = repositoryOfCommentLike.Read(a => a.CommentId == commentEntity.Id && a.UserProfileId == userProfileId);

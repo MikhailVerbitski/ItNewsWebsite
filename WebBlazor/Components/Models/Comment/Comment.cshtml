@@ -17,7 +17,7 @@
         <div class="grid-comment-footer">
             <p class="container-date">@DateConverter.GetTime(comment.Created)</p>
             <div></div>
-            @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser != null)
+            @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 1)
             {
                 @if (comment.IsUserLiked)
                 {

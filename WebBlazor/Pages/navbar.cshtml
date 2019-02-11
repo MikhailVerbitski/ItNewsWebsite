@@ -8,7 +8,13 @@
     <ul class="pure-menu-list">
         @if (serviceOfAuthorize.IsAuthorize)
         {
-            <li class="pure-menu-item"><a href="/UserPage/@(serviceOfAuthorize.DataAboutUser?.UserProfileId)" class="pure-menu-link">@serviceOfAuthorize.DataAboutUser?.Login <font color="red">@((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.claims.Any(a => a.ClaimType == "blocked")) ? "(blocked)" : "")</font></a></li>
+            <li class="pure-menu-item">
+                <a href="/UserPage/@(serviceOfAuthorize.DataAboutUser?.UserProfileId)" class="pure-menu-link">
+                    @serviceOfAuthorize.DataAboutUser?.Login
+                    <font color="red">@((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.claims.Any(a => a.ClaimType == "blocked")) ? "(blocked)" : "")</font>
+                    <font color="orange">@((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 0) ? "(not confirmed)" : "")</font>
+                </a>
+            </li>
             <li class="pure-menu-item"><a href="/Login" class="pure-menu-link" onclick="@serviceOfAuthorize.Logout">Login out</a></li>
         }
         else

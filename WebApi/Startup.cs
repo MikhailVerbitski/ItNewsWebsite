@@ -37,7 +37,7 @@ namespace WebApi
             services.AddLocalization(option => option.ResourcesPath = "Resources");
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
+
             services.AddIdentity<ApplicationUserEntity, RoleEntity>(a =>
             {
                 a.Password.RequireNonAlphanumeric = false;
@@ -45,7 +45,8 @@ namespace WebApi
                 a.Password.RequireUppercase = false;
                 a.Password.RequireDigit = false;
             })
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
             var mappingConfig = new MapperConfiguration(a =>
             {

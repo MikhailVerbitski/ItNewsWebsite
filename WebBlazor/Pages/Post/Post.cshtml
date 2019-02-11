@@ -29,12 +29,12 @@ else
             <UserMini User="@postViewModel.AuthorUserMiniViewModel" />
             <div>
                 <span>Rating</span>
-                <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null)" />
+                <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !postViewModel.BelongsToUser)" />
             </div>
         </div>
         <br />
         <br />
-        @if (serviceOfAuthorize.IsAuthorize)
+        @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser.Priority >= 1)
         {
             <div class="pure-form pure-form-stacked">
                 <label for="Content">Comment</label>

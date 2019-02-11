@@ -110,6 +110,7 @@
     <div></div>
 </div>
 <br />
+<button style="display: @((paramChange) ? "" : "none")" class="pure-button pure-button-primary" onclick="@SaveChange">Save change</button>
 
 @functions{
     [Parameter] private UserViewModel User { get; set; }

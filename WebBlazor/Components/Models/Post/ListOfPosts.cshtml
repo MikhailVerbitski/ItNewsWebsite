@@ -57,7 +57,7 @@ else
             {
                 type = PostType.Name,
                 count = null,
-                orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}Created.Millisecond",
+                orderBy = $"{(a != null && a.Contains("r") ? "-" : "")}Created.Millisecond",
                 where = (a != null) ?
                 $"{(a.Contains("f") ? $"IsFinished=={a.Contains("fin")} " : "")}" +
                 $"{((a.Contains("f") && (a.Any(b => b.Contains("User")) || (a.Any(b => b.Contains("ByTag"))))) ? "and" : "")}" +

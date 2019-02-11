@@ -18,7 +18,7 @@
 
     private async Task SetRating(int score)
     {
-        if (CanChange)
+        if (CanChange && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 1)
         {
             PercentOfRating = 20 * await Http.GetJsonAsync<double>($"/api/Post/PutEstimate?postId={PostId}&score={score}");
         }

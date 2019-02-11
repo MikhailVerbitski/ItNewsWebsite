@@ -186,6 +186,10 @@ namespace Domain.Implementation.Services
         }
         public async Task<int> GetUserPriority(ApplicationUserEntity applicationUser)
         {
+            if (!applicationUser.EmailConfirmed)
+            {
+                return 0;
+            }
             var roles = repositoryOfRole.ReadMany(null).ToList();
             var IsBlocked = GetUserClaim(applicationUser.Id, "blocked");
             if (IsBlocked != null)

@@ -26,6 +26,7 @@ namespace WebApi.Controllers
         private readonly UserManager<ApplicationUserEntity> userManager;
         private readonly IMapper mapper;
         private readonly ServiceOfAccount serviceOfAccount;
+        private readonly IHostingEnvironment hostingEnvironment;
 
         public TokenController(
             ApplicationDbContext context,
@@ -39,7 +40,8 @@ namespace WebApi.Controllers
             _tokenService = tokenService;
             this.userManager = userManager;
             this.mapper = mapper;
-            
+            this.hostingEnvironment = hostingEnvironment;
+
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
         }
 
@@ -56,6 +58,18 @@ namespace WebApi.Controllers
                 {
                     return Json(result.Errors.Select(a => a.Description).ToList());
                 }
+                var code = await userManager.GenerateEmailConfirmationTokenAsync(applicationUser);
+                var callbackUrl = Url.Action(
+                    nameof(ConfirmEmail),
+                    this.ControllerContext.ActionDescriptor.ControllerName,
+                    new
+                    {
+                        userId = applicationUser.Id,
+                        code = code
+                    },
+                    this.HttpContext.Request.Scheme,
+                    this.HttpContext.Request.Host.ToString());
+                serviceOfAccount.SendEmailAsync(registerViewModel.Email, "Confirm your account", $"Confirm your registration by clicking on the link: <a href='{callbackUrl}'>link</a>");
                 await serviceOfAccount.TryToRegistration(registerViewModel.Login);
                 return Json(Ok());
             }
@@ -63,6 +77,26 @@ namespace WebApi.Controllers
             {
                 return Json(validatorResult.Errors.Select(a => a.ErrorMessage).ToList());
             }
+        }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return StatusCode(400);
+            }
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return StatusCode(400);
+            }
+            var result = await userManager.ConfirmEmailAsync(user, code);
+            if (result.Succeeded)
+            {
+                return Redirect($"{this.HttpContext.Request.Scheme}://{this.HttpContext.Request.Host.ToString()}/Login");
+            }
+            return StatusCode(400);
         }
         [HttpPost]
         public async Task<JsonResult> Login([FromBody] LoginViewModel loginViewModel)
