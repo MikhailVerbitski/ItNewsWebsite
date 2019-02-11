@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Domain.Implementation.Services
@@ -67,6 +68,14 @@ namespace Domain.Implementation.Services
             };
         }
 
+        public IEnumerable<PostCompactViewModel> Search(string propetry)
+        {
+            return repositoryOfPost
+                .ReadMany(new Expression<Func<PostEntity, bool>>[] { a => a.Header.Contains(propetry) })
+                .Select(a => GetPostCompactViewModel(a, null))
+                .AsParallel()
+                .ToList();
+        }
         public async Task<PostUpdateViewModel> Create(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel)
         {
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
@@ -160,6 +169,7 @@ namespace Domain.Implementation.Services
             }
             var postsViewModel = postsEntities
                 .Select(a => GetViewModelWithProperty(type, a, applicationUserIdCurrent))
+                .AsParallel()
                 .ToList();
             return postsViewModel;
         }

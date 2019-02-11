@@ -51,7 +51,13 @@ namespace WebApi.Controllers
             serviceOfComment.serviceOfUser = serviceOfUser;
             serviceOfPost.serviceOfUser = serviceOfUser;
         }
-        
+        [AllowAnonymous]
+        [HttpGet]
+        public JsonResult Search(string property)
+        {
+            var posts = serviceOfPost.Search(property);
+            return Json(posts);
+        }
         [HttpPost]
         public async Task<JsonResult> Create(PostUpdateViewModel post)
         {
