@@ -54,6 +54,7 @@ namespace WebApi
                 a.AddProfile(new AutomapperUserProfile());
                 a.AddProfile(new AutomapperTagProfile());
                 a.AddProfile(new AutomapperRoleProfile());
+                a.AddProfile(new AutomapperClimeProfile());
             });
             IMapper mapper = mappingConfig.CreateMapper();
 

@@ -70,7 +70,7 @@ namespace Domain.Implementation.Services
         public async Task<PostUpdateViewModel> Create(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel)
         {
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
-            if (!await serviceOfRole.IsThereAccess(new[] { 2, 3 }, applicationUserCurrent, null, false))
+            if (!await serviceOfUser.IsThereAccess(new[] { 2, 3 }, applicationUserCurrent, null, false))
             {
                 return null;
             }
@@ -119,7 +119,7 @@ namespace Domain.Implementation.Services
         {
             lastPostEntity = (lastPostEntity == null) ? repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags, a => a.UserProfile) : lastPostEntity;
             var postEntity = mapper.Map<PostUpdateViewModel, PostEntity>(postCreateEditViewModel);
-            if (!await serviceOfRole.IsThereAccess(new[] { 2, 3 }, applicationUserCurrent, lastPostEntity.UserProfile.ApplicationUserId, true))
+            if (!await serviceOfUser.IsThereAccess(new[] { 2, 3 }, applicationUserCurrent, lastPostEntity.UserProfile.ApplicationUserId, true))
             {
                 return;
             }
@@ -140,7 +140,7 @@ namespace Domain.Implementation.Services
                 return;
             }
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
-            if (await serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, post.UserProfile.ApplicationUserId, true))
+            if (await serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, post.UserProfile.ApplicationUserId, true))
             {
                 post.Images.ToList().ForEach(a => File.Delete(a.Path));
                 repositoryOfPost.Delete(post);
@@ -169,7 +169,7 @@ namespace Domain.Implementation.Services
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
             postViewModel.BelongsToUser = (applicationUserCurrent == null) 
                 ? false 
-                : serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+                : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
             return postViewModel;
         }
         private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -178,7 +178,7 @@ namespace Domain.Implementation.Services
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+                : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
             return postViewModel;
         }
         private PostCompactViewModel GetPostCompactViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -188,7 +188,7 @@ namespace Domain.Implementation.Services
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+                : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
             return postViewModel;
         }
         private PostViewModel GetPostViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -202,10 +202,9 @@ namespace Domain.Implementation.Services
             postViewModel.CurrentUserId = (applicationUserCurrent == null) ? null : applicationUserCurrent.Id;
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+                : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
             return postViewModel;
         }
-
         public BasePostViewModel GetViewModelWithProperty(string type, PostEntity postEntity, string applicationUserIdCurrent)
         {
             var applicationUser = (applicationUserIdCurrent == null) 

@@ -43,11 +43,12 @@ namespace WebApi.Controllers
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
             serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
             serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag, serviceOfRole);
-            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost, serviceOfRole);
+            serviceOfUser = new ServiceOfUser(context, userManager, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost, serviceOfRole);
 
             serviceOfComment.serviceOfUser = serviceOfUser;
             serviceOfPost.serviceOfUser = serviceOfUser;
             serviceOfPost.serviceOfUser = serviceOfUser;
+            serviceOfRole.serviceOfUser = serviceOfUser;
         }
 
         [AllowAnonymous]
@@ -66,10 +67,10 @@ namespace WebApi.Controllers
             return Json(user);
         }
         [HttpPost]
-        public async Task Update([FromBody] UserUpdateViewModel userUpdateViewModel)
+        public async Task Update([FromBody] UserViewModel userViewModel)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            await serviceOfUser.Update(userId, userUpdateViewModel);
+            await serviceOfUser.Update(userId, userViewModel);
         }
         [HttpPost]
         public JsonResult ChangeImage([FromBody] UserImage image)
@@ -81,18 +82,9 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<JsonResult> GetDataAboutCurrentUser()
         {
-            var data = new DataAboutCurrentUser()
-            {
-                Login = User.Claims.FirstOrDefault(a => a.Type == System.Security.Claims.ClaimsIdentity.DefaultNameClaimType)?.Value,
-                Priority = await serviceOfRole.GetUserPriority(User.Claims.SingleOrDefault(a => a.Type == "UserId").Value)
-            };
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var data = await serviceOfUser.GetUserData(userId);
             return Json(data);
-        }
-        [HttpGet]
-        public JsonResult GetRoles()
-        {
-            var roles = serviceOfRole.GetRoles();
-            return Json(roles);
         }
     }
 }

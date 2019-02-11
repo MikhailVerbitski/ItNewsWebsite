@@ -99,7 +99,11 @@ namespace Data.Implementation.Repositories
         }
         public virtual void Delete(T entity)
         {
-            entities.Attach(entity);
+            try
+            {
+                entities.Attach(entity);
+            }
+            catch { }
             entities.Remove(entity);
             context.SaveChanges();
         }

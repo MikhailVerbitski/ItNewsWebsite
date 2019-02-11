@@ -3,9 +3,11 @@ using Data.Contracts.Models.Entities;
 using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
+using Domain.Contracts.Models.ViewModels;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +19,14 @@ namespace Domain.Implementation.Services
     public class ServiceOfUser
     {
         private readonly IMapper mapper;
-        ApplicationDbContext context;
+        private readonly UserManager<ApplicationUserEntity> userManager;
 
         private readonly RepositoryOfIdentityUserRole repositoryOfIdentityUserRole;
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
+        private readonly RepositoryOfUserClaim repositoryOfUserClaim;
         private readonly RepositoryOfPost repositoryOfPost;
+        private readonly RepositoryOfRole repositoryOfRole;
 
         public ServiceOfImage serviceOfImage { get; set; }
         public ServiceOfAccount serviceOfAccount { get; set; }
@@ -30,8 +34,13 @@ namespace Domain.Implementation.Services
         public ServiceOfPost serviceOfPost { get; set; }
         public ServiceOfRole serviceOfRole { get; set; }
 
+        public Dictionary<string, Func<string, string, UserClaim>> Climes { get; set; } = new Dictionary<string, Func<string, string, UserClaim>>(new[] {
+            new KeyValuePair<string, Func<string, string, UserClaim>>("blocked", (u,v) => new UserClaim(){ UserId = u, ClaimValue = ((v == string.Empty) ? $"your account has been suspended due to: " : v), ClaimType = "blocked" })
+        });
+
         public ServiceOfUser(
             ApplicationDbContext context,
+            UserManager<ApplicationUserEntity> userManager,
             IMapper mapper,
             ServiceOfImage serviceOfImage,
             ServiceOfAccount serviceOfAccount,
@@ -41,12 +50,14 @@ namespace Domain.Implementation.Services
             )
         {
             this.mapper = mapper;
-            this.context = context;
+            this.userManager = userManager;
 
             repositoryOfIdentityUserRole = new RepositoryOfIdentityUserRole(context);
             repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            repositoryOfUserClaim = new RepositoryOfUserClaim(context);
             repositoryOfPost = new RepositoryOfPost(context);
+            repositoryOfRole = new RepositoryOfRole(context);
 
             this.serviceOfImage = serviceOfImage;
             this.serviceOfAccount = serviceOfAccount;
@@ -59,7 +70,6 @@ namespace Domain.Implementation.Services
         {
             return GetUsers(a => a.FirstName.Contains(propetry) || a.LastName.Contains(propetry) || a.UserName.Contains(propetry));
         }
-
         public IEnumerable<UserMiniViewModel> GetUsers(params Expression<Func<ApplicationUserEntity, bool>>[] whereProperties)
         {
             return repositoryOfApplicationUser
@@ -75,29 +85,60 @@ namespace Domain.Implementation.Services
             repositoryOfApplicationUser.Update(applicationUser, a => a.Avatar);
             return path;
         }
-        public async Task Update(string applicationUserIdCurrent, UserUpdateViewModel userUpdateViewModel)
+        public async Task Update(string applicationUserIdCurrent, UserViewModel userViewModel)
         {
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
-            if(await serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, userUpdateViewModel.ApplicationUserId, true))
+            if(await IsThereAccess(new[] { 3 }, applicationUserCurrent, userViewModel.ApplicationUserId, true))
             {
-                var applicationUser = mapper.Map<UserUpdateViewModel, ApplicationUserEntity>(userUpdateViewModel);
+                var applicationUser = mapper.Map<UserViewModel, ApplicationUserEntity>(userViewModel);
                 repositoryOfApplicationUser.Update(applicationUser,
                     a => a.FirstName,
                     a => a.LastName,
                     a => a.UserName,
                     a => a.Email);
 
-                if (userUpdateViewModel.Password != null && userUpdateViewModel.Password != "")
+                if (userViewModel.Password != null && userViewModel.Password != "")
                 {
-                    await serviceOfAccount.ChangePassword(applicationUser.Id, userUpdateViewModel.Password);
+                    await serviceOfAccount.ChangePassword(applicationUser.Id, userViewModel.Password);
                 }
-                if(await serviceOfRole.GetUserPriority(applicationUserCurrent) == 3)
+                if(await GetUserPriority(applicationUserCurrent) == 3)
                 {
-                    await serviceOfRole.ChangeRole(applicationUser, userUpdateViewModel.Role);
+                    await serviceOfRole.ChangeRole(applicationUser, userViewModel.Role);
+                }
+                if(userViewModel.UserClaims != null)
+                {
+                    var userClaims = GetUserClaim(userViewModel.ApplicationUserId);
+                    userClaims.Except(userViewModel.UserClaims, new UserClaim()).ToList().ForEach(a => RemoveUserClaim(a));
+                    userViewModel.UserClaims.Except(userClaims, new UserClaim()).ToList().ForEach(a => SetUserClime(applicationUser.Id, a.ClaimType, a.ClaimValue));
                 }
             }
         }
-
+        public UserClaim GetUserClaim(string ApplicationUserId, string ClaimType)
+        {
+            return mapper.Map<IdentityUserClaim<string>, UserClaim>(repositoryOfUserClaim.Read(a => a.UserId == ApplicationUserId && a.ClaimType == ClaimType));
+        }
+        public List<UserClaim> GetUserClaim(string ApplicationUserId)
+        {
+            return mapper.Map<IEnumerable< IdentityUserClaim<string>>, IEnumerable< UserClaim>>(repositoryOfUserClaim.ReadMany(new Expression<Func<IdentityUserClaim<string>, bool>>[] { a => a.UserId == ApplicationUserId })).ToList();
+        }
+        public void SetUserClime(string userId, string name, string value)
+        {
+            var clime = repositoryOfUserClaim.Read(a => a.UserId == userId && a.ClaimType == name);
+            if(clime != null)
+            {
+                return;
+            }
+            var userClime = (Climes.Any(a => a.Key == name))
+                ? Climes.GetValueOrDefault(name)(userId, value)
+                : new UserClaim() { UserId = userId, ClaimType = name, ClaimValue = value };
+            clime = mapper.Map<UserClaim, IdentityUserClaim<string>>(userClime);
+            repositoryOfUserClaim.Create(clime);
+        }
+        public void RemoveUserClaim(UserClaim userClaim)
+        {
+            var claim = mapper.Map<UserClaim, IdentityUserClaim<string>>(userClaim);
+            repositoryOfUserClaim.Delete(claim);
+        }
         public UserMiniViewModel GetUserMiniViewModel(ApplicationUserEntity applicationUserPost)
         {
             var userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserPost);
@@ -119,8 +160,57 @@ namespace Domain.Implementation.Services
             userViewModel.Role = await serviceOfRole.GetUserRole(applicationUser);
             userViewModel.Comments = userProfile.Comments.Select(a => serviceOfComment.GetViewModelWithProperty<CommentMiniViewModel>(a, applicationUserCurrent)).ToList();
             userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty(nameof(PostMiniViewModel), a, applicationUserCurrent) as PostMiniViewModel).ToList();
-            userViewModel.IsCurrentUser = await serviceOfRole.IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, true);
+            userViewModel.UserClaims = GetUserClaim(applicationUser.Id);
+            userViewModel.IsCurrentUser = await IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, true);
+            if(await IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, false))
+            {
+                userViewModel.AllClaims = Climes.Select(a => a.Value(string.Empty, string.Empty)).ToList();
+                userViewModel.AllRoles = new[] { userViewModel.Role }.Union(serviceOfRole.GetRoles().Except(new[] { userViewModel.Role }, new UserRole())).ToList();
+            }
             return userViewModel;
+        }
+        public async Task<DataAboutCurrentUser> GetUserData(string userId)
+        {
+            DataAboutCurrentUser data = new DataAboutCurrentUser();
+            var user = repositoryOfApplicationUser.Read(a => a.Id == userId);
+            data.Priority = await GetUserPriority(user);
+            data.Login = user.UserName;
+            data.UserProfileId = user.UserProfileId.Value;
+            data.claims = GetUserClaim(user.Id);
+            return data;
+        }
+        public async Task<int> GetUserPriority(string applicationUserId)
+        {
+            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
+            return await GetUserPriority(applicationUser);
+        }
+        public async Task<int> GetUserPriority(ApplicationUserEntity applicationUser)
+        {
+            var roles = repositoryOfRole.ReadMany(null).ToList();
+            var IsBlocked = GetUserClaim(applicationUser.Id, "blocked");
+            if (IsBlocked != null)
+            {
+                return 1;
+            }
+            var role = (await userManager.GetRolesAsync(applicationUser)).Select(a => roles.FirstOrDefault(b => b.Name == a)).FirstOrDefault();
+            return role.Priority;
+        }
+        public async Task<bool> IsThereAccess(int[] prioritiesWithResolution, ApplicationUserEntity applicationUserCurrent, string applicationUserIdRequest, bool allowOwner)
+        {
+            if (applicationUserCurrent == null)
+            {
+                return false;
+            }
+            if (allowOwner && applicationUserCurrent.Id == applicationUserIdRequest)
+            {
+                return true;
+            }
+            var userCurrentPriority = await GetUserPriority(applicationUserCurrent);
+            if (prioritiesWithResolution.Contains(userCurrentPriority))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -15,7 +15,7 @@
 <br />
 <div class="grid-cols-two">
     <UserMini User="@post.AuthorUserMiniViewModel" />
-    @if (post.BelongsToUser)
+    @if (post.BelongsToUser && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)
     {
         <div class="post-edit-delete">
             <font size="2"><a href="/CreatePost/@post.PostId">Edit</a></font>

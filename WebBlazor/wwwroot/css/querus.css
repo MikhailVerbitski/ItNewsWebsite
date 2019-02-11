@@ -2,6 +2,31 @@
     #grid-user-profile {
         margin-top: 80px;
         grid-template-columns: auto;
+        background-color: inherit;
+        margin-bottom: 0px;
+        padding: 0px;
+        display: block;
+    }
+    .grid-scroll-user-posts {
+        opacity: 0.78;
+        border-radius: 7px;
+        background-color: #F0F4F3;
+        padding: 20px 30px 20px 30px;
+        margin-bottom: 10px;
+    }
+    .grid-scroll-user-comment {
+        opacity: 0.78;
+        border-radius: 7px;
+        background-color: #F0F4F3;
+        padding: 20px 30px 20px 30px;
+        margin-bottom: 10px;
+    }
+    .user-edit {
+        opacity: 0.78;
+        border-radius: 7px;
+        background-color: #F0F4F3;
+        padding: 20px 30px 20px 30px;
+        margin-bottom: 10px;
     }
 }
 @media only screen and (max-width: 720px){

@@ -38,10 +38,9 @@
 #grid-user-profile {
     display: grid;
     grid-template-columns: 7fr 5fr 4fr;
-    grid-template-rows: 88vh;
     grid-column-gap: 20px;
     background-color: #F0F4F3;
-    padding: 20px 30px 0 30px;
+    padding: 20px 30px 20px 30px;
     margin-top: 80px;
     margin-bottom: 40px;
 }
@@ -92,10 +91,6 @@
     grid-column-gap: 5px;
 }
 
-.grid-scroll{
-    display:grid;
-    grid-template-rows: auto 1fr;
-}
 .grid-scroll-user-posts {
     display: grid;
     grid-template-rows: auto auto auto 1fr;
@@ -108,4 +103,9 @@
 }
 grid-login-remember input{
     width: auto;
+}
+
+.grid-scroll-user-comment {
+    display: grid;
+    grid-template-rows: auto 1fr;
 }

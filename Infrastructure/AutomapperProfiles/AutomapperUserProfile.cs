@@ -46,13 +46,6 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Email, a => a.MapFrom(b => b.Email))
                 .ForMember(a => a.UserName, a => a.MapFrom(b => b.Login))
                 .ForAllOtherMembers(a => a.Ignore());
-            CreateMap<UserUpdateViewModel, ApplicationUserEntity>()
-                .ForMember(a => a.Id, a => a.MapFrom(b => b.ApplicationUserId))
-                .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
-                .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
-                .ForMember(a => a.UserName, a => a.MapFrom(b => b.Login))
-                .ForMember(a => a.Email, a => a.MapFrom(b => b.Email))
-                .ForAllOtherMembers(a => a.Ignore());
 
 
             CreateMap<RegisterViewModel, ApplicationUserEntity>()

@@ -46,7 +46,7 @@ namespace WebApi.Controllers
             serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
             serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
             serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag, serviceOfRole);
-            serviceOfUser = new ServiceOfUser(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost, serviceOfRole);
+            serviceOfUser = new ServiceOfUser(context, userManager, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost, serviceOfRole);
 
             serviceOfComment.serviceOfUser = serviceOfUser;
             serviceOfPost.serviceOfUser = serviceOfUser;

@@ -53,7 +53,7 @@ namespace WebBlazor.Components
                 Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
                 try
                 {
-                    DataAboutUser = await Http.GetJsonAsync<DataAboutCurrentUser>("/api/User/GetDataAboutCurrentUser");
+                    await UpdateUserData();
                 }
                 catch
                 {
@@ -62,6 +62,10 @@ namespace WebBlazor.Components
                 UpdateAfterAuthorization.Invoke();
             }
             return result;
+        }
+        public async Task UpdateUserData()
+        {
+            DataAboutUser = await Http.GetJsonAsync<DataAboutCurrentUser>("/api/User/GetDataAboutCurrentUser");
         }
         public async Task Logout()
         {
