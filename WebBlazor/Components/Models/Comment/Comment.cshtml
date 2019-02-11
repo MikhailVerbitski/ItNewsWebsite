@@ -5,8 +5,9 @@
 @using Domain.Contracts.Models;
 
 <div class="comment">
-    <div class="grid-post">
+    <div class="grid-comment-head">
         <UserMini User="@comment.AuthorUserMiniViewModel" />
+        <img src="/img/cross.png" onclick="@(() => delete.Invoke(comment))" class="cross" style="display: @((comment.BelongsToUser || (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)) ? "" : "none")"/>
     </div>
     <div style="padding: 0 0 0 50px;">
         <div class="comment-content">
@@ -37,6 +38,7 @@
 @functions{
     [Parameter] CommentViewModel comment { get; set; }
     [Parameter] PostViewModel post { get; set; }
+    [Parameter] private Action<CommentViewModel> delete { get; set; }
 
     protected override void OnInit()
     {

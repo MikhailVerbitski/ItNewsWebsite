@@ -4,7 +4,6 @@ using Data.Implementation;
 using Data.Implementation.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using MimeKit;
 using System;
 using System.Linq.Expressions;
 using System.Net;

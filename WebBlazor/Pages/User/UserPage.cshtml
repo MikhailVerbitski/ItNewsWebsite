@@ -1,5 +1,6 @@
 ﻿@page "/UserPage/{Id:int}"
 @using Domain.Contracts.Models.ViewModels.User
+@using Domain.Contracts.Models.ViewModels.Comment
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 
 <div id="grid-user-profile" class="content-head content content-radius">
@@ -10,7 +11,7 @@
     else
     {
         <div class="user-edit">
-            <UserEdit User="@User"/>
+            <UserEdit User="@User" />
         </div>
         <div class="grid-scroll-user-posts">
             <h2>Posts</h2>
@@ -43,7 +44,7 @@
                 <br />
                 <ListViewTemplate Items="User.Comments.ToList()">
                     <ItemTemplate>
-                        <CommentMini comment="@context" />
+                        <CommentMini comment="@context" delete="@((comment) => DeleteComment(comment))" />
                     </ItemTemplate>
                 </ListViewTemplate>
             </div>
@@ -55,7 +56,7 @@
     [Parameter] private int Id { get; set; }
     private UserViewModel User { get; set; }
     private string Param { get; set; }
-    
+
     protected override void OnInit()
     {
         Param = $"Time:User-{Id}:f:fin";
@@ -63,5 +64,11 @@
     protected async override Task OnParametersSetAsync()
     {
         User = await serviceOfAuthorize.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?userProfileId={Id}");
+    }
+    private async Task DeleteComment(CommentMiniViewModel comment)
+    {
+        await serviceOfAuthorize.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
+        (User.Comments as List<CommentMiniViewModel>).Remove(comment);
+        this.StateHasChanged();
     }
 }

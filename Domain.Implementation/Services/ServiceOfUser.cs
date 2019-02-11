@@ -66,7 +66,7 @@ namespace Domain.Implementation.Services
             this.serviceOfRole = serviceOfRole;
         }
 
-        public IEnumerable<UserMiniViewModel> GetUserByProperty(string propetry)
+        public IEnumerable<UserMiniViewModel> Search(string propetry)
         {
             return GetUsers(a => a.FirstName.Contains(propetry) || a.LastName.Contains(propetry) || a.UserName.Contains(propetry));
         }

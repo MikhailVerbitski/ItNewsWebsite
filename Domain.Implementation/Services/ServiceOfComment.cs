@@ -133,6 +133,7 @@ namespace Domain.Implementation.Services
             var commentViewModel = mapper.Map<CommentEntity, CommentMiniViewModel>(commentEntity);
             var applicationUserForComment = repositoryOfUserProfile.Read(a => a.Id == commentEntity.UserProfileId, a => a.ApplicationUser).ApplicationUser;
             UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserForComment);
+            commentViewModel.PostHeader = commentEntity.Post == null ? repositoryOfPost.Read(a => a.Id == commentEntity.PostId).Header : commentEntity.Post.Header;
             commentViewModel.BelongsToUser = (applicationUserCurrent == null) ? false : applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
             commentViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserForComment);
             return commentViewModel;
@@ -194,13 +195,13 @@ namespace Domain.Implementation.Services
                 repositoryOfCommentLike.Delete(commentLike);
             }
         }
-        public async Task Delete<TCommentViewModel>(string applicationUserIdCurrent, TCommentViewModel commentViewModel)
+        public async Task Delete(string applicationUserIdCurrent, int commentId)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
             if (await serviceOfUser.GetUserPriority(applicationUser) >= 1)
             {
-                var commentEntity = mapper.Map<TCommentViewModel, CommentEntity>(commentViewModel);
-                repositoryOfComment.Delete(commentEntity);
+                var comment = repositoryOfComment.Read(a => a.Id == commentId);
+                repositoryOfComment.Delete(comment);
             }
         }
         public bool IsCommentLike(CommentEntity commentEntity, int userProfileId)

@@ -1,6 +1,6 @@
 ﻿.grid-comment-footer {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr auto auto;
 }
 
 .grid-userMini-search {
@@ -108,4 +108,17 @@ grid-login-remember input{
 .grid-scroll-user-comment {
     display: grid;
     grid-template-rows: auto 1fr;
+}
+
+.grid-comment-head{
+    display:grid;
+    grid-template-columns: auto auto;
+}
+.cross {
+    opacity: 0.3;
+    width: 17px;
+    justify-self: self-end;
+}
+.cross:hover {
+    opacity: 0.6;
 }

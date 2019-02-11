@@ -54,19 +54,25 @@ namespace WebApi.Controllers
             var newComment = await serviceOfComment.Create(userId, commentViewModel);
             return Json(newComment);
         }
-
         [HttpGet]
-        public IActionResult LikeComment(int commentId, int postId)
+        public async Task<IActionResult> Delete(int commentId)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            serviceOfComment.LikeComment(userId, commentId);
+            await serviceOfComment.Delete(userId, commentId);
             return Ok();
         }
         [HttpGet]
-        public IActionResult DislikeComment(int commentId, int postId)
+        public async Task<IActionResult> LikeComment(int commentId, int postId)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            serviceOfComment.DislikeComment(userId, commentId);
+            await serviceOfComment.LikeComment(userId, commentId);
+            return Ok();
+        }
+        [HttpGet]
+        public async Task<IActionResult> DislikeComment(int commentId, int postId)
+        {
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            await serviceOfComment.DislikeComment(userId, commentId);
             return Ok();
         }
     }

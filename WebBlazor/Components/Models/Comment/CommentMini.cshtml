@@ -1,7 +1,11 @@
-﻿@using Domain.Contracts.Models.ViewModels.Comment
+﻿@inject Components.ServiceOfAuthorize serviceOfAuthorize
+@using Domain.Contracts.Models.ViewModels.Comment
 @using Domain.Contracts.Models
 
-<a href="/Post/@comment.PostId"><h3>@comment.PostHeader</h3></a>
+<div class="grid-comment-head">
+    <a href="/Post/@comment.PostId"><h3>@comment.PostHeader</h3></a>
+    <img src="/img/cross.png" onclick="@(() => delete.Invoke(comment))" class="cross" style="display: @((comment.BelongsToUser || (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)) ? "" : "none")" />
+</div>
 <br />
 <div style="word-wrap: break-word;">
     @comment.Content
@@ -17,4 +21,5 @@
 
 @functions{
     [Parameter] private CommentMiniViewModel comment { get; set; }
+    [Parameter] private Action<CommentMiniViewModel> delete { get; set; }
 }

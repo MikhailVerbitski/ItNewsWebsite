@@ -46,9 +46,9 @@ else
     <br />
     <hr />
     <div onmousemove="@Update">
-        <ListViewTemplate Items="comments">
+        <ListViewTemplate Items="@(postViewModel.Comments as List<CommentViewModel>)">
             <ItemTemplate>
-                <Comment comment="@context" post="@postViewModel" />
+                <Comment comment="@context" post="@postViewModel" delete="@(comment => DeleteComment(comment))"/>
             </ItemTemplate>
         </ListViewTemplate>
     </div>
@@ -59,7 +59,6 @@ else
 
     private string CurrentUserId { get; set; }
     private PostViewModel postViewModel;
-    private List<CommentViewModel> comments;
     private List<string> Tags;
     private string CommentContent { get; set; }
 
@@ -71,7 +70,7 @@ else
             count = 1,
             where= $"Id=={Id}"
         });
-        comments = postViewModel.Comments.ToList();
+        postViewModel.Comments = postViewModel.Comments.ToList();
         Tags = postViewModel.Tags.Select(a => a.Name).ToList();
     }
     private async Task SubmitCommentForm()
@@ -82,11 +81,16 @@ else
             Content = CommentContent
         };
         var newComment = await serviceOfAuthorize.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
-        comments.Add(newComment);
+        (postViewModel.Comments as List<CommentViewModel>).Add(newComment);
         CommentContent = string.Empty;
     }
     private void Update()
     {
         this.ShouldRender();
+    }
+    private async Task DeleteComment(CommentViewModel comment)
+    {
+        await serviceOfAuthorize.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
+        (postViewModel.Comments as List<CommentViewModel>).Remove(comment);
     }
 }
