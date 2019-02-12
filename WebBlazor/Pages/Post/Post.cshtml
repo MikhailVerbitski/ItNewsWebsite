@@ -2,6 +2,7 @@
 @inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using Domain.Contracts.Models.ViewModels.Post;
 @using Domain.Contracts.Models.ViewModels.Comment;
+@using Blazor.Extensions;
 
 @if (postViewModel == null)
 {
@@ -39,7 +40,7 @@ else
             <div class="pure-form pure-form-stacked">
                 <label for="Content">Comment</label>
                 <textarea id="Content" class="pure-input-1" name="Content" bind="@CommentContent" />
-                <button onclick="@SubmitCommentForm" id="SubmitComment" class="pure-button pure-button-primary">Send</button>
+                <button onclick="@SendMessage" id="SubmitComment" class="pure-button pure-button-primary">Send</button>
             </div>
         }
     </div>
@@ -48,7 +49,7 @@ else
     <div onmousemove="@Update">
         <ListViewTemplate Items="@(postViewModel.Comments as List<CommentViewModel>)">
             <ItemTemplate>
-                <Comment comment="@context" post="@postViewModel" delete="@(comment => DeleteComment(comment))"/>
+                <Comment comment="@context" post="@postViewModel" delete="@(comment => DeleteComment(comment))" />
             </ItemTemplate>
         </ListViewTemplate>
     </div>
@@ -62,18 +63,21 @@ else
     private List<string> Tags;
     private string CommentContent { get; set; }
 
-    protected async override Task OnParametersSetAsync()
+    HubConnection connection;
+    protected async override Task OnInitAsync()
     {
-        postViewModel = await serviceOfAuthorize.PostJsonAsync<PostViewModel>($"/api/Post/Read", new
-        {
-            type = "PostViewModel",
-            count = 1,
-            where= $"Id=={Id}"
-        });
-        postViewModel.Comments = postViewModel.Comments.ToList();
-        Tags = postViewModel.Tags.Select(a => a.Name).ToList();
+        connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
+        connection.On<CommentViewModel>("createComment", this.OnCreateComment);
+        //connection.On<int>("deleteComment", this.OnDeleteComment);
+        await connection.StartAsync();
     }
-    private async Task SubmitCommentForm()
+    Task OnCreateComment(CommentViewModel comment)
+    {
+        (postViewModel.Comments as List<CommentViewModel>).Add(comment);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    async Task SendMessage()
     {
         var comment = new CommentViewModel()
         {
@@ -81,8 +85,31 @@ else
             Content = CommentContent
         };
         var newComment = await serviceOfAuthorize.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
-        (postViewModel.Comments as List<CommentViewModel>).Add(newComment);
+        await connection.InvokeAsync("Send", newComment);
         CommentContent = string.Empty;
+    }
+
+    //Task OnDeleteComment(int commentId)
+    //{
+    //    (postViewModel.Comments as List<CommentViewModel>).Remove((postViewModel.Comments as List<CommentViewModel>).FirstOrDefault(a => a.CommentId == commentId));
+    //    return Task.CompletedTask;
+    //}
+    //async Task DeleteComment(CommentViewModel comment)
+    //{
+    //    await serviceOfAuthorize.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
+    //    await connection.InvokeAsync("deleteComment", comment.CommentId);
+    //}
+
+    protected async override Task OnParametersSetAsync()
+    {
+        postViewModel = await serviceOfAuthorize.PostJsonAsync<PostViewModel>($"/api/Post/Read", new
+        {
+            type = "PostViewModel",
+            count = 1,
+            where = $"Id=={Id}"
+        });
+        postViewModel.Comments = postViewModel.Comments.ToList();
+        Tags = postViewModel.Tags.Select(a => a.Name).ToList();
     }
     private void Update()
     {

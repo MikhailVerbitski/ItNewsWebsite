@@ -20,6 +20,7 @@ using WebApi.Server.Service;
 using WebApi.Server.Interface;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using WebApi.Hubs;
 
 namespace WebApi
 {
@@ -60,7 +61,6 @@ namespace WebApi
             IMapper mapper = mappingConfig.CreateMapper();
 
             services.AddSingleton(mapper);
-            services.AddCors();
             services.AddMvc();
 
             services.AddTransient<IJwtTokenService, JwtTokenService>();
@@ -87,6 +87,7 @@ namespace WebApi
                     WasmMediaTypeNames.Application.Wasm,
                 });
             });
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment hostingEnvironment)
@@ -135,8 +136,13 @@ namespace WebApi
             {
                 builder.AllowAnyOrigin();
                 builder.AllowAnyHeader();
-                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+                builder.AllowCredentials();
+                //        .AllowAnyHeader()
+                //        .AllowCredentials()
+                //        .WithOrigins("http://localhost:51319");
             });
+            app.UseSignalR(a => a.MapHub<CommentHub>("/commentHub"));
             app.UseAuthentication();
             app.UseMvc(routes =>
             {
