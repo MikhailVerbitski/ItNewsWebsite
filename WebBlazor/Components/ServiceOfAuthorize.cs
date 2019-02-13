@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace WebBlazor.Components
 {
-    class Token
+    class TokenWrapper
     {
-        public string token { get; set; }
+        public string Token { get; set; }
     }
     public class ServiceOfAuthorize
     {

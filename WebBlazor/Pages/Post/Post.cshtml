@@ -55,6 +55,8 @@ else
     </div>
 }
 
+<Locale key="qwe"></Locale>
+
 @functions{
     [Parameter] private int Id { get; set; }
 
@@ -68,9 +70,10 @@ else
     {
         connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
         connection.On<CommentViewModel>("createComment", this.OnCreateComment);
-        //connection.On<int>("deleteComment", this.OnDeleteComment);
+        connection.On<int>("deleteComment", this.OnDeleteComment);
         await connection.StartAsync();
     }
+
     Task OnCreateComment(CommentViewModel comment)
     {
         (postViewModel.Comments as List<CommentViewModel>).Add(comment);
@@ -88,17 +91,18 @@ else
         await connection.InvokeAsync("Send", newComment);
         CommentContent = string.Empty;
     }
+    Task OnDeleteComment(int commentId)
+    {
+        (postViewModel.Comments as List<CommentViewModel>).Remove((postViewModel.Comments as List<CommentViewModel>).FirstOrDefault(a => a.CommentId == commentId));
+        this.StateHasChanged();
+        return Task.CompletedTask;
+    }
+    async Task DeleteComment(CommentViewModel comment)
+    {
+        await serviceOfAuthorize.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
+        await connection.InvokeAsync("Delete", comment.CommentId);
+    }
 
-    //Task OnDeleteComment(int commentId)
-    //{
-    //    (postViewModel.Comments as List<CommentViewModel>).Remove((postViewModel.Comments as List<CommentViewModel>).FirstOrDefault(a => a.CommentId == commentId));
-    //    return Task.CompletedTask;
-    //}
-    //async Task DeleteComment(CommentViewModel comment)
-    //{
-    //    await serviceOfAuthorize.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
-    //    await connection.InvokeAsync("deleteComment", comment.CommentId);
-    //}
 
     protected async override Task OnParametersSetAsync()
     {
@@ -114,10 +118,5 @@ else
     private void Update()
     {
         this.ShouldRender();
-    }
-    private async Task DeleteComment(CommentViewModel comment)
-    {
-        await serviceOfAuthorize.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
-        (postViewModel.Comments as List<CommentViewModel>).Remove(comment);
     }
 }
