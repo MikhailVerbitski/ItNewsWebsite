@@ -24,12 +24,11 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfSection repositoryOfSection;
         private readonly RepositoryOfImage repositoryOfImage;
 
-        public ServiceOfComment serviceOfComment { get; set; }
-        public ServiceOfAccount serviceOfAccount { get; set; }
-        public ServiceOfImage serviceOfImage { get; set; }
-        public ServiceOfUser serviceOfUser { get; set; }
-        public ServiceOfTag serviceOfTag { get; set; }
-        public ServiceOfRole serviceOfRole { get; set; }
+        private readonly ServiceOfComment serviceOfComment;
+        private readonly ServiceOfAccount serviceOfAccount;
+        private readonly ServiceOfImage serviceOfImage;
+        private readonly ServiceOfUser serviceOfUser;
+        private readonly ServiceOfTag serviceOfTag;
 
         public Tuple<string, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[] Config;
 
@@ -40,8 +39,7 @@ namespace Domain.Implementation.Services
             ServiceOfAccount serviceOfAccount,
             ServiceOfComment serviceOfComment,
             ServiceOfUser serviceOfUser,
-            ServiceOfTag serviceOfTag,
-            ServiceOfRole serviceOfRole
+            ServiceOfTag serviceOfTag
             )
         {
             this.mapper = mapper;
@@ -57,7 +55,6 @@ namespace Domain.Implementation.Services
             this.serviceOfComment = serviceOfComment;
             this.serviceOfUser = serviceOfUser;
             this.serviceOfTag = serviceOfTag;
-            this.serviceOfRole = serviceOfRole;
 
             Config = new Tuple<string, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[]
             {

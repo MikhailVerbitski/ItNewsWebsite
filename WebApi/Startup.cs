@@ -21,6 +21,7 @@ using WebApi.Server.Interface;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using WebApi.Hubs;
+using Domain.Implementation.Services;
 
 namespace WebApi
 {
@@ -88,6 +89,14 @@ namespace WebApi
                 });
             });
             services.AddSignalR();
+
+            services.AddScoped<ServiceOfAccount>();
+            services.AddScoped<ServiceOfComment>();
+            services.AddScoped<ServiceOfImage>();
+            services.AddScoped<ServiceOfPost>();
+            services.AddScoped<ServiceOfSection>();
+            services.AddScoped<ServiceOfTag>();
+            services.AddScoped<ServiceOfUser>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment hostingEnvironment)

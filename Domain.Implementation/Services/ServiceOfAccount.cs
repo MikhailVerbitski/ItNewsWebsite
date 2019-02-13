@@ -23,7 +23,7 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfUserProfile RepositoryOfUserProfile;
         private readonly RepositoryOfIdentityUserRole repositoryOfIdentityUserRole;
 
-        public ServiceOfImage serviceOfImage { get; set; }
+        private readonly ServiceOfImage serviceOfImage;
 
         public ServiceOfAccount(
             ApplicationDbContext context,
@@ -70,12 +70,6 @@ namespace Domain.Implementation.Services
                 }
                 repositoryOfApplicationUser.Update(applicationUser);
             }
-        }
-
-        public async Task ChangePassword(string applicationUserId, string newPassword)
-        {
-            var lastApplicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            await userManager.ChangePasswordAsync(lastApplicationUser, lastApplicationUser.PasswordHash, newPassword);
         }
 
         public async Task<bool> AddUserRole(string applicationUserId, params string[] roles)

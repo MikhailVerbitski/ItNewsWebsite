@@ -1,13 +1,8 @@
-﻿using AutoMapper;
-using Data.Contracts.Models.Entities;
-using Data.Implementation;
-using Domain.Contracts.Models;
+﻿using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,37 +14,15 @@ namespace WebApi.Controllers
     [Route("api/Post/[action]")]
     public class PostController : Controller
     {
-        private readonly UserManager<ApplicationUserEntity> userManager;
         private readonly ServiceOfSection serviceOfSection;
         private readonly ServiceOfTag serviceOfTag;
         private readonly ServiceOfPost serviceOfPost;
-        private readonly ServiceOfComment serviceOfComment;
-        private readonly ServiceOfAccount serviceOfAccount;
-        private readonly ServiceOfImage serviceOfImage;
-        private readonly ServiceOfUser serviceOfUser;
-        private readonly ServiceOfRole serviceOfRole;
 
-        public PostController(
-            UserManager<ApplicationUserEntity> userManager,
-            RoleManager<RoleEntity> roleManager,
-            ApplicationDbContext context,
-            IMapper mapper,
-            IHostingEnvironment hostingEnvironment
-            )
+        public PostController(ServiceOfSection serviceOfSection, ServiceOfTag serviceOfTag, ServiceOfPost serviceOfPost )
         {
-            this.userManager = userManager;
-
-            serviceOfRole = new ServiceOfRole(context, userManager, roleManager, mapper);
-            serviceOfTag = new ServiceOfTag(context, mapper);
-            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
-            serviceOfSection = new ServiceOfSection(context, mapper);
-            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
-            serviceOfComment = new ServiceOfComment(context, mapper, serviceOfUser);
-            serviceOfPost = new ServiceOfPost(context, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfUser, serviceOfTag, serviceOfRole);
-            serviceOfUser = new ServiceOfUser(context, userManager, mapper, serviceOfImage, serviceOfAccount, serviceOfComment, serviceOfPost, serviceOfRole);
-
-            serviceOfComment.serviceOfUser = serviceOfUser;
-            serviceOfPost.serviceOfUser = serviceOfUser;
+            this.serviceOfTag = serviceOfTag;
+            this.serviceOfSection = serviceOfSection;
+            this.serviceOfPost = serviceOfPost;
         }
         [AllowAnonymous]
         [HttpGet]

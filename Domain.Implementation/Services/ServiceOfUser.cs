@@ -28,11 +28,7 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfPost repositoryOfPost;
         private readonly RepositoryOfRole repositoryOfRole;
 
-        public ServiceOfImage serviceOfImage { get; set; }
-        public ServiceOfAccount serviceOfAccount { get; set; }
-        public ServiceOfComment serviceOfComment { get; set; }
-        public ServiceOfPost serviceOfPost { get; set; }
-        public ServiceOfRole serviceOfRole { get; set; }
+        private readonly ServiceOfImage serviceOfImage;
 
         public Dictionary<string, Func<string, string, UserClaim>> Climes { get; set; } = new Dictionary<string, Func<string, string, UserClaim>>(new[] {
             new KeyValuePair<string, Func<string, string, UserClaim>>("blocked", (u,v) => new UserClaim(){ UserId = u, ClaimValue = ((v == string.Empty) ? $"your account has been suspended due to: " : v), ClaimType = "blocked" })
@@ -42,11 +38,7 @@ namespace Domain.Implementation.Services
             ApplicationDbContext context,
             UserManager<ApplicationUserEntity> userManager,
             IMapper mapper,
-            ServiceOfImage serviceOfImage,
-            ServiceOfAccount serviceOfAccount,
-            ServiceOfComment serviceOfComment,
-            ServiceOfPost serviceOfPost, 
-            ServiceOfRole serviceOfRole
+            ServiceOfImage serviceOfImage
             )
         {
             this.mapper = mapper;
@@ -60,10 +52,6 @@ namespace Domain.Implementation.Services
             repositoryOfRole = new RepositoryOfRole(context);
 
             this.serviceOfImage = serviceOfImage;
-            this.serviceOfAccount = serviceOfAccount;
-            this.serviceOfComment = serviceOfComment;
-            this.serviceOfPost = serviceOfPost;
-            this.serviceOfRole = serviceOfRole;
         }
 
         public IEnumerable<UserMiniViewModel> Search(string propetry)
@@ -99,11 +87,11 @@ namespace Domain.Implementation.Services
 
                 if (userViewModel.Password != null && userViewModel.Password != "")
                 {
-                    await serviceOfAccount.ChangePassword(applicationUser.Id, userViewModel.Password);
+                    await ChangePassword(applicationUser.Id, userViewModel.Password);
                 }
                 if(await GetUserPriority(applicationUserCurrent) == 3)
                 {
-                    await serviceOfRole.ChangeRole(applicationUser, userViewModel.Role);
+                    await ChangeRole(applicationUser, userViewModel.Role);
                 }
                 if(userViewModel.UserClaims != null)
                 {
@@ -112,6 +100,11 @@ namespace Domain.Implementation.Services
                     userViewModel.UserClaims.Except(userClaims, new UserClaim()).ToList().ForEach(a => SetUserClime(applicationUser.Id, a.ClaimType, a.ClaimValue));
                 }
             }
+        }
+        public async Task ChangePassword(string applicationUserId, string newPassword)
+        {
+            var lastApplicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
+            await userManager.ChangePasswordAsync(lastApplicationUser, lastApplicationUser.PasswordHash, newPassword);
         }
         public UserClaim GetUserClaim(string ApplicationUserId, string ClaimType)
         {
@@ -142,7 +135,7 @@ namespace Domain.Implementation.Services
         public UserMiniViewModel GetUserMiniViewModel(ApplicationUserEntity applicationUserPost)
         {
             var userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserPost);
-            userMiniViewModel.Role = serviceOfRole.GetUserRole(applicationUserPost).Result;
+            userMiniViewModel.Role = GetUserRole(applicationUserPost).Result;
             return userMiniViewModel;
         }
         public async Task<UserViewModel> GetUserViewModel(string applicationUserIdCurrent, int userProfileId)
@@ -157,15 +150,15 @@ namespace Domain.Implementation.Services
                 a => a.Posts,
                 a => a.Comments);
             var userViewModel = mapper.Map<ApplicationUserEntity, UserViewModel>(applicationUser);
-            userViewModel.Role = await serviceOfRole.GetUserRole(applicationUser);
-            userViewModel.Comments = userProfile.Comments.Select(a => serviceOfComment.GetViewModelWithProperty<CommentMiniViewModel>(a, applicationUserCurrent)).ToList();
-            userViewModel.Posts = userProfile.Posts.Select(a => serviceOfPost.GetViewModelWithProperty(nameof(PostMiniViewModel), a, applicationUserCurrent) as PostMiniViewModel).ToList();
+            userViewModel.Role = await GetUserRole(applicationUser);
+            userViewModel.Comments = userProfile.Comments.Select(a => GetCommentMiniViewModel(a, applicationUserCurrent)).ToList();
+            userViewModel.Posts = userProfile.Posts.Select(a => GetPostMiniViewModel(a, applicationUserCurrent)).ToList();
             userViewModel.UserClaims = GetUserClaim(applicationUser.Id);
             userViewModel.IsCurrentUser = await IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, true);
             if(await IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, false))
             {
                 userViewModel.AllClaims = Climes.Select(a => a.Value(string.Empty, string.Empty)).ToList();
-                userViewModel.AllRoles = new[] { userViewModel.Role }.Union(serviceOfRole.GetRoles().Except(new[] { userViewModel.Role }, new UserRole())).ToList();
+                userViewModel.AllRoles = new[] { userViewModel.Role }.Union(GetRoles().Except(new[] { userViewModel.Role }, new UserRole())).ToList();
             }
             return userViewModel;
         }
@@ -215,6 +208,46 @@ namespace Domain.Implementation.Services
                 return true;
             }
             return false;
+        }
+        public async Task<UserRole> GetUserRole(ApplicationUserEntity applicationUser)
+        {
+            var roles = repositoryOfRole.ReadMany(null).ToList();
+            var role = (await userManager.GetRolesAsync(applicationUser)).Select(a => roles.Where(b => b.Name == a).FirstOrDefault()).FirstOrDefault();
+            return mapper.Map<RoleEntity, UserRole>(role);
+        }
+        public List<UserRole> GetRoles()
+        {
+            return mapper.Map<IEnumerable<RoleEntity>, IEnumerable<UserRole>>(repositoryOfRole.ReadMany(null)).ToList();
+        }
+        public async Task ChangeRole(ApplicationUserEntity applicationUser, UserRole newRole)
+        {
+            var roleName = (await userManager.GetRolesAsync(applicationUser)).FirstOrDefault();
+            var role = repositoryOfRole.Read(a => a.Name == roleName);
+            if (newRole.Name != role.Name)
+            {
+                repositoryOfIdentityUserRole.Delete(new IdentityUserRole<string> { UserId = applicationUser.Id, RoleId = role.Id });
+                repositoryOfIdentityUserRole.Create(new IdentityUserRole<string> { UserId = applicationUser.Id, RoleId = newRole.Id });
+            }
+        }
+
+        private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
+        {
+            var postViewModel = mapper.Map<PostEntity, PostMiniViewModel>(postEntity);
+            var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
+            postViewModel.BelongsToUser = (applicationUserCurrent == null)
+                ? false
+                : IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+            return postViewModel;
+        }
+        private CommentMiniViewModel GetCommentMiniViewModel(CommentEntity commentEntity, ApplicationUserEntity applicationUserCurrent)
+        {
+            var commentViewModel = mapper.Map<CommentEntity, CommentMiniViewModel>(commentEntity);
+            var applicationUserForComment = repositoryOfUserProfile.Read(a => a.Id == commentEntity.UserProfileId, a => a.ApplicationUser).ApplicationUser;
+            UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserForComment);
+            commentViewModel.PostHeader = commentEntity.Post == null ? repositoryOfPost.Read(a => a.Id == commentEntity.PostId).Header : commentEntity.Post.Header;
+            commentViewModel.BelongsToUser = (applicationUserCurrent == null) ? false : applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
+            commentViewModel.AuthorUserMiniViewModel = GetUserMiniViewModel(applicationUserForComment);
+            return commentViewModel;
         }
     }
 }

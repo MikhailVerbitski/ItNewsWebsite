@@ -21,7 +21,7 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
 
-        public ServiceOfUser serviceOfUser { get; set; }
+        private readonly ServiceOfUser serviceOfUser;
 
         private readonly Tuple<Type, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>[] Config;
 
@@ -44,8 +44,7 @@ namespace Domain.Implementation.Services
             Config = new[]
             {
                 new Tuple<Type, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(typeof(CommentViewModel), GetCommentViewModel),
-                new Tuple<Type, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(typeof(CommentMiniViewModel), GetCommentMiniViewModel),
-                new Tuple<Type, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(typeof(CommentCreateEditViewModel), GetCommentCreateEditViewModel)
+                new Tuple<Type, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(typeof(CommentMiniViewModel), GetCommentMiniViewModel)
             };
         }
 
@@ -141,10 +140,6 @@ namespace Domain.Implementation.Services
         private CommentCreateEditViewModel GetCommentCreateEditViewModel(CommentEntity commentEntity, ApplicationUserEntity applicationUserCurrent)
         {
             var commentViewModel = mapper.Map<CommentEntity, CommentCreateEditViewModel>(commentEntity);
-            var applicationUserForComment = repositoryOfUserProfile.Read(a => a.Id == commentEntity.UserProfileId, a => a.ApplicationUser).ApplicationUser;
-            UserMiniViewModel userMiniViewModel = mapper.Map<ApplicationUserEntity, UserMiniViewModel>(applicationUserForComment);
-            commentViewModel.BelongsToUser = (applicationUserCurrent == null) ? false : applicationUserCurrent.UserProfileId == commentEntity.UserProfileId;
-            commentViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserForComment);
             return commentViewModel;
         }
 

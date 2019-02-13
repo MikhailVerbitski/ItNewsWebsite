@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Domain.Implementation.Services;
 using WebApi.Server.Interface;
 using System.Collections.Generic;
-using Data.Implementation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,23 +25,19 @@ namespace WebApi.Controllers
         private readonly UserManager<ApplicationUserEntity> userManager;
         private readonly IMapper mapper;
         private readonly ServiceOfAccount serviceOfAccount;
-        private readonly IHostingEnvironment hostingEnvironment;
 
         public TokenController(
-            ApplicationDbContext context,
             IJwtTokenService tokenService, 
             UserManager<ApplicationUserEntity> userManager,
-            RoleManager<RoleEntity> roleManager,
             IHostingEnvironment hostingEnvironment,
-            IMapper mapper
+            IMapper mapper,
+            ServiceOfAccount serviceOfAccount
             )
         {
             _tokenService = tokenService;
             this.userManager = userManager;
             this.mapper = mapper;
-            this.hostingEnvironment = hostingEnvironment;
-
-            serviceOfAccount = new ServiceOfAccount(context, userManager, roleManager, hostingEnvironment, mapper);
+            this.serviceOfAccount = serviceOfAccount;
         }
 
         [HttpPost]
