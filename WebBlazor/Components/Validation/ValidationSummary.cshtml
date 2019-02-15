@@ -1,6 +1,7 @@
 ﻿@using System.ComponentModel
 @using Microsoft.AspNetCore.Blazor.Components
 @using System.Reflection
+@inject Components.ServiceOfLocalization serviceOfLocalization
 
 @if (Errors.Any())
 {
@@ -8,7 +9,7 @@
     <ul>
       @foreach (var error in Errors)
       {
-        <li>@error</li>
+        <li>@((language != null) ? language[error] : "")</li>
       }
     </ul>
   </div>
@@ -16,6 +17,13 @@
 
 @functions {
     [Parameter] protected object Subject { get; set; }
+
+    private Dictionary<string, string> language;
+
+    protected async override Task OnInitAsync()
+    {
+        language = await serviceOfLocalization.LanguageDictionary;
+    }
 
     public IEnumerable<string> Errors
     {

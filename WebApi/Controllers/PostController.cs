@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, writer, admin")]
     [ApiController]
     [Route("api/Post/[action]")]
     public class PostController : Controller
@@ -39,10 +39,10 @@ namespace WebApi.Controllers
             return Json(post);
         }
         [HttpPost]
-        public async Task<IActionResult> Update([FromBody] PostUpdateViewModel postCreateEditViewModel)
+        public IActionResult Update([FromBody] PostUpdateViewModel postCreateEditViewModel)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            await serviceOfPost.Update(userId, postCreateEditViewModel);
+            serviceOfPost.Update(userId, postCreateEditViewModel);
             return Ok();
         }
         [HttpGet]

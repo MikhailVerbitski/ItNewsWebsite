@@ -1,5 +1,5 @@
 ﻿@page "/Post/{Id:int}"
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
+@implements IDisposable
 @using Domain.Contracts.Models.ViewModels.Post;
 @using Domain.Contracts.Models.ViewModels.Comment;
 @using Blazor.Extensions;
@@ -10,15 +10,15 @@
 }
 else
 {
-    <div id="container-post" class="content-radius-top">
+    <div id="container-post">
         <h1 style="text-align: center;">@postViewModel.Header</h1>
-        <h3>Section: <Tag tag="@postViewModel.Section" /></h3>
+        <h3><LocalizationSentence Sentence="@("Section")" />: <Tag tag="@postViewModel.Section" /></h3>
         <br />
         <p class="post-content">
             <Markdown Content="@postViewModel.Content" />
         </p>
         <br />
-        <span>Tags:</span>
+        <span><LocalizationSentence Sentence="@("Tags")" />:</span>
         <ListViewTemplate Items="@Tags">
             <ItemTemplate>
                 <Tag tag="@context" />
@@ -29,7 +29,7 @@ else
         <div class="grid-cols-two">
             <UserMini User="@postViewModel.AuthorUserMiniViewModel" />
             <div>
-                <span>Rating</span>
+                <span><LocalizationSentence Sentence="@("Rating")" /></span>
                 <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !postViewModel.BelongsToUser)" />
             </div>
         </div>
@@ -38,7 +38,7 @@ else
         @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser.Priority >= 1)
         {
             <div class="pure-form pure-form-stacked">
-                <label for="Content">Comment</label>
+                <label for="Content"><LocalizationSentence Sentence="@("Comment")" /></label>
                 <textarea id="Content" class="pure-input-1" name="Content" bind="@CommentContent" />
                 <button onclick="@SendMessage" id="SubmitComment" class="pure-button pure-button-primary">Send</button>
             </div>
@@ -59,13 +59,12 @@ else
 
 @functions{
     [Parameter] private int Id { get; set; }
-
     private string CurrentUserId { get; set; }
     private PostViewModel postViewModel;
     private List<string> Tags;
     private string CommentContent { get; set; }
-
-    HubConnection connection;
+    private HubConnection connection;
+    
     protected async override Task OnInitAsync()
     {
         connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
@@ -87,9 +86,9 @@ else
             PostId = postViewModel.PostId,
             Content = CommentContent
         };
+        CommentContent = string.Empty;
         var newComment = await serviceOfAuthorize.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
         await connection.InvokeAsync("Send", newComment);
-        CommentContent = string.Empty;
     }
     Task OnDeleteComment(int commentId)
     {
@@ -118,5 +117,9 @@ else
     private void Update()
     {
         this.ShouldRender();
+    }
+    public void Dispose()
+    {
+        connection.StopAsync();
     }
 }

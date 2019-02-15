@@ -15,8 +15,8 @@
     @if (post.BelongsToUser && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)
     {
         <div class="post-edit-delete">
-            <font size="2"><a href="/CreatePost/@post.PostId">Edit</a></font>
-            <font size="2"><a onclick="@Delete">Delete</a></font>
+            <font size="2"><a href="/CreatePost/@post.PostId"><LocalizationSentence Sentence="@("Edit")" /></a></font>
+            <font size="2"><a onclick="@Delete"><LocalizationSentence Sentence="@("Delete")" /></a></font>
         </div>
     }
 </div>

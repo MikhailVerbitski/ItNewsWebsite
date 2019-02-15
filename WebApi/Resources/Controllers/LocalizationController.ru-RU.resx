@@ -117,16 +117,169 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Account-Login-Email" xml:space="preserve">
-    <value>Email</value>
+  <data name="All" xml:space="preserve">
+    <value>Все</value>
   </data>
-  <data name="Account-Login-Password" xml:space="preserve">
-    <value>Password</value>
+  <data name="blocked" xml:space="preserve">
+    <value>заблокированный</value>
   </data>
-  <data name="Account-Login-Remember" xml:space="preserve">
-    <value>Remember me</value>
+  <data name="Comment" xml:space="preserve">
+    <value>Комментировать</value>
   </data>
-  <data name="Account-Login-Submit" xml:space="preserve">
-    <value>Register</value>
+  <data name="Comments" xml:space="preserve">
+    <value>Комментарии</value>
+  </data>
+  <data name="Confirm password" xml:space="preserve">
+    <value>Подтверждение пароля</value>
+  </data>
+  <data name="Confirm Password is mandatory" xml:space="preserve">
+    <value>Подтверждение пароля обязательно</value>
+  </data>
+  <data name="Constructor" xml:space="preserve">
+    <value>Конструктор</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>Содержание</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Электронная почта</value>
+  </data>
+  <data name="Email is mandatory" xml:space="preserve">
+    <value>Электронная почта обязательна</value>
+  </data>
+  <data name="Finished" xml:space="preserve">
+    <value>Законченный</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="First Name is mandatory" xml:space="preserve">
+    <value>Имя обязательно</value>
+  </data>
+  <data name="Header" xml:space="preserve">
+    <value>Заголовок</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Фамилия</value>
+  </data>
+  <data name="Last Name is mandatory" xml:space="preserve">
+    <value>Фамилия обязательна</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Логин</value>
+  </data>
+  <data name="Login is mandatory" xml:space="preserve">
+    <value>Логин является обязательным</value>
+  </data>
+  <data name="Login out" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+  <data name="minimum password length is 6 characters" xml:space="preserve">
+    <value>минимальная длина пароля 6 символов</value>
+  </data>
+  <data name="not confirmed" xml:space="preserve">
+    <value>не подтвержден</value>
+  </data>
+  <data name="nothing found :(" xml:space="preserve">
+    <value>ничего не найдено :(</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="Password is mandatory" xml:space="preserve">
+    <value>Пароль является обязательным</value>
+  </data>
+  <data name="Passwords do not match" xml:space="preserve">
+    <value>Пароли не совпадают</value>
+  </data>
+  <data name="Posts" xml:space="preserve">
+    <value>Посты</value>
+  </data>
+  <data name="Posts yet :(" xml:space="preserve">
+    <value>постов пока нет :(</value>
+  </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Рейтинг</value>
+  </data>
+  <data name="Registration" xml:space="preserve">
+    <value>Регистрация</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>Запомнить меня</value>
+  </data>
+  <data name="Reverse" xml:space="preserve">
+    <value>Реверсивный</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="Section" xml:space="preserve">
+    <value>Раздел</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
+  <data name="Send as draft" xml:space="preserve">
+    <value>Отправить как черновик</value>
+  </data>
+  <data name="Sort by" xml:space="preserve">
+    <value>Сортировать по</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Теги</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Время</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="Unfinished" xml:space="preserve">
+    <value>Незаконченные</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="Upload image" xml:space="preserve">
+    <value>Загрузить изображение</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Пользователи</value>
+  </data>
+  <data name="Change image" xml:space="preserve">
+    <value>Изменить изображение</value>
+  </data>
+  <data name="Count of likes" xml:space="preserve">
+    <value>Количество лайков</value>
+  </data>
+  <data name="Create new post" xml:space="preserve">
+    <value>Создать новый пост</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="lock" xml:space="preserve">
+    <value>заблокировать</value>
+  </data>
+  <data name="New password" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="reason" xml:space="preserve">
+    <value>причина</value>
+  </data>
+  <data name="Registered" xml:space="preserve">
+    <value>Зарегистрирован</value>
+  </data>
+  <data name="Top posts" xml:space="preserve">
+    <value>Топ постов</value>
+  </data>
+  <data name="unlock" xml:space="preserve">
+    <value>разблокировать</value>
   </data>
 </root>

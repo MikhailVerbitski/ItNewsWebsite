@@ -9,25 +9,27 @@
 @if (User.IsCurrentUser)
 {
     <br />
-    <button for="file" class="pure-button user-page-button">Change image</button>
+    <button for="file" class="pure-button user-page-button"><LocalizationSentence Sentence="@("Change image")" /></button>
     <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
 
     <br />
     @if (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)
     {
-        <button onclick="@(() => ChangeProperty(5, ((User.UserClaims.Any(a => a.ClaimType == "blocked")) ? User.UserClaims.FirstOrDefault(a => a.ClaimType == "blocked") :  User.AllClaims[User.AllClaims.FindIndex(a => a.ClaimType == "blocked")])))" class="pure-button user-page-button">@(User.UserClaims.Any(a => a.ClaimType == "blocked") ? "unlock" : "lock")</button>
+    <button onclick="@(() => ChangeProperty(5, ((User.UserClaims.Any(a => a.ClaimType == "blocked")) ? User.UserClaims.FirstOrDefault(a => a.ClaimType == "blocked") :  User.AllClaims[User.AllClaims.FindIndex(a => a.ClaimType == "blocked")])))" class="pure-button user-page-button">
+        <LocalizationSentence Sentence="@(User.UserClaims.Any(a => a.ClaimType == "blocked") ? "unlock" : "lock")" />
+    </button>
         <textarea style="display: @((!ChangeKeys[5]) ? "" : "none")" bind="@blockedValue" />
     }
     <br />
 }
 @if (User.UserClaims.Any(a => a.ClaimType == "blocked"))
 {
-    <h2 style="color: red;">Blocked</h2>
-    <h3 style="color: red;">reason: @blockedValue</h3>
+    <h2 style="color: red;"><LocalizationSentence Sentence="@("blocked")" /></h2>
+    <h3 style="color: red;"><LocalizationSentence Sentence="@("reason")" />: @blockedValue</h3>
     <br />
 }
 <div id="grid-user-profile-userData">
-    <font size="5">First name:</font>
+    <font size="5"><LocalizationSentence Sentence="@("First name")" />:</font>
     <font style="display: @((!ChangeKeys[0]) ? "" : "none")" size="5">@User.FirstName</font>
     <input style="display: @((ChangeKeys[0]) ? "" : "none")" bind="@User.FirstName" />
     @if (User.IsCurrentUser)
@@ -39,7 +41,7 @@
         <div></div>
     }
 
-    <font size="5">Last name:</font>
+    <font size="5"><LocalizationSentence Sentence="@("Last name")" />:</font>
     <font style="display: @((!ChangeKeys[1]) ? "" : "none")" size="5">@User.LastName</font>
     <input style="display: @((ChangeKeys[1]) ? "" : "none")" bind="@User.LastName" />
     @if (User.IsCurrentUser)
@@ -51,7 +53,7 @@
         <div></div>
     }
 
-    <font size="5" color="@User.Role.Color">Role:</font>
+    <font size="5" color="@User.Role.Color"><LocalizationSentence Sentence="@("Role")" />:</font>
     <font size="5" color="@User.Role.Color" style="display: @((!ChangeKeys[2]) ? "" : "none")">@User.Role.Name</font>
     @if (User.IsCurrentUser && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)
     {
@@ -68,11 +70,11 @@
         <div></div>
     }
 
-    <font size="5">Count of likes:</font>
+    <font size="5"><LocalizationSentence Sentence="@("Count of likes")" />:</font>
     <font size="5">@User.CountOfLikes</font>
     <div></div>
 
-    <font size="5">Login:</font>
+    <font size="5"><LocalizationSentence Sentence="@("Login")" />:</font>
     <font style="display: @((!ChangeKeys[3]) ? "" : "none")" size="5">@User.Login</font>
     <input style="display: @((ChangeKeys[3]) ? "" : "none")" bind="@User.Login" />
     @if (User.IsCurrentUser)
@@ -87,13 +89,13 @@
 
     @if (User.IsCurrentUser)
     {
-        <font size="5">New password:</font>
+        <font size="5"><LocalizationSentence Sentence="@("New password")" />:</font>
         <font style="display: @((!ChangeKeys[6]) ? "" : "none")" size="5"></font>
         <input style="display: @((ChangeKeys[6]) ? "" : "none")" bind="@User.Password" />
         <button onclick="@(() => ChangeProperty(6))">change</button>
     }
 
-    <font size="5">Email:</font>
+    <font size="5"><LocalizationSentence Sentence="@("Email")" />:</font>
     <font style="display: @((!ChangeKeys[4]) ? "" : "none")" size="5">@User.Email</font>
     <input style="display: @((ChangeKeys[4]) ? "" : "none")" bind="@User.Email" />
     @if (User.IsCurrentUser)

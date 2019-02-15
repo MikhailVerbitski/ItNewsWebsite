@@ -1,11 +1,9 @@
 ﻿@page "/Login"
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
-@using Domain.Contracts.Models.ViewModels.Account
 @using Domain.Contracts.Models.ViewModels.Account
 
-<div class="content-body content content-radius content-account">
-    <h1>Log in</h1>
+<div class="content-body content content-account">
+    <h1><LocalizationSentence Sentence="@("Log in")" /></h1>
     @if (ServerErrors != null)
     {
         <div class="validationsummary">
@@ -20,24 +18,24 @@
     }
     <div class="pure-form pure-form-stacked">
 
-        <label for="Login"><font size="5">Login</font></label>
+        <label for="Login"><font size="5"><LocalizationSentence Sentence="@("Login")" /></font></label>
         <input id="Login" type="text" placeholder="Login" bind="@login.Login" />
         <ValidationError Subject="@login" Property="@nameof(login.Login)" />
         <br />
 
-        <label for="password"><font size="5">Password</font></label>
+        <label for="password"><font size="5"><LocalizationSentence Sentence="@("Password")" /></font></label>
         <input id="password" type="password" placeholder="Password" bind="@login.Password" />
         <ValidationError Subject="@login" Property="@nameof(login.Password)" />
         <br />
 
         <div class="grid-login-remember">
-            <label for="remember" class="pure-checkbox" style="margin: 0;"><font size="3">Remember me</font></label>
+            <label for="remember" class="pure-checkbox" style="margin: 0;"><font size="3"><LocalizationSentence Sentence="@("Remember me")" /></font></label>
             <input id="remember" type="checkbox" bind="@login.RememberMe" style="width: auto;" />
         </div>
         <ValidationError Subject="@login" Property="@nameof(login.RememberMe)" />
         <br />
 
-        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Login</button>
+        <button onclick="@SubmitForm" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send")" /></button>
     </div>
 </div>
 
@@ -45,7 +43,7 @@
 @functions{
     private List<string> ServerErrors { get; set; }
     private bool DisplayValidationSummary { get; set; } = false;
-    LoginValidationViewModel login { get; set; } = new LoginValidationViewModel();
+    private LoginValidationViewModel login { get; set; } = new LoginValidationViewModel();
 
     private async Task SubmitForm()
     {

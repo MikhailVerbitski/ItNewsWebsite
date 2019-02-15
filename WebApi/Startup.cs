@@ -62,7 +62,6 @@ namespace WebApi
             IMapper mapper = mappingConfig.CreateMapper();
 
             services.AddSingleton(mapper);
-            services.AddMvc();
 
             services.AddTransient<IJwtTokenService, JwtTokenService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -97,6 +96,9 @@ namespace WebApi
             services.AddScoped<ServiceOfSection>();
             services.AddScoped<ServiceOfTag>();
             services.AddScoped<ServiceOfUser>();
+
+            services.AddLocalization(a => a.ResourcesPath = "Resources");
+            services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment hostingEnvironment)
@@ -116,18 +118,16 @@ namespace WebApi
                 context.Database.EnsureCreated();
             }
 
-
+            app.UseStaticFiles();
             var supportedCultures = new[]
             {
-                new CultureInfo("en"),
-                new CultureInfo("ru"),
+                new CultureInfo("en-US"),
+                new CultureInfo("ru-RU"),
             };
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
-                DefaultRequestCulture = new RequestCulture("en"),
-                // Formatting numbers, dates, etc.
+                DefaultRequestCulture = new RequestCulture("en-US"),
                 SupportedCultures = supportedCultures,
-                // UI strings that we have localized.
                 SupportedUICultures = supportedCultures
             });
 

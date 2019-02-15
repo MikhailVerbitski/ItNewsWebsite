@@ -3,7 +3,6 @@
 @inject Blazor.FileReader.IFileReaderService fileReadService
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject HttpClient Http
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @inject Components.ServiceOfImage serviceOfImage
 @using Domain.Contracts.Models.ViewModels.Tag;
 @using Domain.Contracts.Models.ViewModels.Post;
@@ -12,13 +11,13 @@
 <div id="container-post">
     <ValidationSummary Subject="@post" />
     <h1 style="text-align: center;">@(post.Header)</h1>
-    <h3>Section: <Tag tag="@(post.Section)" /></h3>
+    <h3><LocalizationSentence Sentence="@("Section")" />: <Tag tag="@(post.Section)" /></h3>
     <br />
     <p class="post-content">
         <Markdown Content="@(post.Content)" />
     </p>
     <br />
-    <span>Tags:</span>
+    <span><LocalizationSentence Sentence="@("Tags")" />:</span>
     <ListViewTemplateWithIf Items="@(post.Tags)">
         <ItemTemplate>
             <div style="display: inline-block; margin-top: 4px;" class="tag">@context.Name</div>
@@ -26,14 +25,14 @@
     </ListViewTemplateWithIf>
 </div>
 <hr />
-<h2 style="text-align: center; padding:20px;">Constructor</h2>
+<h2 style="text-align: center; padding:20px;"><LocalizationSentence Sentence="@("Constructor")" /></h2>
 <div id="createPost-top">
     <div class="pure-form pure-form-stacked">
-        <label for="header">Header</label>
+        <label for="header"><LocalizationSentence Sentence="@("Header")" /></label>
         <input id="header" type="text" bind="@(post.Header)" />
         <ValidationError Subject="@post" Property="@nameof(post.Header)" />
 
-        <label for="selection">Selection: </label>
+        <label for="selection"><LocalizationSentence Sentence="@("Section")" />: </label>
         <select bind="@(post.Section)">
             @if (Selections != null)
             {
@@ -44,13 +43,13 @@
             }
         </select>
         <div>
-            <label for="file" class="pure-button">Load image</label>
+            <label for="file" class="pure-button"><LocalizationSentence Sentence="@("Upload image")" /></label>
             <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
-            <label for="content">Content</label>
+            <label for="content"><LocalizationSentence Sentence=@("Content") /></label>
             <textarea id="content" rows="10" bind="@(post.Content)" />
             <ValidationError Subject="@post" Property="@nameof(post.Content)" />
         </div>
-        <label for="tagInput">Tags:</label>
+        <label for="tagInput"><LocalizationSentence Sentence="@("Tags")" />:</label>
         <div id="grid-tag">
             <div style="display: inline-block;">
                 <ListViewTemplateWithIf Items="@(post.Tags)">
@@ -71,12 +70,12 @@
         <br />
         @if (IsEditPost)
         {
-            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary">Update</button>
+            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Update")" /></button>
         }
         else
         {
-            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary">Send</button>
-            <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary">Send as draft</button>
+            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send")" /></button>
+            <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send as draft")" /></button>
         }
     </div>
 </div>
@@ -114,7 +113,6 @@
         int id;
         if (Id != null && Int32.TryParse(Id, out id))
         {
-            //post = await serviceOfAuthorize.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Edit?postId={id}");
             post = await serviceOfAuthorize.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Read?type=PostUpdateViewModel&where=Id=={id}");
             post.Content = new ReverseMarkdown.Converter().Convert(post.Content);
             IsEditPost = true;

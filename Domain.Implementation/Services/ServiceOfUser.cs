@@ -87,11 +87,11 @@ namespace Domain.Implementation.Services
 
                 if (userViewModel.Password != null && userViewModel.Password != "")
                 {
-                    await ChangePassword(applicationUser.Id, userViewModel.Password);
+                    ChangePassword(applicationUser.Id, userViewModel.Password);
                 }
                 if(await GetUserPriority(applicationUserCurrent) == 3)
                 {
-                    await ChangeRole(applicationUser, userViewModel.Role);
+                    ChangeRole(applicationUser, userViewModel.Role);
                 }
                 if(userViewModel.UserClaims != null)
                 {
@@ -101,10 +101,10 @@ namespace Domain.Implementation.Services
                 }
             }
         }
-        public async Task ChangePassword(string applicationUserId, string newPassword)
+        public void ChangePassword(string applicationUserId, string newPassword)
         {
             var lastApplicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
-            await userManager.ChangePasswordAsync(lastApplicationUser, lastApplicationUser.PasswordHash, newPassword);
+            userManager.ChangePasswordAsync(lastApplicationUser, lastApplicationUser.PasswordHash, newPassword);
         }
         public UserClaim GetUserClaim(string ApplicationUserId, string ClaimType)
         {

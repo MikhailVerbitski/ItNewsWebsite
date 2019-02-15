@@ -116,10 +116,10 @@ namespace Domain.Implementation.Services
             var newPostCreateEditViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
             return newPostCreateEditViewModel;
         }
-        public async Task Update(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
+        public void Update(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
         {
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile);
-            await Update(applicationUserCurrent, postCreateEditViewModel, lastPostEntity);
+            Update(applicationUserCurrent, postCreateEditViewModel, lastPostEntity);
         }
         public async Task Update(ApplicationUserEntity applicationUserCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
         {

@@ -116,7 +116,7 @@ namespace WebApi.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, (roles.Contains("admin") ? "admin" : "user")),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, roles.FirstOrDefault()),
                     new Claim("UserId" , user.Id)
                 };
 
@@ -128,7 +128,7 @@ namespace WebApi.Controllers
             }
             return Json(response);
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, writer, admin")]
         [HttpGet]
         public IActionResult TokenVerification()
         {

@@ -5,8 +5,8 @@
 @addTagHelper *, Blazor.Validation
 @using Domain.Contracts.Models.ViewModels.Account
 
-<div class="content-body content content-radius content-account">
-    <h1>Registration</h1>
+<div class="content-body content content-account">
+    <h1><LocalizationSentence Sentence="@("Registration")" /></h1>
     @if (DisplayValidationSummary)
     {
         <div>
@@ -28,67 +28,67 @@
     }
     <div class="pure-form pure-form-stacked">
 
-        <label for="FirstName"><font size="5">First Name</font></label>
+        <label for="FirstName"><font size="5"><LocalizationSentence Sentence="@("First Name")" /></font></label>
         <input id="FirstName" type="text" bind="@user.FirstName" />
         <ValidationError Subject="@user" Property="@nameof(user.FirstName)" />
         <br />
 
-        <label for="LastName"><font size="5">Last Name</font></label>
+        <label for="LastName"><font size="5"><LocalizationSentence Sentence="@("Last Name")" /></font></label>
         <input id="LastName" type="text" bind="@user.LastName" />
         <ValidationError Subject="@user" Property="@nameof(user.LastName)" />
         <br />
 
-        <label for="Login"><font size="5">Login</font></label>
+        <label for="Login"><font size="5"><LocalizationSentence Sentence="@("Login")" /></font></label>
         <input id="Login" type="text" bind="@user.Login" />
         <ValidationError Subject="@user" Property="@nameof(user.Login)" />
         <br />
 
-        <label for="Email"><font size="5">Email</font></label>
+        <label for="Email"><font size="5"><LocalizationSentence Sentence="@("Email")" /></font></label>
         <input id="Email" type="text" bind="@user.Email" />
         <ValidationError Subject="@user" Property="@nameof(user.Email)" />
         <br />
 
-        <label for="Password"><font size="5">Password</font></label>
+        <label for="Password"><font size="5"><LocalizationSentence Sentence="@("Password")" /></font></label>
         <input id="Password" type="password" bind="@user.Password" />
         <ValidationError Subject="@user" Property="@nameof(user.Password)" />
         <br />
 
-        <label for="ConfirmPassword"><font size="5">Confirm password</font></label>
+        <label for="ConfirmPassword"><font size="5"><LocalizationSentence Sentence="@("Confirm password")" /></font></label>
         <input id="ConfirmPassword" type="password" bind="@user.ConfirmPassword" />
         <ValidationError Subject="@user" Property="@nameof(user.ConfirmPassword)" />
         <br />
 
-        <button onclick="@SubmitForm" class="pure-button pure-button-primary">Registration</button>
+        <button onclick="@SubmitForm" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send")" /></button>
     </div>
 </div>
 
-    @functions{
-        RegisterValidationViewModel user { get; set; } = new RegisterValidationViewModel();
-        private bool DisplayValidationSummary { get; set; } = false;
-        private List<string> ServerErrors { get; set; }
+@functions{
+    RegisterValidationViewModel user { get; set; } = new RegisterValidationViewModel();
+    private bool DisplayValidationSummary { get; set; } = false;
+    private List<string> ServerErrors { get; set; }
 
-        private async Task SubmitForm()
+    private async Task SubmitForm()
+    {
+        ServerErrors = null;
+        if (!user.HasErrors)
         {
-            ServerErrors = null;
-            if (!user.HasErrors)
+            var registerUser = new RegisterViewModel()
             {
-                var registerUser = new RegisterViewModel()
-                {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Login = user.Login,
-                    Email = user.Email,
-                    Password = user.Password
-                };
-                try
-                {
-                    ServerErrors = await Http.PostJsonAsync<List<string>>("/api/Token/Registration", registerUser);
-                }
-                catch
-                {
-                    UriHelper.NavigateTo("/Login");
-                }
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Login = user.Login,
+                Email = user.Email,
+                Password = user.Password
+            };
+            try
+            {
+                ServerErrors = await Http.PostJsonAsync<List<string>>("/api/Token/Registration", registerUser);
             }
-            DisplayValidationSummary = true;
+            catch
+            {
+                UriHelper.NavigateTo("/Login");
+            }
         }
+        DisplayValidationSummary = true;
     }
+}

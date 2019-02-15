@@ -37,14 +37,14 @@ namespace Domain.Contracts.Models.ViewModels.Account
             {
                 if (string.IsNullOrEmpty(this.Login))
                 {
-                    yield return $"{nameof(this.Login)} is mandatory";
+                    yield return "Login is mandatory";
                 }
             }
             if (property == null || property == nameof(this.Password))
             {
                 if (string.IsNullOrEmpty(this.Password))
                 {
-                    yield return $"{nameof(this.Password)} is mandatory";
+                    yield return "Password is mandatory";
                 }
                 if (this.Password != null && this.Password.Length < 6)
                 {

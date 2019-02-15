@@ -55,7 +55,7 @@ namespace Domain.Implementation.Services
             var isRoleExist = await roleManager.RoleExistsAsync("user");
             if (isRoleExist)
             {
-                var resultAddRole = await userManager.AddToRoleAsync(applicationUser, "user");
+                userManager.AddToRoleAsync(applicationUser, "user");
             }
             if(applicationUser.UserProfileId == null)
             {

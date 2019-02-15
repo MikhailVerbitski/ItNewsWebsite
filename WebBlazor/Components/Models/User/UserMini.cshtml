@@ -5,8 +5,8 @@
     <img src="@((User.Avatar == null) ? "/img/default-user-profile-image.png" : User.Avatar)" class="userMiniImg" asp-append-version="true" height="50" width="50" />
     <div>
         <p><a href="/UserPage/@(User.UserProfileId)"><font size="3">(<font color="@User.Role.Color">@User.Role.Name</font>) @User.FirstName @User.LastName</font></a></p>
-        <p>Ratin - @User.CountOfLikes</p>
-        <p><font size="2">registered for @DateConverter.GetTime(User.Created)</font></p>
+        <p><LocalizationSentence Sentence="@("Rating")" /> - @User.CountOfLikes</p>
+        <p><font size="2"><LocalizationSentence Sentence="@("Registered")" /> @DateConverter.GetTime(User.Created)</font></p>
     </div>
 </div>
 

@@ -3,7 +3,6 @@
 @using Domain.Contracts.Models.ViewModels.Tag
 @using Domain.Contracts.Models.ViewModels.Post
 @layout MainLayout
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div class="grid-content">
@@ -11,15 +10,15 @@
         <div class="side-bar">
             @if (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)
             {
-                <div class="content-body content-radius-top">
-                    <a href="/CreatePost" class="pure-button create-post-link content-radius-top"><font size="4">Create new post</font></a>
+                <div class="content-body">
+                    <a href="/CreatePost" class="pure-button create-post-link"><font size="4"><LocalizationSentence Sentence="@("Create new post")" /></font></a>
                 </div>
             }
-            <div class="content-body @((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1) ? "" : "content-radius-top")">
+            <div class="content-body">
                 <div id="keywords"></div>
             </div>
-            <div class="content-body content-radius-bott" style="padding: 20px;">
-                <a href="/@("Top:1:f:fin")"><h1 style="text-align:center;">Top posts</h1></a>
+            <div class="content-body" style="padding: 20px;">
+                <a href="/@("Top:1:f:fin")"><h1 style="text-align:center;"><LocalizationSentence Sentence="@("Top posts")" /></h1></a>
                 <br />
                 @if (TheFirstFiveWithTheHighestRating != null)
                 {
@@ -38,7 +37,7 @@
             </div>
         </div>
     </div>
-    <div class="content-body content content-radius" id="posts">
+    <div class="content-body content" id="posts">
         @Body
     </div>
 </div>

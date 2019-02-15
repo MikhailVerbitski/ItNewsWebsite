@@ -1,0 +1,13 @@
+﻿@inject Components.ServiceOfLocalization serviceOfLocalization
+
+@((language != null) ? (Sentence == "" || Sentence == null) ? "" : language[Sentence] : "")
+
+@functions{
+    [Parameter] private string Sentence { get; set; }
+    private Dictionary<string, string> language;
+
+    protected async override Task OnInitAsync()
+    {
+        language = await serviceOfLocalization.LanguageDictionary;
+    }
+}

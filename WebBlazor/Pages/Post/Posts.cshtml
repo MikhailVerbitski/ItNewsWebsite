@@ -2,11 +2,23 @@
 @page "/{Param}"
 
 <span>
-    <font size="3">Sort by: </font>
-    <a><font size="2" color="@(Param.Contains("Time")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Time") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Time"; }; Param = string.Join(":", mas); } )">time</font></a>
-    <a><font size="2" color="@(Param.Contains("Top")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Top") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Top"; } Param = string.Join(":", mas); })">rating</font></a>
+    <font size="3"><LocalizationSentence Sentence="@("Sort by")" />: </font>
+    <a>
+        <font size="2" color="@(Param.Contains("Time")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Time") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Time"; }; Param = string.Join(":", mas); } )">
+            <LocalizationSentence Sentence="@("Time")" />
+        </font>
+    </a>
+    <a>
+        <font size="2" color="@(Param.Contains("Top")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Top") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Top"; } Param = string.Join(":", mas); })">
+            <LocalizationSentence Sentence="@("Rating")" />
+        </font>
+    </a>
 
-    <a><font size="2" color="@(Param.Contains("r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">Reverse</font></a>
+    <a>
+    <font size="2" color="@(Param.Contains("r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">
+        <LocalizationSentence Sentence="@("Reverse")" />
+    </font>
+    </a>
 </span>
 <div id="container-posts">
     <ListOfPosts PostType="@(typeof(Domain.Contracts.Models.ViewModels.Post.PostCompactViewModel))" param="@Param" />

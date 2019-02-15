@@ -117,16 +117,172 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Account-Login-Email" xml:space="preserve">
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="blocked" xml:space="preserve">
+    <value>blocked</value>
+  </data>
+  <data name="Change image" xml:space="preserve">
+    <value>Change image</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Comments</value>
+  </data>
+  <data name="Confirm password" xml:space="preserve">
+    <value>Confirm password</value>
+  </data>
+  <data name="Confirm Password is mandatory" xml:space="preserve">
+    <value>Confirm Password is mandatory</value>
+  </data>
+  <data name="Constructor" xml:space="preserve">
+    <value>Constructor</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="Count of likes" xml:space="preserve">
+    <value>Count of likes</value>
+  </data>
+  <data name="Create new post" xml:space="preserve">
+    <value>Create new post</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Email" xml:space="preserve">
     <value>Email</value>
   </data>
-  <data name="Account-Login-Password" xml:space="preserve">
-    <value>Пароль</value>
+  <data name="Email is mandatory" xml:space="preserve">
+    <value>Email is mandatory</value>
   </data>
-  <data name="Account-Login-Remember" xml:space="preserve">
-    <value>Запомнить меня</value>
+  <data name="Finished" xml:space="preserve">
+    <value>Finished</value>
   </data>
-  <data name="Account-Login-Submit" xml:space="preserve">
-    <value>Отправить</value>
+  <data name="First Name" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="First Name is mandatory" xml:space="preserve">
+    <value>First Name is mandatory</value>
+  </data>
+  <data name="Header" xml:space="preserve">
+    <value>Header</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="Last Name is mandatory" xml:space="preserve">
+    <value>Last Name is mandatory</value>
+  </data>
+  <data name="lock" xml:space="preserve">
+    <value>lock</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Log in</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Login is mandatory" xml:space="preserve">
+    <value>Login is mandatory</value>
+  </data>
+  <data name="Login out" xml:space="preserve">
+    <value>Login out</value>
+  </data>
+  <data name="minimum password length is 6 characters" xml:space="preserve">
+    <value>minimum password length is 6 characters</value>
+  </data>
+  <data name="New password" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="not confirmed" xml:space="preserve">
+    <value>not confirmed</value>
+  </data>
+  <data name="nothing found :(" xml:space="preserve">
+    <value>nothing found :(</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Password is mandatory" xml:space="preserve">
+    <value>Password is mandatory</value>
+  </data>
+  <data name="Passwords do not match" xml:space="preserve">
+    <value>Passwords do not match</value>
+  </data>
+  <data name="Posts" xml:space="preserve">
+    <value>Posts</value>
+  </data>
+  <data name="Posts yet :(" xml:space="preserve">
+    <value>Posts yet :(</value>
+  </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+  <data name="reason" xml:space="preserve">
+    <value>reason</value>
+  </data>
+  <data name="Registered" xml:space="preserve">
+    <value>Registered</value>
+  </data>
+  <data name="Registration" xml:space="preserve">
+    <value>Registration</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>Remember me</value>
+  </data>
+  <data name="Reverse" xml:space="preserve">
+    <value>Reverse</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Section" xml:space="preserve">
+    <value>Section</value>
+  </data>
+  <data name="Selection" xml:space="preserve">
+    <value>Selection</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="Send as draft" xml:space="preserve">
+    <value>Send as draft</value>
+  </data>
+  <data name="Sort by" xml:space="preserve">
+    <value>Sort by</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Top posts" xml:space="preserve">
+    <value>Top posts</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Unfinished" xml:space="preserve">
+    <value>Unfinished</value>
+  </data>
+  <data name="unlock" xml:space="preserve">
+    <value>unlock</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="Upload image" xml:space="preserve">
+    <value>Upload image</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Users</value>
   </data>
 </root>

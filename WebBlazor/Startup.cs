@@ -15,8 +15,9 @@ namespace WebBlazor
             services.AddStorage();
             services.AddSingleton<IFileReaderService>(sp => new FileReaderService());
             services.AddSingleton<ServiceOfAuthorize>();
+            services.AddSingleton<ServiceOfLocalization>();
             services.AddScoped<ServiceOfImage>();
-            services.AddScoped<ServiceOfTheme>();
+            services.AddScoped<ServiceOfTheme>(); 
         }
 
         public void Configure(IBlazorApplicationBuilder app)

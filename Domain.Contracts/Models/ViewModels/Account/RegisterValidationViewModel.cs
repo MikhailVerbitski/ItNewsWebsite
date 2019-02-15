@@ -43,35 +43,35 @@ namespace Domain.Contracts.Models.ViewModels.Account
             {
                 if (string.IsNullOrEmpty(this.FirstName))
                 {
-                    yield return $"{nameof(this.FirstName)} is mandatory";
+                    yield return "First Name is mandatory";
                 }
             }
             if (property == null || property == nameof(this.LastName))
             {
                 if (string.IsNullOrEmpty(this.LastName))
                 {
-                    yield return $"{nameof(this.LastName)} is mandatory";
+                    yield return "Last Name is mandatory";
                 }
             }
             if (property == null || property == nameof(this.Email))
             {
                 if (string.IsNullOrEmpty(this.Email))
                 {
-                    yield return $"{nameof(this.Email)} is mandatory";
+                    yield return "Email is mandatory";
                 }
             }
             if (property == null || property == nameof(this.Login))
             {
                 if (string.IsNullOrEmpty(this.Login))
                 {
-                    yield return $"{nameof(this.Login)} is mandatory";
+                    yield return "Login is mandatory";
                 }
             }
             if (property == null || property == nameof(this.Password))
             {
                 if (string.IsNullOrEmpty(this.Password))
                 {
-                    yield return $"{nameof(this.Password)} is mandatory";
+                    yield return "Password is mandatory";
                 }
                 if (this.Password != null && this.Password.Length < 6)
                 {
@@ -82,11 +82,11 @@ namespace Domain.Contracts.Models.ViewModels.Account
             {
                 if (string.IsNullOrEmpty(this.ConfirmPassword))
                 {
-                    yield return $"{nameof(this.ConfirmPassword)} is mandatory";
+                    yield return "Confirm Password is mandatory";
                 }
                 if (this.Password != null && this.ConfirmPassword != null && this.Password != this.ConfirmPassword)
                 {
-                    yield return "passwords do not match";
+                    yield return "Passwords do not match";
                 }
             }
         }

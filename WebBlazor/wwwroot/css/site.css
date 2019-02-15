@@ -6,7 +6,6 @@
     position: fixed;
     top: 0; 
     background-color: #EFE7CC;
-    border-radius: 0 0 10px 10px;
     box-shadow: 0 0 10px black;
     padding: 12px 8px;
     z-index: 3;
@@ -14,17 +13,6 @@
 
 .content {
     opacity: 0.78;
-}
-
-.content-radius-top {
-    border-radius: 7px 7px 0 0 ;
-}
-
-.content-radius-bott {
-    border-radius: 0 0 7px 7px;
-}
-.content-radius {
-    border-radius: 7px;
 }
 
 .content-body {

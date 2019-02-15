@@ -24,7 +24,7 @@ namespace WebBlazor.Components
         public Task CreateHeader { get; set; }
         public bool IsAuthorize { get; set; } = false;
         public event Action UpdateAfterAuthorization;
-
+        
         public ServiceOfAuthorize(LocalStorage localStorage, HttpClient Http, IUriHelper UriHelper)
         {
             this.localStorage = localStorage;
@@ -59,7 +59,7 @@ namespace WebBlazor.Components
                 {
                     await Logout();
                 }
-                UpdateAfterAuthorization.Invoke();
+                UpdateAfterAuthorization?.Invoke();
             }
             return result;
         }

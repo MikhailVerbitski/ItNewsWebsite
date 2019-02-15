@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, writer, admin")]
     [ApiController]
     [Route("api/User/[action]")]
     public class UserController : Controller
