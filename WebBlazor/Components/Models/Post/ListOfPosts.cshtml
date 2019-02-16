@@ -1,5 +1,6 @@
 ﻿@inject Components.ServiceOfAuthorize serviceOfAuthorize
 @using Domain.Contracts.Models.ViewModels.Post
+@using Domain.Contracts.Models
 
 @if (listOfPosts == null)
 {
@@ -36,12 +37,12 @@ else
     [Parameter] private object listOfPosts { get; set; }
     private int count = 0;
     private bool notFirstTime = false;
-    private KeyValuePair<string, Func<string[], RequestParams>>[] config;
+    private KeyValuePair<string, Func<string[], PostReadRequestParams>>[] config;
 
     protected override void OnInit()
     {
         config = new[] {
-            new KeyValuePair<string,Func<string[],RequestParams>>("Top", a => new RequestParams()
+            new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Top", a => new PostReadRequestParams()
             {
                 type =PostType.Name,
                 count = null,
@@ -53,7 +54,7 @@ else
                 $"{(((a.Any(b => b.Contains("User")) || a.Contains("f")) && a.Any(b => b.Contains("ByTag"))) ? "and" : "")}" +
                 $"{(a.Any(b => b.Contains("ByTag")) ? $" Tags.Any(TagId=={a.Where(b => b.Contains("ByTag")).FirstOrDefault().Split('-')[1]})" : "")}" : null
             }),
-            new KeyValuePair<string,Func<string[],RequestParams>>("Time", a => new RequestParams()
+            new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Time", a => new PostReadRequestParams()
             {
                 type = PostType.Name,
                 count = null,
@@ -108,13 +109,5 @@ else
                 break;
         }
         StateHasChanged();
-    }
-
-    public class RequestParams
-    {
-        public string type { get; set; }
-        public int? count { get; set; }
-        public string where { get; set; }
-        public string orderBy { get; set; }
     }
 }

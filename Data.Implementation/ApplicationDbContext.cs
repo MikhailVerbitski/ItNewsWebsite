@@ -128,12 +128,12 @@ namespace Data.Implementation
                 .WithOne(a => a.Post)
                 .HasForeignKey(a => a.PostId);
             Post
-                .HasMany(a => a.Images)
+                .HasMany(a => a.PostRatings)
                 .WithOne(a => a.Post)
                 .HasForeignKey(a => a.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
             Post
-                .HasMany(a => a.PostRatings)
+                .HasMany(a => a.Images)
                 .WithOne(a => a.Post)
                 .HasForeignKey(a => a.PostId)
                 .OnDelete(DeleteBehavior.Cascade);

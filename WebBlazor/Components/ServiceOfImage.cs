@@ -1,5 +1,7 @@
 ﻿using Blazor.FileReader;
+using Domain.Contracts.Models;
 using Microsoft.AspNetCore.Blazor;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -20,12 +22,9 @@ namespace WebBlazor.Components
         {
             var Extension = ".png";
 
-            var images = await fileReadService.CreateReference(image).EnumerateFilesAsync();
-            var memoryStream = await images.First().CreateMemoryStreamAsync();
-
             var userImage = new UserImage()
             {
-                Data = memoryStream.ToArray(),
+                Data = await LoadImage(image),
                 Extension = Extension
             };
             return await Http.SendJsonAsync<string>(HttpMethod.Post, "/api/User/ChangeImage", userImage);
@@ -34,27 +33,19 @@ namespace WebBlazor.Components
         {
             var Extension = ".png";
 
-            var images = await fileReadService.CreateReference(image).EnumerateFilesAsync();
-            var memoryStream = await images.First().CreateMemoryStreamAsync();
-
             var postImage = new PostImage()
             {
                 PostId = postId,
-                Data = memoryStream.ToArray(),
+                Data = await LoadImage(image),
                 Extension = Extension
             };
             return await Http.SendJsonAsync<string>(HttpMethod.Post, "/api/Post/AddImage", postImage);
         }
-    }
-    class UserImage
-    {
-        public byte[] Data { get; set; }
-        public string Extension { get; set; }
-    }
-    class PostImage
-    {
-        public int PostId { get; set; }
-        public byte[] Data { get; set; }
-        public string Extension { get; set; }
+        public async Task<string> LoadImage(ElementRef image)
+        {
+            var images = await fileReadService.CreateReference(image).EnumerateFilesAsync();
+            var data = (await images.First().CreateMemoryStreamAsync()).ToArray();
+            return Convert.ToBase64String(data);
+        }
     }
 }

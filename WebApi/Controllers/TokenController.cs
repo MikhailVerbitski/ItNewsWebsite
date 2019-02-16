@@ -14,6 +14,7 @@ using Domain.Contracts.Models.ViewModels.Account;
 using Domain.Contracts.Validators.ViewModels.Account;
 using System.Linq;
 using Domain.Contracts.Models.ViewModels;
+using System.IO;
 
 namespace WebApi.Controllers
 {

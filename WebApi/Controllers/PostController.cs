@@ -31,6 +31,13 @@ namespace WebApi.Controllers
             var posts = serviceOfPost.Search(property);
             return Json(posts);
         }
+        [HttpGet]
+        public async Task<JsonResult> Create()
+        {
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var post = await serviceOfPost.Create(userId, null);
+            return Json(post);
+        }
         [HttpPost]
         public async Task<JsonResult> Create(PostUpdateViewModel post)
         {
@@ -58,17 +65,9 @@ namespace WebApi.Controllers
             var rating = serviceOfPost.RatingPost(currentUserId, postId, score);
             return Json(rating);
         }
-
-        public class RequestParams
-        {
-            public string type { get; set; }
-            public int? count { get; set; }
-            public string where { get; set; }
-            public string orderBy { get; set; }
-        }
         [AllowAnonymous]
         [HttpPost]
-        public JsonResult Read([FromBody]RequestParams readRequest)
+        public JsonResult Read([FromBody]PostReadRequestParams readRequest)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var post = serviceOfPost.Get(readRequest.type, currentUserId, readRequest.count, readRequest.where, readRequest.orderBy);

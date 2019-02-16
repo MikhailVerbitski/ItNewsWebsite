@@ -15,7 +15,7 @@ namespace WebBlazor.JsInteropClasses
             this.localStorage = localStorage;
         }
 
-        public string PahtIcon { get { return (ThemeIsDefault == null || ThemeIsDefault == "False") ? "/img/moon.png" : "/img/sun.png"; } }
+        public string PahtIcon { get { return (!(ThemeIsDefault == null || ThemeIsDefault == "False")) ? "/img/sun.png" : "/img/moon.png"; } }
 
         public async Task Init()
         {

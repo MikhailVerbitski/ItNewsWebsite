@@ -1,84 +1,89 @@
 ﻿@page "/CreatePost/"
 @page "/CreatePost/{Id}"
+@implements IDisposable
 @inject Blazor.FileReader.IFileReaderService fileReadService
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @inject HttpClient Http
 @inject Components.ServiceOfImage serviceOfImage
 @using Domain.Contracts.Models.ViewModels.Tag;
 @using Domain.Contracts.Models.ViewModels.Post;
+@using Domain.Contracts.Models;
 @using Markdig;
 
-<div id="container-post">
-    <ValidationSummary Subject="@post" />
-    <h1 style="text-align: center;">@(post.Header)</h1>
-    <h3><LocalizationSentence Sentence="@("Section")" />: <Tag tag="@(post.Section)" /></h3>
-    <br />
-    <p class="post-content">
-        <Markdown Content="@(post.Content)" />
-    </p>
-    <br />
-    <span><LocalizationSentence Sentence="@("Tags")" />:</span>
-    <ListViewTemplateWithIf Items="@(post.Tags)">
-        <ItemTemplate>
-            <div style="display: inline-block; margin-top: 4px;" class="tag">@context.Name</div>
-        </ItemTemplate>
-    </ListViewTemplateWithIf>
-</div>
-<hr />
-<h2 style="text-align: center; padding:20px;"><LocalizationSentence Sentence="@("Constructor")" /></h2>
-<div id="createPost-top">
-    <div class="pure-form pure-form-stacked">
-        <label for="header"><LocalizationSentence Sentence="@("Header")" /></label>
-        <input id="header" type="text" bind="@(post.Header)" />
-        <ValidationError Subject="@post" Property="@nameof(post.Header)" />
-
-        <label for="selection"><LocalizationSentence Sentence="@("Section")" />: </label>
-        <select bind="@(post.Section)">
-            @if (Selections != null)
-            {
-                foreach (var item in Selections)
-                {
-                    <option>@item</option>
-                }
-            }
-        </select>
-        <div>
-            <label for="file" class="pure-button"><LocalizationSentence Sentence="@("Upload image")" /></label>
-            <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
-            <label for="content"><LocalizationSentence Sentence=@("Content") /></label>
-            <textarea id="content" rows="10" bind="@(post.Content)" />
-            <ValidationError Subject="@post" Property="@nameof(post.Content)" />
-        </div>
-        <label for="tagInput"><LocalizationSentence Sentence="@("Tags")" />:</label>
-        <div id="grid-tag">
-            <div style="display: inline-block;">
-                <ListViewTemplateWithIf Items="@(post.Tags)">
-                    <ItemTemplate>
-                        <div style="display: inline-block; margin-top: 4px;" class="tag" onclick="@(() => DeselectTag(context))">@(context.Name)</div>
-                    </ItemTemplate>
-                </ListViewTemplateWithIf>
-            </div>
-            <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress" />
-            <datalist id="listTags">
-                <ListViewTemplateWithIf Items="@ServerTags">
-                    <ItemTemplate>
-                        <option>@(context.Name)</option>
-                    </ItemTemplate>
-                </ListViewTemplateWithIf>
-            </datalist>
-        </div>
+@if (post != null)
+{
+    <div id="container-post">
+        <ValidationSummary Subject="@post" />
+        <h1 style="text-align: center;">@(post.Header)</h1>
+        <h3><LocalizationSentence Sentence="@("Section")" />: <Tag tag="@(post.Section)" /></h3>
         <br />
-        @if (IsEditPost)
-        {
-            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Update")" /></button>
-        }
-        else
-        {
-            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send")" /></button>
-            <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send as draft")" /></button>
-        }
+        <p class="post-content">
+            <Markdown Content="@(post.Content)" />
+        </p>
+        <br />
+        <span><LocalizationSentence Sentence="@("Tags")" />:</span>
+        <ListViewTemplateWithIf Items="@(post.Tags)">
+            <ItemTemplate>
+                <div style="display: inline-block; margin-top: 4px;" class="tag">@context.Name</div>
+            </ItemTemplate>
+        </ListViewTemplateWithIf>
     </div>
-</div>
+    <hr />
+    <h2 style="text-align: center; padding:20px;"><LocalizationSentence Sentence="@("Constructor")" /></h2>
+    <div id="createPost-top">
+        <div class="pure-form pure-form-stacked">
+            <label for="header"><LocalizationSentence Sentence="@("Header")" /></label>
+            <input id="header" type="text" bind="@(post.Header)" />
+            <ValidationError Subject="@post" Property="@nameof(post.Header)" />
+
+            <label for="selection"><LocalizationSentence Sentence="@("Section")" />: </label>
+            <select bind="@(post.Section)">
+                @if (Selections != null)
+                {
+                    foreach (var item in Selections)
+                    {
+                        <option>@item</option>
+                    }
+                }
+            </select>
+            <div>
+                <label for="file" class="pure-button"><LocalizationSentence Sentence="@("Upload image")" /></label>
+                <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
+                <label for="content"><LocalizationSentence Sentence=@("Content") /></label>
+                <textarea id="content" rows="10" bind="@(post.Content)" />
+                <ValidationError Subject="@post" Property="@nameof(post.Content)" />
+            </div>
+            <label for="tagInput"><LocalizationSentence Sentence="@("Tags")" />:</label>
+            <div id="grid-tag">
+                <div style="display: inline-block;">
+                    <ListViewTemplateWithIf Items="@(post.Tags)">
+                        <ItemTemplate>
+                            <div style="display: inline-block; margin-top: 4px;" class="tag" onclick="@(() => DeselectTag(context))">@(context.Name)</div>
+                        </ItemTemplate>
+                    </ListViewTemplateWithIf>
+                </div>
+                <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress" />
+                <datalist id="listTags">
+                    <ListViewTemplateWithIf Items="@ServerTags">
+                        <ItemTemplate>
+                            <option>@(context.Name)</option>
+                        </ItemTemplate>
+                    </ListViewTemplateWithIf>
+                </datalist>
+            </div>
+            <br />
+            @if (IsEditPost)
+            {
+                <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Update")" /></button>
+            }
+            else
+            {
+                <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send as draft")" /></button>
+            }
+            <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send")" /></button>
+        </div>
+    </div>
+}
 
 @functions{
     [Parameter] private string Id { get; set; }
@@ -91,20 +96,14 @@
 
     private ElementRef files;
 
-    private PostUpdateValidationViewModel post = new PostUpdateValidationViewModel()
-    {
-        Header = "New Post",
-        Content = "# Content",
-        Tags = new List<TagViewModel>(),
-        Images = new List<string>()
-    };
+    private PostUpdateValidationViewModel post;
 
     private bool IsEditPost = false;
+    private bool IsSend = false;
 
     protected override async Task OnInitAsync()
     {
         Selections = (Selections == null) ? await serviceOfAuthorize.GetJsonAsync<List<string>>("api/Post/GetListOfSelections") : Selections;
-        post.Section = Selections.First();
         ServerTags = (ServerTags == null) ? await serviceOfAuthorize.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags") : ServerTags;
         ServerTags = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
     }
@@ -113,11 +112,21 @@
         int id;
         if (Id != null && Int32.TryParse(Id, out id))
         {
-            post = await serviceOfAuthorize.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Read?type=PostUpdateViewModel&where=Id=={id}");
+            var postRequest = new PostReadRequestParams()
+            {
+                type = "PostUpdateViewModel",
+                where = $"Id=={id}",
+                count = 1
+            };
+            post = await serviceOfAuthorize.PostJsonAsync<PostUpdateValidationViewModel>($"/api/Post/Read", postRequest);
             post.Content = new ReverseMarkdown.Converter().Convert(post.Content);
             IsEditPost = true;
-            await OnInitAsync();
         }
+        else
+        {
+            post = await serviceOfAuthorize.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Create");
+        }
+        post.Section = Selections.First();
     }
     private async Task UpdateCreate(bool isFinished = false)
     {
@@ -136,15 +145,8 @@
                 Tags = post.Tags,
                 UserProfileId = post.UserProfileId
             };
-            if (IsEditPost)
-            {
-                await serviceOfAuthorize.PostJsonAsync<object>("api/Post/Update", postUpdate);
-            }
-            else
-            {
-                postUpdate = await serviceOfAuthorize.SendJsonAsync<PostUpdateViewModel>(HttpMethod.Post, "api/Post/Create", postUpdate);
-                UriHelper.NavigateTo($"/Post/{postUpdate.PostId}");
-            }
+            await serviceOfAuthorize.PostJsonAsync<object>("api/Post/Update", postUpdate);
+            IsSend = true;
             UriHelper.NavigateTo("/");
         }
     }
@@ -191,5 +193,14 @@
         var path = await serviceOfImage.LoadPostImage(files, post.PostId);
         (post.Images as List<string>).Add(path);
         post.Content += $"{Environment.NewLine}![comment to the image]({path})";
+    }
+    public void Dispose()
+    {
+        if(!IsSend)
+        {
+            Console.WriteLine("auto save");
+            IsEditPost = true;
+            UpdateCreate(false);
+        }
     }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Domain.Contracts.Models
+﻿namespace Domain.Contracts.Models
 {
     public class UserImage
     {
-        public byte[] Data { get; set; }
+        public string Data { get; set; }
         public string Extension { get; set; }
     }
 }

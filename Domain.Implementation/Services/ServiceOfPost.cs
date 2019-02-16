@@ -5,9 +5,9 @@ using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
+using Domain.Contracts.Models.ViewModels.Tag;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -80,6 +80,19 @@ namespace Domain.Implementation.Services
             {
                 return null;
             }
+            if(postCreateEditViewModel == null)
+            {
+                var newPost = repositoryOfPost.Create(new PostEntity()
+                {
+                    Header = "New Post",
+                    Content = "# Content",
+                    UserProfileId = applicationUserCurrent.UserProfileId
+                });
+                var newPostViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(newPost);
+                newPostViewModel.Tags = new List<TagViewModel>();
+                newPostViewModel.Images = new List<string>();
+                return newPostViewModel;
+            }
             PostEntity postEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags, a => a.UserProfile);
             if (postEntity != null)
             {
@@ -103,7 +116,7 @@ namespace Domain.Implementation.Services
                 {
                     return repositoryOfImage.Create(new ImageEntity()
                     {
-                        Path = a /*serviceOfImage.RenameImage("Post", a, postEntity.Id.ToString())*/,
+                        Path = a,
                         PostId = postEntity.Id
                     });
                 })
@@ -123,7 +136,7 @@ namespace Domain.Implementation.Services
         }
         public async Task Update(ApplicationUserEntity applicationUserCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
         {
-            lastPostEntity = (lastPostEntity == null) ? repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags, a => a.UserProfile) : lastPostEntity;
+            lastPostEntity = (lastPostEntity == null) ? repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags, a => a.UserProfile, a => a.Images) : lastPostEntity;
             var postEntity = mapper.Map<PostUpdateViewModel, PostEntity>(postCreateEditViewModel);
             if (!await serviceOfUser.IsThereAccess(new[] { 2, 3 }, applicationUserCurrent, lastPostEntity.UserProfile.ApplicationUserId, true))
             {
@@ -134,6 +147,31 @@ namespace Domain.Implementation.Services
                 var section = repositoryOfSection.Read(a => a.Name == postCreateEditViewModel.Section);
                 postEntity.Section = section;
                 postEntity.SectionId = section.Id;
+            }
+            if(lastPostEntity.Images != null && lastPostEntity.Images.Count() > 0)
+            {
+                lastPostEntity
+                    .Images
+                    .Select(a => a.Path)
+                    .Except(postCreateEditViewModel.Images)
+                    .ToList()
+                    .ForEach(a => 
+                    {
+                        serviceOfImage.Delete(a);
+                        repositoryOfImage.Delete(lastPostEntity.Images.First(b => b.Path == a));
+                    });
+                postCreateEditViewModel
+                    .Images
+                    .Except(lastPostEntity.Images.Select(a => a.Path))
+                    .ToList()
+                    .ForEach(a => repositoryOfImage.Create(new ImageEntity() { Path = a, PostId = postEntity.Id }));
+            }
+            else if(postCreateEditViewModel.Images != null && postCreateEditViewModel.Images.Count() > 0)
+            {
+                postCreateEditViewModel
+                       .Images
+                       .ToList()
+                       .ForEach(a => repositoryOfImage.Create(new ImageEntity() { Path = a, PostId = postEntity.Id }));
             }
             postEntity.Tags = serviceOfTag.TagsPostUpdate(postCreateEditViewModel.Tags, lastPostEntity.Tags, postCreateEditViewModel.PostId);
             repositoryOfPost.Update(postEntity);
@@ -148,7 +186,7 @@ namespace Domain.Implementation.Services
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
             if (await serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, post.UserProfile.ApplicationUserId, true))
             {
-                post.Images.ToList().ForEach(a => File.Delete(a.Path));
+                post.Images.ToList().ForEach(a => serviceOfImage.Delete(a.Path));
                 repositoryOfPost.Delete(post);
             }
             return;
@@ -174,6 +212,7 @@ namespace Domain.Implementation.Services
         {
             var postViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
+            postViewModel.Images = repositoryOfImage.ReadMany(new Expression<Func<ImageEntity, bool>>[] { a => a.PostId == postEntity.Id }).Select(a => a.Path).ToList();
             postViewModel.BelongsToUser = (applicationUserCurrent == null) 
                 ? false 
                 : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;

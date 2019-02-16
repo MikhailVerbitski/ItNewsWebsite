@@ -21,8 +21,16 @@ namespace Domain.Implementation.Services
             repositoryOfImage = new RepositoryOfImage(context);
         }
 
-        public string LoadImage(string host, string applicationUserCurrent, UserImage image) => LoadImage(host, "Avatars", applicationUserCurrent, image.Extension, image.Data, true);
-        public string LoadImage(string host, string applicationUserCurrent, PostImage image) => LoadImage(host, "Post", applicationUserCurrent, image.Extension, image.Data, false);
+        public string LoadImage(string host, string applicationUserCurrent, UserImage image)
+        {
+            var data = System.Convert.FromBase64String(image.Data);
+            return LoadImage(host, "Avatars", applicationUserCurrent, image.Extension, data, true);
+        }
+        public string LoadImage(string host, string applicationUserCurrent, PostImage image)
+        {
+            var data = System.Convert.FromBase64String(image.Data);
+            return LoadImage(host, "Post", applicationUserCurrent, image.Extension, data, false);
+        }
         public string LoadImage(string host, string folder, string name, string extension, byte[] date, bool isRewrite = false)
         {
             int addition = 0;
@@ -43,25 +51,10 @@ namespace Domain.Implementation.Services
             string result = $"{host}/Images/{folder}/{fileName}";
             return result;
         }
-
-        //public string RenameImage(string folder, string lastPath, string newName)
-        //{
-        //    var filePath = $"{string.Join('/', SolutionPath.Split("\\"))}/{lastPath}";
-        //    var mas = lastPath.Split('/');
-        //    var extension = mas.Last().Split('.').Last();
-        //    var newPath = $"{string.Join('/', mas.Take(mas.Length - 1).ToArray())}/{newName}";
-        //    int addition = 0;
-        //    while(File.Exists($"{newPath}_{addition}.{extension}"))
-        //    {
-        //        addition++;
-        //    }
-        //    newPath = $"{newPath}_{addition}.{extension}";
-        //    File.Move(filePath, string.Join('/', SolutionPath.Split("\\")) + newPath);
-        //    return newPath;
-        //}
-
         public void Delete(string path)
         {
+            var mas = path.Split('/').ToList();
+            path = SolutionPath + "\\" + mas.Skip(mas.IndexOf("Images")).Aggregate((a, b) => a + "\\" + b);
             if(File.Exists(path))
             {
                 File.Delete(path);
