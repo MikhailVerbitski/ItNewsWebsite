@@ -1,36 +1,38 @@
 ﻿@inject JsInteropClasses.ServiceOfTheme serviceOfTheme
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
-<div class="logo"><a href="/@("Time:f:fin")" style="margin-left:3vh; padding-bottom: 0;"><font size="5">ItNews</font></a></div>
-<div onclick="@ChangeTheme" class="theme-button"><img src="@serviceOfTheme.PahtIcon" /></div>
-<div class="account-nav">
-    <ul class="pure-menu-list">
-        @if (serviceOfAuthorize.IsAuthorize)
-        {
-            <li class="pure-menu-item">
-                <a href="/UserPage/@(serviceOfAuthorize.DataAboutUser?.UserProfileId)" class="pure-menu-link">
-                    @serviceOfAuthorize.DataAboutUser?.Login
-                    <font color="red"><LocalizationSentence Sentence="@((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.claims.Any(a => a.ClaimType == "blocked")) ? $"blocked" : "")" /></font>
-                    <font color="orange"><LocalizationSentence Sentence="@((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 0) ? "not confirmed" : "")" /></font>
-                </a>
-            </li>
-            <li class="pure-menu-item"><a href="/Login" class="pure-menu-link" onclick="@serviceOfAuthorize.Logout"><LocalizationSentence Sentence="@("Login out")" /></a></li>
-        }
-        else
-        {
-            <li class="pure-menu-item"><a href="/Login" class="pure-menu-link"><LocalizationSentence Sentence="@("Login")" /></a></li>
-            <li class="pure-menu-item"><a href="/Registration" class="pure-menu-link"><LocalizationSentence Sentence="@("Registration")" /></a></li>
-        }
-    </ul>
-</div>
-<div class="pure-form" id="search">
-    <input type="text" class="pure-input-rounded" bind="@SearchWords" />
-    <div onclick="@(() => UriHelper.NavigateTo($"/Search/{SearchWords}"))"><LocalizationSentence Sentence="@("Search")" /></div>
+<div class="pure-menu pure-menu-horizontal" id="navbar">
+    <div class="logo"><a href="/@("Time:f:fin")" style="margin-left:3vh; padding-bottom: 0;"><font size="5">ItNews</font></a></div>
+    <div onclick="@ChangeTheme"><img src="@serviceOfTheme.PahtIcon"/></div>
+    <div class="account-nav">
+        <ul class="pure-menu-list">
+            @if (serviceOfAuthorize.IsAuthorize)
+            {
+                <li class="pure-menu-item">
+                    <a href="/UserPage/@(serviceOfAuthorize.DataAboutUser?.UserProfileId)" class="pure-menu-link">
+                        @serviceOfAuthorize.DataAboutUser?.Login
+                        <font color="red"><LocalizationSentence Sentence="@((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.claims.Any(a => a.ClaimType == "blocked")) ? $"blocked" : "")" /></font>
+                        <font color="orange"><LocalizationSentence Sentence="@((serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 0) ? "not confirmed" : "")" /></font>
+                    </a>
+                </li>
+                <li class="pure-menu-item"><a href="/Login" class="pure-menu-link" onclick="@serviceOfAuthorize.Logout"><LocalizationSentence Sentence="@("Login out")" /></a></li>
+            }
+            else
+            {
+                <li class="pure-menu-item"><a href="/Login" class="pure-menu-link"><LocalizationSentence Sentence="@("Login")" /></a></li>
+                <li class="pure-menu-item"><a href="/Registration" class="pure-menu-link"><LocalizationSentence Sentence="@("Registration")" /></a></li>
+            }
+        </ul>
+    </div>
+    <div class="pure-form" id="search">
+        <input type="text" class="pure-input-rounded" bind="@SearchWords" />
+        <div onclick="@(() => UriHelper.NavigateTo($"/Search/{SearchWords}"))"><LocalizationSentence Sentence="@("Search")" /></div>
+    </div>
 </div>
 
 @functions{
     private string SearchWords { get; set; }
-    
+
     protected async override Task OnInitAsync()
     {
         serviceOfAuthorize.UpdateAfterAuthorization += (() => this.StateHasChanged());

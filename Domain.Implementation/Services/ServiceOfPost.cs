@@ -245,6 +245,6 @@ namespace Domain.Implementation.Services
             var post = repositoryOfPost.Read(a => a.Id == postId);
             return (post.SumOfScore / (double)post.CountOfScore);
         }
-        public string AddImage(string applicationUserCurrent, PostImage image) => serviceOfImage.LoadImage(applicationUserCurrent, image);
+        public string AddImage(string host, string applicationUserCurrent, PostImage image) => serviceOfImage.LoadImage(host, applicationUserCurrent, image);
     }
 }

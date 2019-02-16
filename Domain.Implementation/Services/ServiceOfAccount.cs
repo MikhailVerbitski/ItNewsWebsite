@@ -30,7 +30,8 @@ namespace Domain.Implementation.Services
             UserManager<ApplicationUserEntity> userManager,
             RoleManager<RoleEntity> roleManager,
             IHostingEnvironment hostingEnvironment,
-            IMapper mapper
+            IMapper mapper,
+            ServiceOfImage serviceOfImage
             )
         {
             this.mapper = mapper;
@@ -42,7 +43,7 @@ namespace Domain.Implementation.Services
             RepositoryOfUserProfile = new RepositoryOfUserProfile(context);
             repositoryOfIdentityUserRole = new RepositoryOfIdentityUserRole(context);
 
-            serviceOfImage = new ServiceOfImage(context, hostingEnvironment);
+            this.serviceOfImage = serviceOfImage;
         }
 
         public ApplicationUserEntity Get(Expression<Func<ApplicationUserEntity, bool>> property)

@@ -21,9 +21,9 @@ namespace Domain.Implementation.Services
             repositoryOfImage = new RepositoryOfImage(context);
         }
 
-        public string LoadImage(string applicationUserCurrent, UserImage image) => LoadImage("Avatars", applicationUserCurrent, image.Extension, image.Data, true);
-        public string LoadImage(string applicationUserCurrent, PostImage image) => LoadImage("Post", applicationUserCurrent, image.Extension, image.Data, false);
-        public string LoadImage(string folder, string name, string extension, byte[] date, bool isRewrite = false)
+        public string LoadImage(string host, string applicationUserCurrent, UserImage image) => LoadImage(host, "Avatars", applicationUserCurrent, image.Extension, image.Data, true);
+        public string LoadImage(string host, string applicationUserCurrent, PostImage image) => LoadImage(host, "Post", applicationUserCurrent, image.Extension, image.Data, false);
+        public string LoadImage(string host, string folder, string name, string extension, byte[] date, bool isRewrite = false)
         {
             int addition = 0;
             while(!isRewrite && File.Exists(Path.Combine(SolutionPath, "Images", folder, $"{name}_{addition}{extension}")))
@@ -40,7 +40,7 @@ namespace Domain.Implementation.Services
             {
                 new MemoryStream(date).CopyToAsync(stream).Wait();
             }
-            string result = $"/Images/{folder}/{fileName}";
+            string result = $"{host}/Images/{folder}/{fileName}";
             return result;
         }
 

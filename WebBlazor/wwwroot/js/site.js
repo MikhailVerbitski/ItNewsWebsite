@@ -1,7 +1,12 @@
 ﻿window.TagCloudStarterFunction = {
     Start: function (jsonWords) {
         words = JSON.parse(jsonWords);
+        let cl = $('#keywords').clone();
         $('#keywords').jQCloud(words);
+        $(window).resize(function () {
+            $('#keywords').replaceWith(cl.clone());
+            $('#keywords').jQCloud(words);
+        })
     }
 }
 window.Theme = {

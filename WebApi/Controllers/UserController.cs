@@ -46,7 +46,8 @@ namespace WebApi.Controllers
         public JsonResult ChangeImage([FromBody] UserImage image)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            var path = serviceOfUser.ChangeUserImage(currentUserId, image);
+            var host = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            var path = serviceOfUser.ChangeUserImage(host, currentUserId, image);
             return Json(path);
         }
         [HttpGet]

@@ -282,4 +282,7 @@
   <data name="unlock" xml:space="preserve">
     <value>разблокировать</value>
   </data>
+  <data name="Role" xml:space="preserve">
+    <value>Роль</value>
+  </data>
 </root>

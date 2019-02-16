@@ -96,7 +96,8 @@ namespace WebApi.Controllers
         public JsonResult AddImage([FromBody] PostImage image)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            var path = serviceOfPost.AddImage(currentUserId, image);
+            var host = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            var path = serviceOfPost.AddImage(host, currentUserId, image);
             return Json(path);
         }
     }

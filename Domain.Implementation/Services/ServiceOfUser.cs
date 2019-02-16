@@ -65,9 +65,9 @@ namespace Domain.Implementation.Services
                 .Select(a => GetUserMiniViewModel(a))
                 .ToList();
         }
-        public string ChangeUserImage(string applicationUserCurrent, UserImage image)
+        public string ChangeUserImage(string host, string applicationUserCurrent, UserImage image)
         {
-            var path = serviceOfImage.LoadImage(applicationUserCurrent, image);
+            var path = serviceOfImage.LoadImage(host, applicationUserCurrent, image);
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserCurrent);
             applicationUser.Avatar = path;
             repositoryOfApplicationUser.Update(applicationUser, a => a.Avatar);
