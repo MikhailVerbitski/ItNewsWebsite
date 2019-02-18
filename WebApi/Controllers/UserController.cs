@@ -51,6 +51,12 @@ namespace WebApi.Controllers
             return Json(path);
         }
         [HttpGet]
+        public void Delete(int id)
+        {
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            serviceOfUser.Delete(currentUserId, id);
+        }
+        [HttpGet]
         public async Task<JsonResult> GetDataAboutCurrentUser()
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;

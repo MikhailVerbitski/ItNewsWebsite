@@ -25,5 +25,13 @@ namespace Data.Implementation.Repositories
 
             return ApplicationUser;
         }
+
+        public override void Delete(ApplicationUserEntity entity)
+        {
+            var repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            var userProfile = repositoryOfUserProfile.Read(a => a.Id == entity.UserProfileId);
+            base.Delete(entity);
+            repositoryOfUserProfile.Delete(userProfile);
+        }
     }
 }

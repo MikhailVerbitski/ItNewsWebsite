@@ -1,5 +1,4 @@
 ﻿using Data.Contracts.Models.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -60,26 +59,23 @@ namespace Data.Implementation
             ApplicationUser
                 .HasOne(a => a.UserProfile)
                 .WithOne(a => a.ApplicationUser)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasForeignKey<ApplicationUserEntity>(a => a.UserProfileId);
+                .HasForeignKey<UserProfileEntity>(a => a.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
             var UserProfile = builder.Entity<UserProfileEntity>();
             UserProfile
                 .HasOne(a => a.ApplicationUser)
                 .WithOne(a => a.UserProfile)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasForeignKey<ApplicationUserEntity>(a => a.UserProfileId);
+                .HasForeignKey<ApplicationUserEntity>(a => a.UserProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
             UserProfile
                 .HasMany(a => a.Posts)
                 .WithOne(a => a.UserProfile)
-                .HasForeignKey(a => a.UserProfileId);
+                .HasForeignKey(a => a.UserProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
             UserProfile
                 .HasMany(a => a.Comments)
-                .WithOne(a => a.UserProfile)
-                .HasForeignKey(a => a.UserProfileId);
-            UserProfile
-                .HasMany(a => a.PostRatings)
                 .WithOne(a => a.UserProfile)
                 .HasForeignKey(a => a.UserProfileId);
 
@@ -106,10 +102,16 @@ namespace Data.Implementation
                 .WithMany(a => a.Likes)
                 .HasForeignKey(a => a.CommentId);
             CommentLike
-                .HasKey(a => new { a.CommentId, a.UserProfileId });
+                .HasOne(a => a.UserProfile)
+                .WithMany(a => a.CommentLikes)
+                .HasForeignKey(a => a.UserProfileId);
 
 
             var Post = builder.Entity<PostEntity>();
+            Post
+                .HasOne(a => a.UserProfile)
+                .WithMany(a => a.Posts)
+                .HasForeignKey(a => a.UserProfileId);
             Post
                 .HasOne(a => a.Section)
                 .WithMany(a => a.Posts)
@@ -119,10 +121,6 @@ namespace Data.Implementation
                 .WithOne(a => a.Post)
                 .HasForeignKey(a => a.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
-            Post
-                .HasOne(a => a.UserProfile)
-                .WithMany(a => a.Posts)
-                .HasForeignKey(a => a.UserProfileId);
             Post
                 .HasMany(a => a.Tags)
                 .WithOne(a => a.Post)
@@ -164,8 +162,7 @@ namespace Data.Implementation
             PostTag
                 .HasOne(a => a.Post)
                 .WithMany(a => a.Tags)
-                .HasForeignKey(a => a.PostId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(a => a.PostId);
             PostTag
                 .HasOne(a => a.Tag)
                 .WithMany(a => a.Posts)

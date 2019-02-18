@@ -56,19 +56,16 @@ namespace Domain.Implementation.Services
             var isRoleExist = await roleManager.RoleExistsAsync("user");
             if (isRoleExist)
             {
-                userManager.AddToRoleAsync(applicationUser, "user");
+                await userManager.AddToRoleAsync(applicationUser, "user");
             }
             if(applicationUser.UserProfileId == null)
             {
-                if (applicationUser.UserProfileId == null)
-                {
-                    var userProfile = new UserProfileEntity();
-                    userProfile.ApplicationUserId = applicationUser.Id;
-                    userProfile = RepositoryOfUserProfile.Create(userProfile);
-                    applicationUser.UserProfileId = userProfile.Id;
-                    applicationUser.UserProfile = userProfile;
-                    applicationUser.Created = System.DateTime.Now;
-                }
+                var userProfile = new UserProfileEntity();
+                userProfile.ApplicationUserId = applicationUser.Id;
+                userProfile = RepositoryOfUserProfile.Create(userProfile);
+                applicationUser.UserProfileId = userProfile.Id;
+                applicationUser.UserProfile = userProfile;
+                applicationUser.Created = System.DateTime.Now;
                 repositoryOfApplicationUser.Update(applicationUser);
             }
         }

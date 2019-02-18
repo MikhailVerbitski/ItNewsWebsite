@@ -3,7 +3,7 @@
 @inject Components.ServiceOfImage serviceOfImage
 
 <div class="grid-cols-two">
-    <p><a href="/UserPage/@(User.Login)"><h1>@User.FirstName @User.LastName</h1></a></p>
+    <p><a href="/UserPage/@(User.UserProfileId)"><h1>@User.FirstName @User.LastName</h1></a></p>
     <img src="@((User.Avatar == null) ? "/img/default-user-profile-image.png" : User.Avatar)" asp-append-version="true" height="100" width="100" />
 </div>
 @if (User.IsCurrentUser)
@@ -15,9 +15,9 @@
     <br />
     @if (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)
     {
-    <button onclick="@(() => ChangeProperty(5, ((User.UserClaims.Any(a => a.ClaimType == "blocked")) ? User.UserClaims.FirstOrDefault(a => a.ClaimType == "blocked") :  User.AllClaims[User.AllClaims.FindIndex(a => a.ClaimType == "blocked")])))" class="pure-button user-page-button">
-        <LocalizationSentence Sentence="@(User.UserClaims.Any(a => a.ClaimType == "blocked") ? "unlock" : "lock")" />
-    </button>
+        <button class="pure-button pure-button-primary" onclick="@(() => ChangeProperty(5, ((User.UserClaims.Any(a => a.ClaimType == "blocked")) ? User.UserClaims.FirstOrDefault(a => a.ClaimType == "blocked") :  User.AllClaims[User.AllClaims.FindIndex(a => a.ClaimType == "blocked")])))" class="pure-button user-page-button">
+            <LocalizationSentence Sentence="@(User.UserClaims.Any(a => a.ClaimType == "blocked") ? "unlock" : "lock")" />
+        </button>
         <textarea style="display: @((!ChangeKeys[5]) ? "" : "none")" bind="@blockedValue" />
     }
     <br />
@@ -34,7 +34,7 @@
     <input style="display: @((ChangeKeys[0]) ? "" : "none")" bind="@User.FirstName" />
     @if (User.IsCurrentUser)
     {
-        <button onclick="@(() => ChangeProperty(0))">change</button>
+        <button class="pure-button pure-button-primary" onclick="@(() => ChangeProperty(0))">change</button>
     }
     else
     {
@@ -46,7 +46,7 @@
     <input style="display: @((ChangeKeys[1]) ? "" : "none")" bind="@User.LastName" />
     @if (User.IsCurrentUser)
     {
-        <button onclick="@(() => ChangeProperty(1))">change</button>
+        <button class="pure-button pure-button-primary" onclick="@(() => ChangeProperty(1))">change</button>
     }
     else
     {
@@ -63,7 +63,7 @@
                 <option style="color: @item.Color;">@item.Name</option>
             }
         </select>
-        <button onclick="@(() => ChangeProperty(2))">change</button>
+        <button class="pure-button pure-button-primary" onclick="@(() => ChangeProperty(2))">change</button>
     }
     else
     {
@@ -79,7 +79,7 @@
     <input style="display: @((ChangeKeys[3]) ? "" : "none")" bind="@User.Login" />
     @if (User.IsCurrentUser)
     {
-        <button onclick="@(() => ChangeProperty(3))">change</button>
+        <button class="pure-button pure-button-primary" onclick="@(() => ChangeProperty(3))">change</button>
     }
     else
     {
@@ -91,7 +91,7 @@
         <font size="5"><LocalizationSentence Sentence="@("New password")" />:</font>
         <font style="display: @((!ChangeKeys[6]) ? "" : "none")" size="5"></font>
         <input style="display: @((ChangeKeys[6]) ? "" : "none")" bind="@User.Password" />
-        <button onclick="@(() => ChangeProperty(6))">change</button>
+        <button class="pure-button pure-button-primary" onclick="@(() => ChangeProperty(6))">change</button>
     }
 
     <font size="5"><LocalizationSentence Sentence="@("Email")" />:</font>
@@ -99,7 +99,7 @@
     <input style="display: @((ChangeKeys[4]) ? "" : "none")" bind="@User.Email" />
     @if (User.IsCurrentUser)
     {
-        <button onclick="@(() => ChangeProperty(4))">change</button>
+        <button class="pure-button pure-button-primary" onclick="@(() => ChangeProperty(4))">change</button>
     }
     else
     {
@@ -110,6 +110,13 @@
     <font size="5">@User.Created.ToLongDateString()</font>
     <div></div>
 </div>
+<br />
+@if (serviceOfAuthorize.DataAboutUser != null && (serviceOfAuthorize.DataAboutUser.UserProfileId == User.UserProfileId || serviceOfAuthorize.DataAboutUser.Priority >= 3))
+{
+    <button class="pure-button pure-button-primary" onclick="@(() => (serviceOfAuthorize.GetAsync($"/api/User/Delete?id={User.UserProfileId}")))">
+        <LocalizationSentence Sentence="@("Delete account")" />
+    </button>
+}
 <br />
 <button style="display: @((paramChange) ? "" : "none")" class="pure-button pure-button-primary" onclick="@SaveChange">Save change</button>
 

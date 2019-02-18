@@ -54,6 +54,7 @@ namespace WebApi.Controllers
                 {
                     return Json(result.Errors.Select(a => a.Description).ToList());
                 }
+                await serviceOfAccount.TryToRegistration(registerViewModel.Login);
                 var code = await userManager.GenerateEmailConfirmationTokenAsync(applicationUser);
                 var callbackUrl = Url.Action(
                     nameof(ConfirmEmail),
@@ -66,7 +67,6 @@ namespace WebApi.Controllers
                     this.HttpContext.Request.Scheme,
                     this.HttpContext.Request.Host.ToString());
                 serviceOfAccount.SendEmailAsync(registerViewModel.Email, "Confirm your account", $"Confirm your registration by clicking on the link: <a href='{callbackUrl}'>link</a>");
-                await serviceOfAccount.TryToRegistration(registerViewModel.Login);
                 return Json(Ok());
             }
             else

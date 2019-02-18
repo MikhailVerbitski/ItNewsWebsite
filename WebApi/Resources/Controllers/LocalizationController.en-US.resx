@@ -288,4 +288,7 @@
   <data name="Role" xml:space="preserve">
     <value>Role</value>
   </data>
+  <data name="Delete account" xml:space="preserve">
+    <value>Delete account</value>
+  </data>
 </root>

@@ -15,5 +15,7 @@ namespace Data.Contracts.Models.Entities
         public virtual IEnumerable<CommentEntity> Comments { get; set; }
 
         public virtual IEnumerable<PostRatingEntity> PostRatings { get; set; }
+
+        public virtual IEnumerable<CommentLikeEntity> CommentLikes { get; set; }
     }
 }

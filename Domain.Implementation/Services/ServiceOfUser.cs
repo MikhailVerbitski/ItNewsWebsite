@@ -229,7 +229,15 @@ namespace Domain.Implementation.Services
                 repositoryOfIdentityUserRole.Create(new IdentityUserRole<string> { UserId = applicationUser.Id, RoleId = newRole.Id });
             }
         }
-
+        public async Task Delete(string applicationUserCurrentId, int userProfileId)
+        {
+            var currentUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserCurrentId);
+            var user = (currentUser.UserProfileId != userProfileId) ? repositoryOfApplicationUser.Read(a => a.UserProfileId == userProfileId) : currentUser;
+            if (await IsThereAccess(new[] { 3 }, currentUser, user.Id, true))
+            {
+                repositoryOfApplicationUser.Delete(user);
+            }
+        }
         private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
         {
             var postViewModel = mapper.Map<PostEntity, PostMiniViewModel>(postEntity);
