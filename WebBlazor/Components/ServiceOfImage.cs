@@ -41,6 +41,16 @@ namespace WebBlazor.Components
             };
             return await Http.SendJsonAsync<string>(HttpMethod.Post, "/api/Post/AddImage", postImage);
         }
+        public async Task<string> LoadPostImage(string data, int postId, string Extension)
+        {
+            var postImage = new PostImage()
+            {
+                PostId = postId,
+                Data = data,
+                Extension = Extension
+            };
+            return await Http.SendJsonAsync<string>(HttpMethod.Post, "/api/Post/AddImage", postImage);
+        }
         public async Task<string> LoadImage(ElementRef image)
         {
             var images = await fileReadService.CreateReference(image).EnumerateFilesAsync();

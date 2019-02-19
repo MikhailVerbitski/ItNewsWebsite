@@ -50,7 +50,15 @@
                 <label for="file" class="pure-button"><LocalizationSentence Sentence="@("Upload image")" /></label>
                 <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
                 <label for="content"><LocalizationSentence Sentence=@("Content") /></label>
-                <textarea id="content" rows="10" bind="@(post.Content)" />
+
+                <div>
+                    <textarea id="textareaContent"
+                              rows="10"
+                              bind="@(post.Content)"
+                              dropzone="move"
+                              style="@highlightDropTargetStyle" />
+                </div>
+
                 <ValidationError Subject="@post" Property="@nameof(post.Content)" />
             </div>
             <label for="tagInput"><LocalizationSentence Sentence="@("Tags")" />:</label>
@@ -87,6 +95,7 @@
 
 @functions{
     [Parameter] private string Id { get; set; }
+    private string highlightDropTargetStyle = null;
 
     private string strTags { get; set; }
     private string bindStrForInput { get; set; }
@@ -100,7 +109,18 @@
 
     private bool IsEditPost = false;
     private bool IsSend = false;
+    private bool renderInitialization = true;
 
+    protected override async Task OnAfterRenderAsync()
+    {
+        if(post != null && renderInitialization)
+        {
+            renderInitialization = false;
+            WebBlazor.JsInteropClasses.DragAndDropJs.serviceOfImage = serviceOfImage;
+            WebBlazor.JsInteropClasses.DragAndDropJs.sendEvent += (path) => { post.Content += $"{Environment.NewLine}![comment to the image]({path})"; this.StateHasChanged(); };
+            await WebBlazor.JsInteropClasses.DragAndDropJs.IncludeJs(post.PostId);
+        }
+    }
     protected override async Task OnInitAsync()
     {
         Selections = (Selections == null) ? await serviceOfAuthorize.GetJsonAsync<List<string>>("api/Post/GetListOfSelections") : Selections;

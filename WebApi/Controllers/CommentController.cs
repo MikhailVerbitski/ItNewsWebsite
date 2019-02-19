@@ -19,8 +19,9 @@ namespace WebApi.Controllers
         {
             this.serviceOfComment = serviceOfComment;
         }
+
         [HttpPost]
-        public async Task<JsonResult> CreateComment([FromBody] CommentCreateEditViewModel commentViewModel)
+        public async Task<JsonResult> Create([FromBody] CommentCreateEditViewModel commentViewModel)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
             var newComment = await serviceOfComment.Create(userId, commentViewModel);

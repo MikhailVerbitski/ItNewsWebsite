@@ -284,6 +284,11 @@ namespace Domain.Implementation.Services
             var post = repositoryOfPost.Read(a => a.Id == postId);
             return (post.SumOfScore / (double)post.CountOfScore);
         }
-        public string AddImage(string host, string applicationUserCurrent, PostImage image) => serviceOfImage.LoadImage(host, applicationUserCurrent, image);
+        public string AddImage(string host, string applicationUserCurrent, PostImage image)
+        {
+            var result = serviceOfImage.LoadImage(host, applicationUserCurrent, image);
+            repositoryOfImage.Create(new ImageEntity() { Path = result, PostId = image.PostId });
+            return result;
+        }
     }
 }

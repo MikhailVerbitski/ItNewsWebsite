@@ -64,7 +64,7 @@ else
     private List<string> Tags;
     private string CommentContent { get; set; }
     private HubConnection connection;
-    
+
     protected async override Task OnInitAsync()
     {
         connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
@@ -81,14 +81,17 @@ else
     }
     async Task SendMessage()
     {
-        var comment = new CommentViewModel()
+        if(CommentContent != "")
         {
-            PostId = postViewModel.PostId,
-            Content = CommentContent
-        };
-        CommentContent = string.Empty;
-        var newComment = await serviceOfAuthorize.PostJsonAsync<CommentViewModel>("api/Comment/CreateComment", comment);
-        await connection.InvokeAsync("Send", newComment);
+            var comment = new CommentCreateEditViewModel()
+            {
+                PostId = postViewModel.PostId,
+                Content = CommentContent
+            };
+            CommentContent = string.Empty;
+            var newComment = await serviceOfAuthorize.PostJsonAsync<CommentViewModel>("api/Comment/Create", comment);
+            await connection.InvokeAsync("Send", newComment);
+        }
     }
     Task OnDeleteComment(int commentId)
     {
