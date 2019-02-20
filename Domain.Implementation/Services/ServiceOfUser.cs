@@ -91,7 +91,7 @@ namespace Domain.Implementation.Services
                 }
                 if(await GetUserPriority(applicationUserCurrent) == 3)
                 {
-                    ChangeRole(applicationUser, userViewModel.Role);
+                    await ChangeRole(applicationUser, userViewModel.Role);
                 }
                 if(userViewModel.UserClaims != null)
                 {
@@ -151,8 +151,6 @@ namespace Domain.Implementation.Services
                 a => a.Comments);
             var userViewModel = mapper.Map<ApplicationUserEntity, UserViewModel>(applicationUser);
             userViewModel.Role = await GetUserRole(applicationUser);
-            userViewModel.Comments = userProfile.Comments.Select(a => GetCommentMiniViewModel(a, applicationUserCurrent)).ToList();
-            userViewModel.Posts = userProfile.Posts.Select(a => GetPostMiniViewModel(a, applicationUserCurrent)).ToList();
             userViewModel.UserClaims = GetUserClaim(applicationUser.Id);
             userViewModel.IsCurrentUser = await IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, true);
             if(await IsThereAccess(new[] { 3 }, applicationUserCurrent, applicationUser.Id, false))
@@ -237,15 +235,6 @@ namespace Domain.Implementation.Services
             {
                 repositoryOfApplicationUser.Delete(user);
             }
-        }
-        private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
-        {
-            var postViewModel = mapper.Map<PostEntity, PostMiniViewModel>(postEntity);
-            var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
-            postViewModel.BelongsToUser = (applicationUserCurrent == null)
-                ? false
-                : IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
-            return postViewModel;
         }
         private CommentMiniViewModel GetCommentMiniViewModel(CommentEntity commentEntity, ApplicationUserEntity applicationUserCurrent)
         {

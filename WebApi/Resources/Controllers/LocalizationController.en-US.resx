@@ -291,4 +291,7 @@
   <data name="Delete account" xml:space="preserve">
     <value>Delete account</value>
   </data>
+  <data name="No comments yet :(" xml:space="preserve">
+    <value>No comments yet :(</value>
+  </data>
 </root>

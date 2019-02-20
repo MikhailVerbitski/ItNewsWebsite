@@ -70,7 +70,7 @@ namespace WebApi.Controllers
         public JsonResult Read([FromBody]PostReadRequestParams readRequest)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var post = serviceOfPost.Get(readRequest.type, currentUserId, readRequest.count, readRequest.where, readRequest.orderBy);
+            var post = serviceOfPost.Get(readRequest.type, currentUserId, readRequest.skip, readRequest.count, readRequest.where, readRequest.orderBy);
             if(readRequest.count != null && readRequest.count == 1)
             {
                 return Json(post.FirstOrDefault());

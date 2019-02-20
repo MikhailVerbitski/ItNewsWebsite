@@ -28,6 +28,10 @@ else
             </ListViewTemplate>
             break;
     }
+    @if(!allLoaded)
+    {
+        <button onclick="@LoadMore" class="pure-button" style="width: 100%">Load more</button>
+    }
 }
 
 @functions {
@@ -35,6 +39,8 @@ else
     [Parameter] private string param { get; set; }
     [Parameter] private object listOfPosts { get; set; }
     private int count = 0;
+    private int takeCount = 3;
+    private bool allLoaded = false;
     private bool notFirstTime = false;
     private KeyValuePair<string, Func<string[], PostReadRequestParams>>[] config;
 
@@ -44,7 +50,7 @@ else
             new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Top", a => new PostReadRequestParams()
             {
                 type =PostType.Name,
-                count = null,
+                count = takeCount,
                 orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))",
                 where = (a != null) ?
                 $"{(a.Contains("f") ? $"IsFinished=={a.Contains("fin")} " : "")}" +
@@ -56,7 +62,7 @@ else
             new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Time", a => new PostReadRequestParams()
             {
                 type = PostType.Name,
-                count = null,
+                count = takeCount,
                 orderBy = $"{(a != null && a.Contains("r") ? "-" : "")}Created.Millisecond",
                 where = (a != null) ?
                 $"{(a.Contains("f") ? $"IsFinished=={a.Contains("fin")} " : "")}" +
@@ -101,6 +107,7 @@ else
         {
             case nameof(PostCompactViewModel):
                 listOfPosts = (listOfPosts as List<PostCompactViewModel>).Except(new[] { post as PostCompactViewModel }).ToList();
+                count = (listOfPosts as List<PostCompactViewModel>).Count;
                 break;
             case nameof(PostMiniViewModel):
                 listOfPosts = (listOfPosts as List<PostMiniViewModel>).Except(new[] { post as PostMiniViewModel }).ToList();
@@ -108,5 +115,26 @@ else
                 break;
         }
         StateHasChanged();
+    }
+    private async Task LoadMore()
+    {
+        var parameters = param.Split(':');
+        var requestParams = config.Where(a => a.Key == parameters[0]).FirstOrDefault().Value.Invoke((parameters.Length > 1) ? parameters.Skip(1).ToArray() : null);
+        requestParams.skip = count;
+        switch (PostType.Name)
+        {
+            case nameof(PostCompactViewModel):
+                var newRangePostCompact = await serviceOfRequest.PostJsonAsync<List<PostCompactViewModel>>("/api/Post/Read", requestParams);
+                (listOfPosts as List<PostCompactViewModel>).AddRange(newRangePostCompact);
+                count += newRangePostCompact.Count;
+                allLoaded = newRangePostCompact.Count != takeCount;
+                break;
+            case nameof(PostMiniViewModel):
+                var newRangePostMini = await serviceOfRequest.PostJsonAsync<List<PostMiniViewModel>>("/api/Post/Read", requestParams);
+                (listOfPosts as List<PostMiniViewModel>).AddRange(newRangePostMini);
+                count += newRangePostMini.Count;
+                allLoaded = newRangePostMini.Count != takeCount;
+                break;
+        }
     }
 }

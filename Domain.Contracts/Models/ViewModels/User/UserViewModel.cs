@@ -31,10 +31,6 @@ namespace Domain.Contracts.Models.ViewModels.User
 
         public UserRole Role { get; set; }
 
-        public IEnumerable<PostMiniViewModel> Posts { get; set; }
-
-        public IEnumerable<CommentMiniViewModel> Comments { get; set; }
-
         public List<UserClaim> UserClaims { get; set; }
 
         public List<UserClaim> AllClaims { get; set; }

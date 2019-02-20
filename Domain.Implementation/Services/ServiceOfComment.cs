@@ -23,13 +23,9 @@ namespace Domain.Implementation.Services
 
         private readonly ServiceOfUser serviceOfUser;
 
-        private readonly Tuple<Type, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>[] Config;
+        private readonly Tuple<string, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>[] Config;
 
-        public ServiceOfComment(
-            ApplicationDbContext context,
-            IMapper mapper,
-            ServiceOfUser serviceOfUser
-            )
+        public ServiceOfComment(ApplicationDbContext context, IMapper mapper, ServiceOfUser serviceOfUser)
         {
             this.mapper = mapper;
 
@@ -43,8 +39,8 @@ namespace Domain.Implementation.Services
 
             Config = new[]
             {
-                new Tuple<Type, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(typeof(CommentViewModel), GetCommentViewModel),
-                new Tuple<Type, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(typeof(CommentMiniViewModel), GetCommentMiniViewModel)
+                new Tuple<string, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(nameof(CommentViewModel), GetCommentViewModel),
+                new Tuple<string, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(nameof(CommentMiniViewModel), GetCommentMiniViewModel)
             };
         }
 
@@ -56,65 +52,79 @@ namespace Domain.Implementation.Services
                 var commentEntity = mapper.Map<CommentCreateEditViewModel, CommentEntity>(commentCreateEditViewModel);
                 commentEntity.UserProfileId = applicationUser.UserProfileId;
                 commentEntity = repositoryOfComment.Create(commentEntity);
-                var commentViewModel = GetViewModelWithProperty<CommentViewModel>(commentEntity, applicationUserIdCurrent);
+                var commentViewModel = GetViewModelWithProperty(nameof(CommentViewModel), commentEntity, applicationUserIdCurrent);
                 return commentViewModel as CommentViewModel;
             }
             return null;
         }
 
-        public IEnumerable<TCommentViewModel> GetMany<TCommentViewModel>(int postId, string applicationUserIdCurrent) 
-            where TCommentViewModel : BaseCommentViewModel
+        public IEnumerable<BaseCommentViewModel> GetMany(string type, string applicationUserId, int? skip, int? take, string applicationUserIdCurrent)
         {
-            var post = repositoryOfPost.Read(a => a.Id == postId, a => a.Comments);
-            return GetMany<TCommentViewModel>(post, applicationUserIdCurrent);
+            var user = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
+            return GetMany(type, user, skip, take, applicationUserId);
         }
-        public IEnumerable<TCommentViewModel> GetMany<TCommentViewModel>(int postId, ApplicationUserEntity applicationUserCurrent)
-            where TCommentViewModel : BaseCommentViewModel
+        public IEnumerable<BaseCommentViewModel> GetMany(string type, ApplicationUserEntity applicationUser, int? skip, int? take, string applicationUserIdCurrent)
         {
-            var post = repositoryOfPost.Read(a => a.Id == postId, a => a.Comments);
-            return GetMany<TCommentViewModel>(post, applicationUserCurrent);
+            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.UserProfileId == applicationUser.UserProfileId });
+            commentEntities = commentEntities.OrderBy(a => a.Created).Reverse();
+            return GetMany(type, commentEntities, skip, take, applicationUserIdCurrent);
         }
-        public IEnumerable<TCommentViewModel> GetMany<TCommentViewModel>(PostEntity post, string applicationUserIdCurrent)
-            where TCommentViewModel : BaseCommentViewModel
+        public IEnumerable<BaseCommentViewModel> GetMany(string type, int postId, int? skip, int? take, string applicationUserIdCurrent)
         {
-            if (post.Comments == null)
+            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.PostId == postId });
+            commentEntities = commentEntities.OrderBy(a => a.Created).Reverse();
+            return GetMany(type, commentEntities, skip, take, applicationUserIdCurrent);
+        }
+        public IEnumerable<BaseCommentViewModel> GetMany(string type, int postId, int? skip, int? take, ApplicationUserEntity applicationUserCurrent)
+        {
+            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.PostId == postId });
+            commentEntities = commentEntities.OrderBy(a => a.Created).Reverse();
+            return GetMany(type, commentEntities, skip, take, applicationUserCurrent);
+        }
+        public IEnumerable<BaseCommentViewModel> GetMany(string type, IEnumerable<CommentEntity> commentEntities, int? skip, int? take, ApplicationUserEntity applicationUserCurrent)
+        {
+            if (skip != null)
             {
-                post = repositoryOfPost.Read(a => a.Id == post.Id, a => a.Comments);
+                commentEntities = commentEntities.Skip(skip.Value);
             }
-            return GetMany<TCommentViewModel>(post, applicationUserIdCurrent);
-        }
-        public IEnumerable<TCommentViewModel> GetMany<TCommentViewModel>(PostEntity post, ApplicationUserEntity applicationUserCurrent)
-            where TCommentViewModel : BaseCommentViewModel
-        {
-            if(post.Comments == null)
+            if (take != null)
             {
-                post = repositoryOfPost.Read(a => a.Id == post.Id, a => a.Comments);
+                commentEntities = commentEntities.Take(take.Value);
             }
-            return post.Comments.Select(a => Get<TCommentViewModel>(a, applicationUserCurrent)).AsParallel().ToList();
+            return commentEntities.Select(a => GetViewModelWithProperty(type, a, applicationUserCurrent)).ToList();
         }
-        public TCommentViewModel Get<TCommentViewModel>(int commentId, string applicationUserIdCurrent) 
-            where TCommentViewModel : BaseCommentViewModel
+        public IEnumerable<BaseCommentViewModel> GetMany(string type, IEnumerable<CommentEntity> commentEntities, int? skip, int? take, string applicationUserIdCurrent)
+        {
+            if (skip != null)
+            {
+                commentEntities = commentEntities.Skip(skip.Value);
+            }
+            if (take != null)
+            {
+                commentEntities = commentEntities.Take(take.Value);
+            }
+            return commentEntities.Select(a => GetViewModelWithProperty(type, a, applicationUserIdCurrent)).ToList();
+        }
+
+        public BaseCommentViewModel Get(string type, int commentId, string applicationUserIdCurrent) 
         {
             var commentEntity = repositoryOfComment.Read(a => a.Id == commentId);
-            return Get<TCommentViewModel>(commentEntity, applicationUserIdCurrent);
+            return Get(type, commentEntity, applicationUserIdCurrent);
         }
-        public TCommentViewModel Get<TCommentViewModel>(int commentId, ApplicationUserEntity applicationUserCurrent)
-            where TCommentViewModel : BaseCommentViewModel
+        public BaseCommentViewModel Get(string type, int commentId, ApplicationUserEntity applicationUserCurrent)
         {
             var commentEntity = repositoryOfComment.Read(a => a.Id == commentId);
-            return Get<TCommentViewModel>(commentEntity, applicationUserCurrent);
+            return Get(type, commentEntity, applicationUserCurrent);
         }
-        public TCommentViewModel Get<TCommentViewModel>(CommentEntity commentEntity, ApplicationUserEntity applicationUserCurrent)
-            where TCommentViewModel : BaseCommentViewModel
+        public BaseCommentViewModel Get(string type, CommentEntity commentEntity, ApplicationUserEntity applicationUserCurrent)
         {
-            var commentViewModel = GetViewModelWithProperty<TCommentViewModel>(commentEntity, applicationUserCurrent);
-            return commentViewModel as TCommentViewModel;
+            var commentViewModel = GetViewModelWithProperty(type, commentEntity, applicationUserCurrent);
+            return commentViewModel;
         }
-        public TCommentViewModel Get<TCommentViewModel>(CommentEntity commentEntity, string applicationUserIdCurrent)
-            where TCommentViewModel : BaseCommentViewModel
+        public BaseCommentViewModel Get(string type, CommentEntity commentEntity, string applicationUserIdCurrent)
         {
-            var commentViewModel = GetViewModelWithProperty<TCommentViewModel>(commentEntity, applicationUserIdCurrent);
-            return commentViewModel as TCommentViewModel;
+            var commentViewModel = GetViewModelWithProperty(type, commentEntity, applicationUserIdCurrent);
+            return commentViewModel;
         }
 
         private CommentViewModel GetCommentViewModel(CommentEntity commentEntity, ApplicationUserEntity applicationUserCurrent)
@@ -143,16 +153,14 @@ namespace Domain.Implementation.Services
             return commentViewModel;
         }
 
-        public TCommentViewModel GetViewModelWithProperty<TCommentViewModel>(CommentEntity commentEntity, string applicationUserIdCurrent) 
-            where TCommentViewModel: BaseCommentViewModel
+        public BaseCommentViewModel GetViewModelWithProperty(string type, CommentEntity commentEntity, string applicationUserIdCurrent) 
         {
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile);
-            return GetViewModelWithProperty<TCommentViewModel>(commentEntity, applicationUser);
+            var applicationUser = (applicationUserIdCurrent != null) ? repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile) : null;
+            return GetViewModelWithProperty(type, commentEntity, applicationUser);
         }
-        public TCommentViewModel GetViewModelWithProperty<TCommentViewModel>(CommentEntity commentEntity, ApplicationUserEntity applicationUserEntity)
-            where TCommentViewModel : BaseCommentViewModel
+        public BaseCommentViewModel GetViewModelWithProperty(string type, CommentEntity commentEntity, ApplicationUserEntity applicationUserEntity)
         {
-            return Config.Single(a => a.Item1 == typeof(TCommentViewModel)).Item2(commentEntity, applicationUserEntity) as TCommentViewModel;
+            return Config.Single(a => a.Item1 == type).Item2(commentEntity, applicationUserEntity);
         }
 
         public async Task<CommentViewModel> Update(string applicationUserIdCurrent, CommentCreateEditViewModel commentCreateEditViewModel)

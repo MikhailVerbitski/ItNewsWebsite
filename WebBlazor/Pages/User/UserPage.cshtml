@@ -1,6 +1,7 @@
 ﻿@page "/UserPage/{Id:int}"
 @using Domain.Contracts.Models.ViewModels.User
 @using Domain.Contracts.Models.ViewModels.Comment
+@using Domain.Contracts.Models.ViewModels.Post
 
 <div id="grid-user-profile" class="content-head content">
     @if (User == null)
@@ -57,7 +58,7 @@
             <div class="scrollbox">
                 <hr />
                 <br />
-                <ListOfPosts listOfPosts="@User.Posts.ToList()" PostType="@(User.Posts.GetType().GetGenericArguments().Single())" param="@Param" />
+                <ListOfPosts PostType="@(typeof(PostMiniViewModel))" param="@Param" />
             </div>
         </div>
         <div class="grid-scroll-user-comment">
@@ -65,11 +66,7 @@
             <div class="scrollbox">
                 <hr />
                 <br />
-                <ListViewTemplate Items="User.Comments.ToList()">
-                    <ItemTemplate>
-                        <CommentMini comment="@context" delete="@((comment) => DeleteComment(comment))" />
-                    </ItemTemplate>
-                </ListViewTemplate>
+                <ListOfComments CommentType="@(typeof(CommentMiniViewModel))" ApplicationUserId="@(User.ApplicationUserId)" />
             </div>
         </div>
     }
@@ -87,11 +84,5 @@
     protected async override Task OnParametersSetAsync()
     {
         User = await serviceOfRequest.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?userProfileId={Id}");
-    }
-    private async Task DeleteComment(CommentMiniViewModel comment)
-    {
-        await serviceOfRequest.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
-        (User.Comments as List<CommentMiniViewModel>).Remove(comment);
-        this.StateHasChanged();
     }
 }

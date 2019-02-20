@@ -12,7 +12,7 @@ namespace WebApi.Hubs
         }
         public void Send(CommentViewModel comment)
         {
-            Clients.All.SendAsync("createComment", comment);
+            Clients.All.SendAsync("createComment", Microsoft.JSInterop.Json.Serialize(comment));
         }
         public void Delete(int commentId)
         {

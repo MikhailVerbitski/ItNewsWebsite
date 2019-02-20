@@ -1,0 +1,161 @@
+﻿@implements IDisposable
+@using Domain.Contracts.Models.ViewModels.Comment
+@using Domain.Contracts.Models.ViewModels.Post
+@using Domain.Contracts.Models
+@using Blazor.Extensions;
+
+@if (listOfComments == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (count == 0)
+{
+    <p><em><LocalizationSentence Sentence="@("No comments yet :(")" /></em></p>
+}
+else
+{
+    @switch (CommentType.Name)
+    {
+        case nameof(CommentViewModel):
+            <ListViewTemplate Items="@(listOfComments as List<CommentViewModel>)">
+                <ItemTemplate>
+                    <Comment comment="@context" delete="@((comment) => Delete(comment))" post="@post" />
+                </ItemTemplate>
+            </ListViewTemplate>
+            break;
+        case nameof(CommentMiniViewModel):
+            <ListViewTemplate Items="@(listOfComments as List<CommentMiniViewModel>)">
+                <ItemTemplate>
+                    <CommentMini comment="@context" delete="@((comment) => Delete(comment))" />
+                </ItemTemplate>
+            </ListViewTemplate>
+            break;
+    }
+    @if (!allLoaded)
+    {
+        <button onclick="@LoadMore" class="pure-button" style="width: 100%">Load more</button>
+    }
+}
+
+@functions{
+    [Parameter] private Type CommentType { get; set; }
+    [Parameter] private string ApplicationUserId { get; set; }
+    [Parameter] private object listOfComments { get; set; }
+    [Parameter] private PostViewModel post { get; set; }
+    private int count = 0;
+    private int takeCount = 3;
+    private bool allLoaded = false;
+    private bool notFirstTime = false;
+
+    private HubConnection connection;
+
+    protected override async Task OnInitAsync()
+    {
+        connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
+        connection.On<string>("createComment", this.OnCreateComment);
+        connection.On<int>("deleteComment", this.OnDeleteComment);
+        await connection.StartAsync();
+
+        switch (CommentType.Name)
+        {
+            case nameof(CommentViewModel):
+                listOfComments = await serviceOfRequest.PostJsonAsync<List<CommentViewModel>>("/api/Comment/Read", new CommentReadRequestParams
+                {
+                    PostId = post.PostId,
+                    count = takeCount,
+                    type = nameof(CommentViewModel),
+                    skip = count,
+                });
+                count = (listOfComments as List<CommentViewModel>).Count;
+                break;
+            case nameof(CommentMiniViewModel):
+                listOfComments = await serviceOfRequest.PostJsonAsync<List<CommentMiniViewModel>>("/api/Comment/Read", new CommentReadRequestParams
+                {
+                    ApplicationUserId = ApplicationUserId,
+                    count = takeCount,
+                    type = nameof(CommentMiniViewModel),
+                    skip = count,
+                });
+                count = (listOfComments as List<CommentMiniViewModel>).Count;
+                break;
+        }
+        this.StateHasChanged();
+    }
+    private Task OnCreateComment(string comment)
+    {
+        switch (CommentType.Name)
+        {
+            case nameof(CommentViewModel):
+                var commentViewModel = Json.Deserialize<CommentViewModel>(comment);
+                (listOfComments as List<CommentViewModel>).Insert(0, commentViewModel);
+                break;
+            case nameof(CommentMiniViewModel):
+                var commentMiniViewModel = Json.Deserialize<CommentMiniViewModel>(comment);
+                (listOfComments as List<CommentMiniViewModel>).Insert(0, commentMiniViewModel);
+                break;
+        }
+        count++;
+        this.StateHasChanged();
+        return Task.CompletedTask;
+    }
+    private async Task OnDeleteComment(int commentId)
+    {
+        switch (CommentType.Name)
+        {
+            case nameof(CommentViewModel):
+                var commentViewModel = (listOfComments as List<CommentViewModel>).FirstOrDefault(a => a.CommentId == commentId);
+                (listOfComments as List<CommentViewModel>).Remove(commentViewModel);
+                count--;
+                break;
+            case nameof(CommentMiniViewModel):
+                var commentMiniViewModel = (listOfComments as List<CommentMiniViewModel>).FirstOrDefault(a => a.CommentId == commentId);
+                (listOfComments as List<CommentMiniViewModel>).Remove(commentMiniViewModel);
+                count--;
+                break;
+        }
+        if(count <= takeCount)
+        {
+            await LoadMore();
+        }
+        StateHasChanged();
+    }
+    private async Task Delete(object comment)
+    {
+        var id = comment.GetType().GetProperty("CommentId").GetValue(comment);
+        await connection.InvokeAsync("Delete", id);
+    }
+    private async Task LoadMore()
+    {
+        switch (CommentType.Name)
+        {
+            case nameof(CommentViewModel):
+                var newRangeCommentViewModel = await serviceOfRequest.PostJsonAsync<List<CommentViewModel>>("/api/Comment/Read", new CommentReadRequestParams
+                {
+                    PostId = post.PostId,
+                    count = takeCount,
+                    type = nameof(CommentViewModel),
+                    skip = count,
+                });
+                (listOfComments as List<CommentViewModel>).AddRange(newRangeCommentViewModel);
+                count += newRangeCommentViewModel.Count;
+                allLoaded = newRangeCommentViewModel.Count != takeCount;
+                break;
+            case nameof(CommentMiniViewModel):
+                var newRangeCommentMiniViewModel = await serviceOfRequest.PostJsonAsync<List<CommentMiniViewModel>>("/api/Comment/Read", new CommentReadRequestParams
+                {
+                    ApplicationUserId = ApplicationUserId,
+                    count = takeCount,
+                    type = nameof(CommentMiniViewModel),
+                    skip = count,
+                });
+                (listOfComments as List<CommentMiniViewModel>).AddRange(newRangeCommentMiniViewModel);
+                count += newRangeCommentMiniViewModel.Count;
+                allLoaded = newRangeCommentMiniViewModel.Count != takeCount;
+                break;
+        }
+    }
+    public void Dispose()
+    {
+        connection.StopAsync();
+    }
+}

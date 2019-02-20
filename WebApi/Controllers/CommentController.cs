@@ -1,4 +1,5 @@
-﻿using Domain.Contracts.Models.ViewModels.Comment;
+﻿using Domain.Contracts.Models;
+using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +20,22 @@ namespace WebApi.Controllers
         {
             this.serviceOfComment = serviceOfComment;
         }
-
+        [AllowAnonymous]
+        [HttpPost]
+        public JsonResult Read([FromBody] CommentReadRequestParams requestParams)
+        {
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
+            System.Collections.Generic.IEnumerable<BaseCommentViewModel> comments = null;
+            if (requestParams.ApplicationUserId != null)
+            {
+                comments = serviceOfComment.GetMany(requestParams.type, requestParams.ApplicationUserId, requestParams.skip, requestParams.count, currentUserId);
+            }
+            else if (requestParams.PostId != null)
+            {
+                comments = serviceOfComment.GetMany(requestParams.type, requestParams.PostId.Value, requestParams.skip, requestParams.count, currentUserId);
+            }
+            return Json(comments);
+        }
         [HttpPost]
         public async Task<JsonResult> Create([FromBody] CommentCreateEditViewModel commentViewModel)
         {

@@ -166,16 +166,20 @@ namespace Domain.Implementation.Services
             }
             return;
         }
-        public IEnumerable<BasePostViewModel> Get(string type, string applicationUserIdCurrent, int? take, string where, string orderBy)
+        public IEnumerable<BasePostViewModel> Get(string type, string applicationUserIdCurrent, int? skip, int? take, string where, string orderBy)
         {
             IEnumerable<PostEntity> postsEntities = repositoryOfPost.ReadMany(where, orderBy,
                     a => a.Tags,
                     a => a.Comments,
                     a => a.Section,
                     a => a.UserProfile);
+            if (skip != null)
+            {
+                postsEntities = postsEntities.Skip(skip.Value);
+            }
             if (take != null)
             {
-                postsEntities = postsEntities.Take(take.Value).ToList();
+                postsEntities = postsEntities.Take(take.Value);
             }
             var postsViewModel = postsEntities
                 .Select(a => GetViewModelWithProperty(type, a, applicationUserIdCurrent))
@@ -219,7 +223,7 @@ namespace Domain.Implementation.Services
                 .Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
-            postViewModel.Comments = serviceOfComment.GetMany<CommentViewModel>(postEntity, applicationUserCurrent);
+            postViewModel.Comments = serviceOfComment.GetMany(nameof(CommentViewModel), postEntity.Id, null, null, applicationUserCurrent) as List<CommentViewModel>;
             postViewModel.CurrentUserId = (applicationUserCurrent == null) ? null : applicationUserCurrent.Id;
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false

@@ -79,14 +79,16 @@
                 </datalist>
             </div>
             <br />
-            @if (IsEditPost)
-            {
-                <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Update")" /></button>
-            }
-            else
-            {
-                <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send as draft")" /></button>
-            }
+            <button onclick="@(() => UpdateCreate(false))" class="pure-button pure-button-primary">
+                @if (IsEditPost)
+                {
+                    <LocalizationSentence Sentence="@("Update")" />
+                }
+                else
+                {
+                    <LocalizationSentence Sentence="@("Send as draft")" />
+                }
+            </button>
             <button onclick="@(() => UpdateCreate(true))" class="pure-button pure-button-primary"><LocalizationSentence Sentence="@("Send")" /></button>
         </div>
     </div>

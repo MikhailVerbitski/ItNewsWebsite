@@ -35,6 +35,7 @@ else
         </div>
         <br />
         <br />
+        <h3><LocalizationSentence Sentence="@("Comments")" /></h3>
         @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser.Priority >= 1)
         {
             <div class="pure-form pure-form-stacked">
@@ -46,16 +47,8 @@ else
     </div>
     <br />
     <hr />
-    <div onmousemove="@Update">
-        <ListViewTemplate Items="@(postViewModel.Comments as List<CommentViewModel>)">
-            <ItemTemplate>
-                <Comment comment="@context" post="@postViewModel" delete="@(comment => DeleteComment(comment))" />
-            </ItemTemplate>
-        </ListViewTemplate>
-    </div>
+    <ListOfComments CommentType="@typeof(CommentViewModel)" post="@postViewModel"/>
 }
-
-<Locale key="qwe"></Locale>
 
 @functions{
     [Parameter] private int Id { get; set; }
@@ -68,16 +61,7 @@ else
     protected async override Task OnInitAsync()
     {
         connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
-        connection.On<CommentViewModel>("createComment", this.OnCreateComment);
-        connection.On<int>("deleteComment", this.OnDeleteComment);
         await connection.StartAsync();
-    }
-
-    Task OnCreateComment(CommentViewModel comment)
-    {
-        (postViewModel.Comments as List<CommentViewModel>).Add(comment);
-        StateHasChanged();
-        return Task.CompletedTask;
     }
     async Task SendMessage()
     {
@@ -93,19 +77,11 @@ else
             await connection.InvokeAsync("Send", newComment);
         }
     }
-    Task OnDeleteComment(int commentId)
-    {
-        (postViewModel.Comments as List<CommentViewModel>).Remove((postViewModel.Comments as List<CommentViewModel>).FirstOrDefault(a => a.CommentId == commentId));
-        this.StateHasChanged();
-        return Task.CompletedTask;
-    }
     async Task DeleteComment(CommentViewModel comment)
     {
         await serviceOfRequest.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
         await connection.InvokeAsync("Delete", comment.CommentId);
     }
-
-
     protected async override Task OnParametersSetAsync()
     {
         postViewModel = await serviceOfRequest.PostJsonAsync<PostViewModel>($"/api/Post/Read", new
@@ -114,12 +90,8 @@ else
             count = 1,
             where = $"Id=={Id}"
         });
-        postViewModel.Comments = postViewModel.Comments.ToList();
+        postViewModel.Comments = (postViewModel.Comments == null) ? new List<CommentViewModel>() : postViewModel.Comments.ToList();
         Tags = postViewModel.Tags.Select(a => a.Name).ToList();
-    }
-    private void Update()
-    {
-        this.ShouldRender();
     }
     public void Dispose()
     {
