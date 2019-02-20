@@ -46,10 +46,10 @@ namespace WebApi.Controllers
             return Json(post);
         }
         [HttpPost]
-        public IActionResult Update([FromBody] PostUpdateViewModel postCreateEditViewModel)
+        public async Task<IActionResult> Update([FromBody] PostUpdateViewModel postCreateEditViewModel)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            serviceOfPost.Update(userId, postCreateEditViewModel);
+            await serviceOfPost.Update(userId, postCreateEditViewModel);
             return Ok();
         }
         [HttpGet]

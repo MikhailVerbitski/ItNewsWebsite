@@ -1,6 +1,5 @@
 ﻿@using Domain.Contracts.Models.ViewModels.Post
 @using Domain.Contracts.Models
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
 
 <div class="grid-post-head">
     <a href="/Post/@post.PostId"><h3>@post.Header</h3></a>
@@ -29,7 +28,7 @@
 
     private async Task Delete()
     {
-        await serviceOfAuthorize.GetAsync($"api/Post/Delete?postId={post.PostId}");
+        await serviceOfRequest.GetAsync($"api/Post/Delete?postId={post.PostId}");
         deletePost(post);
     }
 }

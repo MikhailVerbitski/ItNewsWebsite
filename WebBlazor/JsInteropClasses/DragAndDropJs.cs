@@ -1,7 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
-using WebBlazor.Components;
+using WebBlazor.Services;
 
 namespace WebBlazor.JsInteropClasses
 {

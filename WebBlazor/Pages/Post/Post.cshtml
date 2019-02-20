@@ -89,7 +89,7 @@ else
                 Content = CommentContent
             };
             CommentContent = string.Empty;
-            var newComment = await serviceOfAuthorize.PostJsonAsync<CommentViewModel>("api/Comment/Create", comment);
+            var newComment = await serviceOfRequest.PostJsonAsync<CommentViewModel>("api/Comment/Create", comment);
             await connection.InvokeAsync("Send", newComment);
         }
     }
@@ -101,14 +101,14 @@ else
     }
     async Task DeleteComment(CommentViewModel comment)
     {
-        await serviceOfAuthorize.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
+        await serviceOfRequest.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
         await connection.InvokeAsync("Delete", comment.CommentId);
     }
 
 
     protected async override Task OnParametersSetAsync()
     {
-        postViewModel = await serviceOfAuthorize.PostJsonAsync<PostViewModel>($"/api/Post/Read", new
+        postViewModel = await serviceOfRequest.PostJsonAsync<PostViewModel>($"/api/Post/Read", new
         {
             type = "PostViewModel",
             count = 1,

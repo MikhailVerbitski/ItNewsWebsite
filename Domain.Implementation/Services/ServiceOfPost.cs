@@ -129,10 +129,10 @@ namespace Domain.Implementation.Services
             var newPostCreateEditViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
             return newPostCreateEditViewModel;
         }
-        public void Update(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
+        public async Task Update(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
         {
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile);
-            Update(applicationUserCurrent, postCreateEditViewModel, lastPostEntity);
+            await Update(applicationUserCurrent, postCreateEditViewModel, lastPostEntity);
         }
         public async Task Update(ApplicationUserEntity applicationUserCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
         {
@@ -147,31 +147,6 @@ namespace Domain.Implementation.Services
                 var section = repositoryOfSection.Read(a => a.Name == postCreateEditViewModel.Section);
                 postEntity.Section = section;
                 postEntity.SectionId = section.Id;
-            }
-            if(lastPostEntity.Images != null && lastPostEntity.Images.Count() > 0)
-            {
-                lastPostEntity
-                    .Images
-                    .Select(a => a.Path)
-                    .Except(postCreateEditViewModel.Images)
-                    .ToList()
-                    .ForEach(a => 
-                    {
-                        serviceOfImage.Delete(a);
-                        repositoryOfImage.Delete(lastPostEntity.Images.First(b => b.Path == a));
-                    });
-                postCreateEditViewModel
-                    .Images
-                    .Except(lastPostEntity.Images.Select(a => a.Path))
-                    .ToList()
-                    .ForEach(a => repositoryOfImage.Create(new ImageEntity() { Path = a, PostId = postEntity.Id }));
-            }
-            else if(postCreateEditViewModel.Images != null && postCreateEditViewModel.Images.Count() > 0)
-            {
-                postCreateEditViewModel
-                       .Images
-                       .ToList()
-                       .ForEach(a => repositoryOfImage.Create(new ImageEntity() { Path = a, PostId = postEntity.Id }));
             }
             postEntity.Tags = serviceOfTag.TagsPostUpdate(postCreateEditViewModel.Tags, lastPostEntity.Tags, postCreateEditViewModel.PostId);
             repositoryOfPost.Update(postEntity);

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace WebBlazor.Components
+namespace WebBlazor.Services
 {
     public class ServiceOfImage
     {
@@ -53,6 +53,12 @@ namespace WebBlazor.Components
         }
         public async Task<string> LoadImage(ElementRef image)
         {
+            Console.WriteLine("Properties");
+            foreach (var item in image.GetType().GetProperties())
+            {
+                Console.WriteLine($"{item.Name} = {item.GetValue(image)}");
+            }
+
             var images = await fileReadService.CreateReference(image).EnumerateFilesAsync();
             var data = (await images.First().CreateMemoryStreamAsync()).ToArray();
             return Convert.ToBase64String(data);

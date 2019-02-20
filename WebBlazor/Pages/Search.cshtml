@@ -73,11 +73,11 @@
         typeOfData = key;
         if(typeOfData)
         {
-            Posts = await serviceOfAuthorize.GetJsonAsync<List<PostCompactViewModel>>($"/api/Post/Search?property={property}");
+            Posts = await serviceOfRequest.GetJsonAsync<List<PostCompactViewModel>>($"/api/Post/Search?property={property}");
         }
         else
         {
-            Users = await serviceOfAuthorize.GetJsonAsync<List<UserMiniViewModel>>($"/api/User/Search?property={property}");
+            Users = await serviceOfRequest.GetJsonAsync<List<UserMiniViewModel>>($"/api/User/Search?property={property}");
         }
     }
 }

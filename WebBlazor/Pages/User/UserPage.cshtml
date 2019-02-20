@@ -86,11 +86,11 @@
     }
     protected async override Task OnParametersSetAsync()
     {
-        User = await serviceOfAuthorize.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?userProfileId={Id}");
+        User = await serviceOfRequest.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?userProfileId={Id}");
     }
     private async Task DeleteComment(CommentMiniViewModel comment)
     {
-        await serviceOfAuthorize.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
+        await serviceOfRequest.GetAsync($"/api/Comment/Delete?commentId={comment.CommentId}");
         (User.Comments as List<CommentMiniViewModel>).Remove(comment);
         this.StateHasChanged();
     }

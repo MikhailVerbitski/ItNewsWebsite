@@ -1,6 +1,5 @@
 ﻿@using Domain.Contracts.Models.ViewModels.Post
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
-@inject Components.ServiceOfAuthorize serviceOfAuthorize
 
 <div>
     <div class="grid-post-head">
@@ -34,7 +33,7 @@
 
     private async Task Delete()
     {
-        await serviceOfAuthorize.GetAsync($"api/Post/Delete?postId={post.PostId}");
+        await serviceOfRequest.GetAsync($"api/Post/Delete?postId={post.PostId}");
         deletePost(post);
     }
 }

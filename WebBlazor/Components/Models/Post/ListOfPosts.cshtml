@@ -1,5 +1,4 @@
-﻿@inject Components.ServiceOfAuthorize serviceOfAuthorize
-@using Domain.Contracts.Models.ViewModels.Post
+﻿@using Domain.Contracts.Models.ViewModels.Post
 @using Domain.Contracts.Models
 
 @if (listOfPosts == null)
@@ -77,10 +76,10 @@ else
             switch (PostType.Name)
             {
                 case nameof(PostCompactViewModel):
-                    listOfPosts = await serviceOfAuthorize.PostJsonAsync<List<PostCompactViewModel>>("/api/Post/Read", requestParams);
+                    listOfPosts = await serviceOfRequest.PostJsonAsync<List<PostCompactViewModel>>("/api/Post/Read", requestParams);
                     break;
                 case nameof(PostMiniViewModel):
-                    listOfPosts = await serviceOfAuthorize.PostJsonAsync<List<PostMiniViewModel>>("/api/Post/Read", requestParams);
+                    listOfPosts = await serviceOfRequest.PostJsonAsync<List<PostMiniViewModel>>("/api/Post/Read", requestParams);
                     break;
             }
         }

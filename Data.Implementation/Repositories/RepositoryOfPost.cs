@@ -82,15 +82,16 @@ namespace Data.Implementation.Repositories
         public override void Delete(PostEntity entity)
         {
             RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
-
             var section = entity.Section;
             if (section == null)
             {
                 section = repositoryOfSection.Read(a => a.Id == entity.SectionId);
             }
-            section.CountOfUsage--;
-            repositoryOfSection.Update(section);
-
+            if(section != null)
+            {
+                section.CountOfUsage--;
+                repositoryOfSection.Update(section);
+            }
             base.Delete(entity);
         }
     }

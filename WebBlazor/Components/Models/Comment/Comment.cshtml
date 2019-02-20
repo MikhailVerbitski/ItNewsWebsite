@@ -1,5 +1,4 @@
-﻿@inject Components.ServiceOfAuthorize serviceOfAuthorize
-@using Domain.Contracts.Models.ViewModels.Comment;
+﻿@using Domain.Contracts.Models.ViewModels.Comment;
 @using Domain.Contracts.Models.ViewModels.Post;
 @using Domain.Contracts.Models.ViewModels.User;
 @using Domain.Contracts.Models;
@@ -7,7 +6,10 @@
 <div class="comment">
     <div class="grid-comment-head">
         <UserMini User="@comment.AuthorUserMiniViewModel" />
-        <img src="/img/cross.png" onclick="@(() => delete.Invoke(comment))" class="cross" style="display: @((comment.BelongsToUser || (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)) ? "" : "none")"/>
+        @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 1)
+        {
+            <img src="/img/cross.png" onclick="@(() => delete.Invoke(comment))" class="cross" style="display: @((comment.BelongsToUser || (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority == 3)) ? "" : "none")"/>
+        }
     </div>
     <div style="padding: 0 0 0 50px;">
         <div class="comment-content">
@@ -50,7 +52,7 @@
     {
         if(post.CurrentUserId != comment.AuthorUserMiniViewModel.ApplicationUserId)
         {
-            await serviceOfAuthorize.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+            await serviceOfRequest.GetAsync($"api/Comment/DislikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
             comment.IsUserLiked = !comment.IsUserLiked;
             comment.CountOfLikes--;
 
@@ -61,7 +63,7 @@
     {
         if (post.CurrentUserId != comment.AuthorUserMiniViewModel.ApplicationUserId)
         {
-            await serviceOfAuthorize.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
+            await serviceOfRequest.GetAsync($"api/Comment/LikeComment?commentId={comment.CommentId}&postId={comment.PostId}");
             comment.IsUserLiked = !comment.IsUserLiked;
             comment.CountOfLikes++;
 

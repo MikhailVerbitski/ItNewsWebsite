@@ -48,14 +48,14 @@
 
     protected async override Task OnInitAsync()
     {
-        TheFirstFiveWithTheHighestRating = await serviceOfAuthorize.PostJsonAsync<List<PostMiniViewModel>>("api/Post/Read", new
+        TheFirstFiveWithTheHighestRating = await serviceOfRequest.PostJsonAsync<List<PostMiniViewModel>>("api/Post/Read", new
         {
             type = "PostMiniViewModel",
             count = 5,
             orderBy = "-((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))",
             where = "IsFinished==true"
         });
-        var tags = await serviceOfAuthorize.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
+        var tags = await serviceOfRequest.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
         tagsForCloud = tags.Select(a => new TagForCloud()
         {
             text = a.Name,

@@ -3,8 +3,7 @@
 @implements IDisposable
 @inject Blazor.FileReader.IFileReaderService fileReadService
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
-@inject HttpClient Http
-@inject Components.ServiceOfImage serviceOfImage
+@inject Services.ServiceOfImage serviceOfImage
 @using Domain.Contracts.Models.ViewModels.Tag;
 @using Domain.Contracts.Models.ViewModels.Post;
 @using Domain.Contracts.Models;
@@ -123,8 +122,8 @@
     }
     protected override async Task OnInitAsync()
     {
-        Selections = (Selections == null) ? await serviceOfAuthorize.GetJsonAsync<List<string>>("api/Post/GetListOfSelections") : Selections;
-        ServerTags = (ServerTags == null) ? await serviceOfAuthorize.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags") : ServerTags;
+        Selections = (Selections == null) ? await serviceOfRequest.GetJsonAsync<List<string>>("api/Post/GetListOfSelections") : Selections;
+        ServerTags = (ServerTags == null) ? await serviceOfRequest.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags") : ServerTags;
         ServerTags = ServerTags.OrderBy(a => -a.CountOfUsage).ToList();
     }
     protected async override Task OnParametersSetAsync()
@@ -138,17 +137,17 @@
                 where = $"Id=={id}",
                 count = 1
             };
-            post = await serviceOfAuthorize.PostJsonAsync<PostUpdateValidationViewModel>($"/api/Post/Read", postRequest);
+            post = await serviceOfRequest.PostJsonAsync<PostUpdateValidationViewModel>($"/api/Post/Read", postRequest);
             post.Content = new ReverseMarkdown.Converter().Convert(post.Content);
             IsEditPost = true;
         }
         else
         {
-            post = await serviceOfAuthorize.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Create");
+            post = await serviceOfRequest.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Create");
         }
         post.Section = Selections.First();
     }
-    private async Task UpdateCreate(bool isFinished = false)
+    private async Task UpdateCreate(bool isFinished = false, bool IsAutoUpdate = false)
     {
         if (!post.HasErrors)
         {
@@ -165,9 +164,12 @@
                 Tags = post.Tags,
                 UserProfileId = post.UserProfileId
             };
-            await serviceOfAuthorize.PostJsonAsync<object>("api/Post/Update", postUpdate);
+            await serviceOfRequest.PostJsonAsync<object>("api/Post/Update", postUpdate);
             IsSend = true;
-            UriHelper.NavigateTo("/");
+            if(!IsAutoUpdate)
+            {
+                UriHelper.NavigateTo("/");
+            }
         }
     }
     private void SelectTag(TagViewModel tagViewModel)
@@ -220,7 +222,7 @@
         {
             Console.WriteLine("auto save");
             IsEditPost = true;
-            UpdateCreate(false);
+            UpdateCreate(false, true);
         }
     }
 }
