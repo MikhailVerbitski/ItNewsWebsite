@@ -26,7 +26,7 @@ namespace Data.Implementation.Repositories
 
             return base.Create(entity);
         }
-        public override void Delete(CommentLikeEntity entity)
+        public void Delete(CommentLikeEntity entity, bool forCommentDelete = false)
         {
             RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
             RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
@@ -36,8 +36,12 @@ namespace Data.Implementation.Repositories
             {
                 comment = repositoryOfComment.Read(a => a.Id == entity.CommentId);
             }
-            comment.CountOfLikes--;
-            repositoryOfComment.Update(comment);
+
+            if (!forCommentDelete)
+            {
+                comment.CountOfLikes--;
+                repositoryOfComment.Update(comment);
+            }
             
             var ApplicationUserOfComment = repositoryOfApplicationUser.Read(a => a.UserProfileId == comment.UserProfileId);
             ApplicationUserOfComment.CountOfLikes--;

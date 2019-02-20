@@ -11,7 +11,7 @@
 <div class="grid-comment-footer">
     <p class="container-date">@DateConverter.GetTime(post.Created)</p>
     <div></div>
-    @if (post.BelongsToUser && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)
+    @if ((post.BelongsToUser && (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)) || serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 3)
     {
         <div class="post-edit-delete">
             <font size="2"><a href="/CreatePost/@post.PostId"><LocalizationSentence Sentence="@("Edit")" /></a></font>

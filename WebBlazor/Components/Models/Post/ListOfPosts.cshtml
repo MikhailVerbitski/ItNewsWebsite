@@ -28,16 +28,16 @@ else
             </ListViewTemplate>
             break;
     }
-    @if(!allLoaded)
+    @if(!allLoaded && count >= takeCount)
     {
-        <button onclick="@LoadMore" class="pure-button" style="width: 100%">Load more</button>
+        <button onclick="@LoadMore" class="pure-button" style="width: 100%"><LocalizationSentence Sentence="@("Load more")" /></button>
     }
 }
 
 @functions {
     [Parameter] private Type PostType { get; set; }
-    [Parameter] private string param { get; set; }
     [Parameter] private object listOfPosts { get; set; }
+    [Parameter] private string param { get; set; }
     private int count = 0;
     private int takeCount = 3;
     private bool allLoaded = false;
@@ -75,6 +75,8 @@ else
     }
     protected override async Task OnParametersSetAsync()
     {
+        Console.WriteLine($"post on Parameter set");
+
         if ((listOfPosts == null || notFirstTime) && param != null && param != string.Empty)
         {
             var parameters = param.Split(':');

@@ -289,6 +289,9 @@
     <value>Удалить учетную запись</value>
   </data>
   <data name="No comments yet :(" xml:space="preserve">
-    <value>No comments yet :(</value>
+    <value>Комментариев пока нет :(</value>
+  </data>
+  <data name="Load more" xml:space="preserve">
+    <value>Загрузить больше</value>
   </data>
 </root>

@@ -84,5 +84,7 @@
     protected async override Task OnParametersSetAsync()
     {
         User = await serviceOfRequest.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?userProfileId={Id}");
+        Id = User.UserProfileId;
+        Param = $"Time:User-{Id}:f:fin";
     }
 }

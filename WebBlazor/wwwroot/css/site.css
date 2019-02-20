@@ -131,17 +131,8 @@
 #search input{
     width: auto;
 }
-#search div {
-    display: flex;
-    align-items:center;
-    justify-content:center;
-    background-color: #FAFAFA;
+#search button {
     border-radius: 2em;
-    border: 3px solid transparent;
-    padding: 0 10px; 
-}
-#search div:hover {
-    border-color: silver;
 }
 
 .create-post-link {

@@ -68,7 +68,7 @@ namespace Domain.Implementation.Services
         public IEnumerable<PostCompactViewModel> Search(string propetry)
         {
             return repositoryOfPost
-                .ReadMany(new Expression<Func<PostEntity, bool>>[] { a => a.Header.Contains(propetry) })
+                .ReadMany(new Expression<Func<PostEntity, bool>>[] { a => a.Header.Contains(propetry), a=> a.IsFinished == true })
                 .Select(a => GetPostCompactViewModel(a, null))
                 .AsParallel()
                 .ToList();
@@ -148,6 +148,13 @@ namespace Domain.Implementation.Services
                 postEntity.Section = section;
                 postEntity.SectionId = section.Id;
             }
+            if (postEntity.IsFinished == false && lastPostEntity.IsFinished == true)
+            {
+                postEntity.IsFinished = true;
+            }
+            postEntity.CountOfScore = lastPostEntity.CountOfScore;
+            postEntity.SumOfScore = lastPostEntity.SumOfScore;
+            postEntity.Created = lastPostEntity.Created;
             postEntity.Tags = serviceOfTag.TagsPostUpdate(postCreateEditViewModel.Tags, lastPostEntity.Tags, postCreateEditViewModel.PostId);
             repositoryOfPost.Update(postEntity);
         }
@@ -194,7 +201,7 @@ namespace Domain.Implementation.Services
             postViewModel.Images = repositoryOfImage.ReadMany(new Expression<Func<ImageEntity, bool>>[] { a => a.PostId == postEntity.Id }).Select(a => a.Path).ToList();
             postViewModel.BelongsToUser = (applicationUserCurrent == null) 
                 ? false 
-                : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+                : applicationUserCurrent.UserProfileId == postEntity.UserProfileId;
             return postViewModel;
         }
         private PostMiniViewModel GetPostMiniViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -203,7 +210,7 @@ namespace Domain.Implementation.Services
             var applicationUserPost = repositoryOfApplicationUser.Read(a => a.UserProfileId == postEntity.UserProfileId);
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+                : applicationUserCurrent.UserProfileId == postEntity.UserProfileId;
             return postViewModel;
         }
         private PostCompactViewModel GetPostCompactViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -213,7 +220,7 @@ namespace Domain.Implementation.Services
             postViewModel.AuthorUserMiniViewModel = serviceOfUser.GetUserMiniViewModel(applicationUserPost);
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+                : applicationUserCurrent.UserProfileId == postEntity.UserProfileId;
             return postViewModel;
         }
         private PostViewModel GetPostViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)
@@ -227,7 +234,7 @@ namespace Domain.Implementation.Services
             postViewModel.CurrentUserId = (applicationUserCurrent == null) ? null : applicationUserCurrent.Id;
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
-                : serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, postEntity.UserProfile.ApplicationUserId, true).Result;
+                : applicationUserCurrent.UserProfileId == postEntity.UserProfileId;
             return postViewModel;
         }
         public BasePostViewModel GetViewModelWithProperty(string type, PostEntity postEntity, string applicationUserIdCurrent)

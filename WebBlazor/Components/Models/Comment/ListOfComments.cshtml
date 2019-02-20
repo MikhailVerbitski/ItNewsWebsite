@@ -31,9 +31,9 @@ else
             </ListViewTemplate>
             break;
     }
-    @if (!allLoaded)
+    @if (!allLoaded && count >= takeCount)
     {
-        <button onclick="@LoadMore" class="pure-button" style="width: 100%">Load more</button>
+        <button onclick="@LoadMore" class="pure-button" style="width: 100%"><LocalizationSentence Sentence="@("Load more")" /></button>
     }
 }
 
@@ -42,6 +42,8 @@ else
     [Parameter] private string ApplicationUserId { get; set; }
     [Parameter] private object listOfComments { get; set; }
     [Parameter] private PostViewModel post { get; set; }
+    private string lastApplicationUserId;
+    private int? lastPostId;
     private int count = 0;
     private int takeCount = 3;
     private bool allLoaded = false;
@@ -49,37 +51,47 @@ else
 
     private HubConnection connection;
 
-    protected override async Task OnInitAsync()
+    protected override void OnInit()
     {
-        connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
-        connection.On<string>("createComment", this.OnCreateComment);
-        connection.On<int>("deleteComment", this.OnDeleteComment);
-        await connection.StartAsync();
-
-        switch (CommentType.Name)
+        lastApplicationUserId = ApplicationUserId;
+        lastPostId = post?.PostId;
+    }
+    protected async override Task OnParametersSetAsync()
+    {
+        if (!notFirstTime || ((lastApplicationUserId == null) ? ((lastPostId == null) ? false : lastPostId != post.PostId) : lastApplicationUserId != ApplicationUserId))
         {
-            case nameof(CommentViewModel):
-                listOfComments = await serviceOfRequest.PostJsonAsync<List<CommentViewModel>>("/api/Comment/Read", new CommentReadRequestParams
-                {
-                    PostId = post.PostId,
-                    count = takeCount,
-                    type = nameof(CommentViewModel),
-                    skip = count,
-                });
-                count = (listOfComments as List<CommentViewModel>).Count;
-                break;
-            case nameof(CommentMiniViewModel):
-                listOfComments = await serviceOfRequest.PostJsonAsync<List<CommentMiniViewModel>>("/api/Comment/Read", new CommentReadRequestParams
-                {
-                    ApplicationUserId = ApplicationUserId,
-                    count = takeCount,
-                    type = nameof(CommentMiniViewModel),
-                    skip = count,
-                });
-                count = (listOfComments as List<CommentMiniViewModel>).Count;
-                break;
+            connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
+            connection.On<string>("createComment", this.OnCreateComment);
+            connection.On<int>("deleteComment", this.OnDeleteComment);
+            await connection.StartAsync();
+            switch (CommentType.Name)
+            {
+                case nameof(CommentViewModel):
+                    listOfComments = await serviceOfRequest.PostJsonAsync<List<CommentViewModel>>("/api/Comment/Read", new CommentReadRequestParams
+                    {
+                        PostId = post.PostId,
+                        count = takeCount,
+                        type = nameof(CommentViewModel),
+                        skip = count,
+                    });
+                    count = (listOfComments as List<CommentViewModel>).Count;
+                    break;
+                case nameof(CommentMiniViewModel):
+                    listOfComments = await serviceOfRequest.PostJsonAsync<List<CommentMiniViewModel>>("/api/Comment/Read", new CommentReadRequestParams
+                    {
+                        ApplicationUserId = ApplicationUserId,
+                        count = takeCount,
+                        type = nameof(CommentMiniViewModel),
+                        skip = count,
+                    });
+                    count = (listOfComments as List<CommentMiniViewModel>).Count;
+                    break;
+            }
+            lastApplicationUserId = ApplicationUserId;
+            lastPostId = post?.PostId;
+            notFirstTime = true;
+            this.StateHasChanged();
         }
-        this.StateHasChanged();
     }
     private Task OnCreateComment(string comment)
     {

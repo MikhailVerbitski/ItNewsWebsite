@@ -1,6 +1,7 @@
 ﻿@using Domain.Contracts.Models.ViewModels.User
 @inject Services.ServiceOfAuthorize serviceOfAuthorize
 @inject Services.ServiceOfImage serviceOfImage
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div class="grid-cols-two">
     <p><a href="/UserPage/@(User.UserProfileId)"><h1>@User.FirstName @User.LastName</h1></a></p>
@@ -113,7 +114,12 @@
 <br />
 @if (serviceOfAuthorize.DataAboutUser != null && (serviceOfAuthorize.DataAboutUser.UserProfileId == User.UserProfileId || serviceOfAuthorize.DataAboutUser.Priority >= 3))
 {
-    <button class="pure-button" onclick="@(() => (serviceOfRequest.GetAsync($"/api/User/Delete?id={User.UserProfileId}")))">
+    <button class="pure-button" onclick="@(async () =>
+            {
+                await serviceOfRequest.GetAsync($"/api/User/Delete?id={User.UserProfileId}");
+                await serviceOfAuthorize.Logout();
+                UriHelper.NavigateTo("/Login");
+            })">
         <LocalizationSentence Sentence="@("Delete account")" />
     </button>
 }

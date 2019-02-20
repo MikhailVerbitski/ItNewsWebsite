@@ -26,7 +26,7 @@
     </div>
     <div class="pure-form" id="search">
         <input type="text" class="pure-input-rounded" bind="@SearchWords" />
-        <div onclick="@(() => UriHelper.NavigateTo($"/Search/{SearchWords}"))"><LocalizationSentence Sentence="@("Search")" /></div>
+        <button onclick="@(() => UriHelper.NavigateTo($"/Search/{SearchWords}"))" class="pure-button"><LocalizationSentence Sentence="@("Search")" /></button>
     </div>
 </div>
 

@@ -30,8 +30,8 @@ namespace Data.Implementation.Repositories
         {
             var repositoryOfUserProfile = new RepositoryOfUserProfile(context);
             var userProfile = repositoryOfUserProfile.Read(a => a.Id == entity.UserProfileId);
-            base.Delete(entity);
             repositoryOfUserProfile.Delete(userProfile);
+            base.Delete(entity);
         }
     }
 }

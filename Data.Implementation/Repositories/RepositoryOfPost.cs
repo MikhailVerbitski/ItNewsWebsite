@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Data.Contracts.Models.Entities;
 
@@ -35,42 +37,23 @@ namespace Data.Implementation.Repositories
         {
             var lastPost = this.Read(a => a.Id == entity.Id, a => a.Section);
             RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
-
-            if(entity.Section != null && lastPost.Section != null && entity.Section != lastPost.Section)
+            
+            if(entity.Section == null)
             {
-                lastPost.Section.CountOfUsage--;
-                repositoryOfSection.Update(lastPost.Section);
+                entity.Section = repositoryOfSection.Read(a => a.Id == entity.SectionId);
             }
 
-            if (entity.Section == null)
+            if(entity.Section != lastPost.Section)
             {
-                var section = repositoryOfSection.Read(a => a.Id == entity.SectionId);
-                if (section != null)
+                if(lastPost.Section != null)
                 {
-                    section.CountOfUsage++;
-                    repositoryOfSection.Update(section);
+                    lastPost.Section.CountOfUsage--;
+                    repositoryOfSection.Update(lastPost.Section);
                 }
-            }
-            else
-            {
                 entity.Section.CountOfUsage++;
                 repositoryOfSection.Update(entity.Section);
             }
 
-            if (lastPost.Section == null)
-            {
-                var section = repositoryOfSection.Read(a => a.Id == lastPost.SectionId);
-                if (section != null)
-                {
-                    section.CountOfUsage++;
-                    repositoryOfSection.Update(section);
-                }
-            }
-            else
-            {
-                lastPost.Section.CountOfUsage++;
-                repositoryOfSection.Update(lastPost.Section);
-            }
             if(entity.Created.Millisecond == 0)
             {
                 entity.Created = DateTime.Now;
@@ -82,6 +65,8 @@ namespace Data.Implementation.Repositories
         public override void Delete(PostEntity entity)
         {
             RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
+            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
+            RepositoryOfPostRating repositoryOfPostRating = new RepositoryOfPostRating(context);
             var section = entity.Section;
             if (section == null)
             {
@@ -91,6 +76,26 @@ namespace Data.Implementation.Repositories
             {
                 section.CountOfUsage--;
                 repositoryOfSection.Update(section);
+            }
+            var comments = entity.Comments;
+            if(comments == null)
+            {
+                comments = repositoryOfComment.ReadMany(new Expression<Func<CommentEntity, bool>>[] { a => a.PostId == entity.Id });
+            }
+            comments = comments.ToList();
+            foreach (var item in comments)
+            {
+                repositoryOfComment.Delete(item);
+            }
+            var postRatings = entity.PostRatings;
+            if (postRatings == null)
+            {
+                postRatings = repositoryOfPostRating.ReadMany(new Expression<Func<PostRatingEntity, bool>>[] { a => a.PostId == entity.Id });
+            }
+            postRatings = postRatings.ToList();
+            foreach (var item in postRatings)
+            {
+                repositoryOfPostRating.Delete(item);
             }
             base.Delete(entity);
         }

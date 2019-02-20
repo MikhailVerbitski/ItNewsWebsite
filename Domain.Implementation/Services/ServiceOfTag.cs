@@ -67,7 +67,8 @@ namespace Domain.Implementation.Services
                     PostId = postId,
                     TagId = a.Id,
                     Tag = a,
-                }));
+                }))
+                .ToList();
         }
     }
 }
