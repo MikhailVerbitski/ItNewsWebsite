@@ -49,15 +49,16 @@
                 <label for="file" class="pure-button"><LocalizationSentence Sentence="@("Upload image")" /></label>
                 <input type="file" id="file" ref="files" onchange="@LoadImage" style="display: none;" />
                 <label for="content"><LocalizationSentence Sentence=@("Content") /></label>
-
                 <div>
                     <textarea id="textareaContent"
                               rows="10"
                               bind="@(post.Content)"
                               dropzone="move"
+                              ondrop="@(() => { highlightDropTargetStyle = null; })"
+                              ondragenter="@(() => { highlightDropTargetStyle = "border:5px dashed salmon !important"; })" 
+                              ondragleave="@(() => { highlightDropTargetStyle = null; })" 
                               style="@highlightDropTargetStyle" />
                 </div>
-
                 <ValidationError Subject="@post" Property="@nameof(post.Content)" />
             </div>
             <label for="tagInput"><LocalizationSentence Sentence="@("Tags")" />:</label>
@@ -69,7 +70,7 @@
                         </ItemTemplate>
                     </ListViewTemplateWithIf>
                 </div>
-                <input style="display: inline;" list="listTags" id="tagInput" type="text" bind="@bindStrForInput" onkeydown="@TagKeyPress" />
+                <input style="display: inline;" id="inputForTags" list="listTags" type="text" onchange="@TagChange"/>
                 <datalist id="listTags">
                     <ListViewTemplateWithIf Items="@ServerTags">
                         <ItemTemplate>
@@ -97,17 +98,10 @@
 @functions{
     [Parameter] private string Id { get; set; }
     private string highlightDropTargetStyle = null;
-
-    private string strTags { get; set; }
-    private string bindStrForInput { get; set; }
-
     private IEnumerable<string> Selections { get; set; }
     private List<TagViewModel> ServerTags { get; set; }
-
     private ElementRef files;
-
     private PostUpdateValidationViewModel post;
-
     private bool IsEditPost = false;
     private bool IsSend = false;
     private bool renderInitialization = true;
@@ -146,6 +140,7 @@
         else
         {
             post = await serviceOfRequest.GetJsonAsync<PostUpdateValidationViewModel>($"api/Post/Create");
+            this.Id = post.PostId.ToString();
         }
         post.Section = Selections.First();
     }
@@ -176,40 +171,33 @@
     }
     private void SelectTag(TagViewModel tagViewModel)
     {
-        post.Tags.Add(tagViewModel);
-        ServerTags.Remove(tagViewModel);
+        if(!post.Tags.Any(a => a.Name == tagViewModel.Name))
+        {
+            post.Tags.Add(tagViewModel);
+            ServerTags.Remove(tagViewModel);
+        }
     }
     private void DeselectTag(TagViewModel tagViewModel)
     {
         ServerTags.Add(tagViewModel);
         post.Tags.Remove(tagViewModel);
+        this.StateHasChanged();
     }
-    private void TagKeyPress(UIKeyboardEventArgs eventArgs)
+    private void TagChange(UIChangeEventArgs e)
     {
-        if (eventArgs.Key == "Backspace")
+        var text = (e.Value as string).Trim();
+        if(text != "")
         {
-            strTags = new string(strTags.Take(strTags.Length - 1).ToArray());
-        }
-        else if (eventArgs.Key.Length > 1)
-        {
-            return;
-        }
-        else
-        {
-            strTags += eventArgs.Key;
-        }
-        var tag = ServerTags.Where(a => a.Name == strTags || a.Name == bindStrForInput).SingleOrDefault();
-        if (tag != null)
-        {
-            SelectTag(tag);
-            bindStrForInput = string.Empty;
-            strTags = string.Empty;
-        }
-        else if (eventArgs.Key == " ")
-        {
-            SelectTag(new TagViewModel() { Name = strTags });
-            bindStrForInput = string.Empty;
-            strTags = string.Empty;
+            var tag = ServerTags.Where(a => a.Name == text).SingleOrDefault();
+            if (tag != null)
+            {
+                SelectTag(tag);
+            }
+            else
+            {
+                SelectTag(new TagViewModel() { Name = text });
+            }
+            JSRuntime.Current.InvokeAsync<object>("Clear.InputContent", "inputForTags");
         }
     }
     private async Task LoadImage()

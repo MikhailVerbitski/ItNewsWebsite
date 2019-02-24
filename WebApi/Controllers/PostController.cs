@@ -28,14 +28,15 @@ namespace WebApi.Controllers
         [HttpGet]
         public JsonResult Search(string property)
         {
-            var posts = serviceOfPost.Search(property);
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var posts = serviceOfPost.Search(userId, property);
             return Json(posts);
         }
         [HttpGet]
         public async Task<JsonResult> Create()
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
-            var post = await serviceOfPost.Create(userId, null);
+            var post = await serviceOfPost.Create(userId);
             return Json(post);
         }
         [HttpPost]

@@ -54,7 +54,7 @@
 
 .grid-cols-two {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 1fr auto;
 }
 
 .grid-userMini {
@@ -121,4 +121,9 @@ grid-login-remember input{
 }
 .cross:hover {
     opacity: 0.6;
+}
+
+.grid-post-edit-delete{
+    display: grid;
+    grid-template-columns: 1fr auto;
 }

@@ -1,4 +1,5 @@
 ﻿@using Domain.Contracts.Models.ViewModels.Post
+@inject Services.ServiceOfLocalization serviceOfLocalization
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div>
@@ -6,7 +7,9 @@
         <a href="/Post/@post.PostId"><h2>@post.Header</h2></a>
         <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !post.BelongsToUser)"/></span>
         <div></div>
-        <span>@post.Created.ToLongDateString()</span>
+        <span>
+            <LocalizationTime Time="@post.Created"/>
+        </span>
     </div>
     <br />
     <span>@post.BriefDesctiption</span>
@@ -30,7 +33,12 @@
 @functions {
     [Parameter] private PostCompactViewModel post { get; set; }
     [Parameter] private Action<BasePostViewModel> deletePost { get; set; }
+    private Dictionary<string, string> language;
 
+    protected async override Task OnInitAsync()
+    {
+        language = await serviceOfLocalization.LanguageDictionary;
+    }
     private async Task Delete()
     {
         await serviceOfRequest.GetAsync($"api/Post/Delete?postId={post.PostId}");

@@ -1,7 +1,6 @@
 ﻿@using Domain.Contracts.Models.ViewModels.Comment;
 @using Domain.Contracts.Models.ViewModels.Post;
 @using Domain.Contracts.Models.ViewModels.User;
-@using Domain.Contracts.Models;
 
 <div class="comment">
     <div class="grid-comment-head">
@@ -18,7 +17,7 @@
             </div>
         </div>
         <div class="grid-comment-footer">
-            <p class="container-date">@DateConverter.GetTime(comment.Created)</p>
+            <p class="container-date"><LocalizationTime Time="@comment.Created" format="@("dddd HH:MM")"/></p>
             <div></div>
             @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 1)
             {

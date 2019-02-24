@@ -294,4 +294,10 @@
   <data name="Load more" xml:space="preserve">
     <value>Загрузить больше</value>
   </data>
+  <data name="Current culture name" xml:space="preserve">
+    <value>ru</value>
+  </data>
+  <data name="Registration date" xml:space="preserve">
+    <value>Дата регистрации</value>
+  </data>
 </root>

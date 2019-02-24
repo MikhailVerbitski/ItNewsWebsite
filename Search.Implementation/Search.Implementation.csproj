@@ -6,12 +6,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="NEST" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Data.Implementation\Data.Implementation.csproj" />
-    <ProjectReference Include="..\Domain.Contracts\Domain.Contracts.csproj" />
-    <ProjectReference Include="..\Search.Implementation\Search.Implementation.csproj" />
+    <ProjectReference Include="..\Data.Contracts\Data.Contracts.csproj" />
+    <ProjectReference Include="..\Search.Contracts\Search.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,6 +6,7 @@ using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.Tag;
+using Search.Implementation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace Domain.Implementation.Services
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfUser serviceOfUser;
         private readonly ServiceOfTag serviceOfTag;
+        private readonly ServiceOfSearch serviceOfSearch;
 
         public Tuple<string, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[] Config;
 
@@ -39,7 +41,8 @@ namespace Domain.Implementation.Services
             ServiceOfAccount serviceOfAccount,
             ServiceOfComment serviceOfComment,
             ServiceOfUser serviceOfUser,
-            ServiceOfTag serviceOfTag
+            ServiceOfTag serviceOfTag,
+            ServiceOfSearch serviceOfSearch
             )
         {
             this.mapper = mapper;
@@ -55,6 +58,7 @@ namespace Domain.Implementation.Services
             this.serviceOfComment = serviceOfComment;
             this.serviceOfUser = serviceOfUser;
             this.serviceOfTag = serviceOfTag;
+            this.serviceOfSearch = serviceOfSearch;
 
             Config = new Tuple<string, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[]
             {
@@ -65,69 +69,55 @@ namespace Domain.Implementation.Services
             };
         }
 
-        public IEnumerable<PostCompactViewModel> Search(string propetry)
+        public IEnumerable<PostCompactViewModel> Search(string applicationUserIdCurrent, string propetry)
         {
-            return repositoryOfPost
-                .ReadMany(new Expression<Func<PostEntity, bool>>[] { a => a.Header.Contains(propetry), a=> a.IsFinished == true })
-                .Select(a => GetPostCompactViewModel(a, null))
-                .AsParallel()
+            var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
+            var ids = serviceOfSearch.SearchPosts(propetry, 0, 10);
+            var result = ids
+                .Select(b => repositoryOfPost.Read(a => a.Id == b,
+                    a => a.Tags,
+                    a => a.Comments,
+                    a => a.Section,
+                    a => a.UserProfile))
+                .Select(a => GetViewModelWithProperty("PostCompactViewModel", a, applicationUserCurrent) as PostCompactViewModel)
                 .ToList();
+            return result;
         }
-        public async Task<PostUpdateViewModel> Create(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel)
+        private async Task<PostEntity> Create(string applicationUserIdCurrent, bool flag)
         {
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
             if (!await serviceOfUser.IsThereAccess(new[] { 2, 3 }, applicationUserCurrent, null, false))
             {
                 return null;
             }
-            if(postCreateEditViewModel == null)
+            var newPost = repositoryOfPost.Create(new PostEntity()
             {
-                var newPost = repositoryOfPost.Create(new PostEntity()
-                {
-                    Header = "New Post",
-                    Content = "# Content",
-                    UserProfileId = applicationUserCurrent.UserProfileId
-                });
-                var newPostViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(newPost);
-                newPostViewModel.Tags = new List<TagViewModel>();
-                newPostViewModel.Images = new List<string>();
-                return newPostViewModel;
-            }
-            PostEntity postEntity = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, a => a.Tags, a => a.UserProfile);
-            if (postEntity != null)
-            {
-                return null;
-            }
-            postEntity = (postCreateEditViewModel == null)
-                ? new PostEntity()
-                : postEntity = mapper.Map<PostUpdateViewModel, PostEntity>(postCreateEditViewModel);
-            var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
-            postEntity.UserProfileId = applicationUser.UserProfileId;
-            if (postCreateEditViewModel != null && postCreateEditViewModel.Section != null)
-            {
-                var section = repositoryOfSection.Read(a => a.Name == postCreateEditViewModel.Section);
-                postEntity.Section = section;
-                postEntity.SectionId = section.Id;
-            }
-            postEntity = repositoryOfPost.Create(postEntity);
-            if (postCreateEditViewModel.Images != null && postCreateEditViewModel.Images.Count() > 0)
-            {
-                postEntity.Images = postCreateEditViewModel.Images.Select(a =>
-                {
-                    return repositoryOfImage.Create(new ImageEntity()
-                    {
-                        Path = a,
-                        PostId = postEntity.Id
-                    });
-                })
-                .ToList();
-            }
-            if (postCreateEditViewModel != null && postCreateEditViewModel.Tags != null)
-            {
-                postEntity.Tags = serviceOfTag.AddTagsPost(postCreateEditViewModel.Tags, postEntity.Id);
-            }
-            var newPostCreateEditViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
-            return newPostCreateEditViewModel;
+                Header = "New Post",
+                Content = "# Content",
+                UserProfileId = applicationUserCurrent.UserProfileId
+            });
+            serviceOfSearch.Create<PostEntity>(newPost);
+            return newPost;
+        }
+        public async Task<PostUpdateViewModel> Create(string applicationUserIdCurrent)
+        {
+            var newPost = await Create(applicationUserIdCurrent, false);
+            var newPostViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(newPost);
+            newPostViewModel.Tags = new List<TagViewModel>();
+            newPostViewModel.Images = new List<string>();
+            return newPostViewModel;
+        }
+        public async Task<PostUpdateViewModel> Create(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel)
+        {
+            var newPost = await Create(applicationUserIdCurrent, false);
+            postCreateEditViewModel.PostId = newPost.Id;
+            await Update(applicationUserIdCurrent, postCreateEditViewModel, newPost);
+            var post = repositoryOfPost.Read(a => a.Id == postCreateEditViewModel.PostId, 
+                a => a.Tags,
+                a => a.Comments,
+                a => a.Section,
+                a => a.UserProfile);
+            return GetViewModelWithProperty("PostUpdateViewModel", post, applicationUserIdCurrent) as PostUpdateViewModel;
         }
         public async Task Update(string applicationUserIdCurrent, PostUpdateViewModel postCreateEditViewModel, PostEntity lastPostEntity = null)
         {
@@ -157,6 +147,7 @@ namespace Domain.Implementation.Services
             postEntity.Created = lastPostEntity.Created;
             postEntity.Tags = serviceOfTag.TagsPostUpdate(postCreateEditViewModel.Tags, lastPostEntity.Tags, postCreateEditViewModel.PostId);
             repositoryOfPost.Update(postEntity);
+            serviceOfSearch.Update<PostEntity>(postEntity);
         }
         public async Task Delete(string applicationUserIdCurrent, int postId)
         {
@@ -169,6 +160,7 @@ namespace Domain.Implementation.Services
             if (await serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, post.UserProfile.ApplicationUserId, true))
             {
                 post.Images.ToList().ForEach(a => serviceOfImage.Delete(a.Path));
+                serviceOfSearch.DeletePost(post);
                 repositoryOfPost.Delete(post);
             }
             return;

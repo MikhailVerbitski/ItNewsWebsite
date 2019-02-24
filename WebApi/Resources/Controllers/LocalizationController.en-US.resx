@@ -297,4 +297,13 @@
   <data name="Load more" xml:space="preserve">
     <value>Load more</value>
   </data>
+  <data name="Current culture name" xml:space="preserve">
+    <value>en</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Registration date" xml:space="preserve">
+    <value>Registration date</value>
+  </data>
 </root>

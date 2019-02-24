@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Data.Contracts.Models.Entities;
@@ -29,7 +28,6 @@ namespace Data.Implementation.Repositories
             {
                 entity.Created = DateTime.Now;
             }
-
             return base.Create(entity);
         }
 

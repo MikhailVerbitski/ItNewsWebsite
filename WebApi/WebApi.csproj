@@ -19,7 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Domain.Implementation\Domain.Implementation.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Search.Implementation\Search.Implementation.csproj" />
     <ProjectReference Include="..\WebBlazor\WebBlazor.csproj" />
   </ItemGroup>
 

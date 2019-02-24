@@ -2,6 +2,7 @@
 using Data.Contracts.Models.Entities;
 using Domain.Contracts.Models.ViewModels.Account;
 using Domain.Contracts.Models.ViewModels.User;
+using Search.Contracts.Models;
 
 namespace Infrastructure.AutomapperProfiles
 {
@@ -54,6 +55,15 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.UserName, a => a.MapFrom(b => b.Login))
                 .ForMember(a => a.Email, a => a.MapFrom(b => b.Email))
                 .ForAllOtherMembers(a => a.Ignore());
+
+            CreateMap<ApplicationUserEntity, ApplicationUserSearch>()
+                .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
+                .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
+                .ForMember(a => a.UserName, a => a.MapFrom(b => b.UserName));
+            CreateMap<ApplicationUserSearch, ApplicationUserEntity> ()
+                .ForMember(a => a.FirstName, a => a.MapFrom(b => b.FirstName))
+                .ForMember(a => a.LastName, a => a.MapFrom(b => b.LastName))
+                .ForMember(a => a.UserName, a => a.MapFrom(b => b.UserName));
         }
     }
 }

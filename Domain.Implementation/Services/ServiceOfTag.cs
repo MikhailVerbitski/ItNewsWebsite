@@ -32,15 +32,19 @@ namespace Domain.Implementation.Services
             var tags = postEntity.Tags.Select(a => repositoryOfTag.Read(b => b.Id == a.TagId)).Select(a => mapper.Map<TagEntity, TagViewModel>(a));
             return tags;
         }
-        private IEnumerable<TagEntity> MapTagViewModelToTagEntity(IEnumerable<TagViewModel> tagViewModels) => tagViewModels.Select(a =>
+        private List<TagEntity> MapTagViewModelToTagEntity(IEnumerable<TagViewModel> tagViewModels) => tagViewModels.Select(a =>
             {
                 var tag = mapper.Map<TagViewModel, TagEntity>(a);
                 if (tag.Id == 0)
                 {
-                    tag = repositoryOfTag.Create(new TagEntity() { Name = a.Name });
+                    var readTag = repositoryOfTag.Read(b => b.Name == tag.Name);
+                    tag = (readTag == null) 
+                    ? tag = repositoryOfTag.Create(new TagEntity() { Name = a.Name }) 
+                    : readTag;
                 }
                 return tag;
-            });
+            })
+            .ToList();
         public List<PostTagEntity> AddTagsPost(IEnumerable<TagViewModel> tagViewModels, int postId) => MapTagViewModelToTagEntity(tagViewModels)
             .Select(a => repositoryOfPostTag.Create(new PostTagEntity()
             {
@@ -55,10 +59,10 @@ namespace Domain.Implementation.Services
             lastTagEntities
                 .Select(a => a.TagId.Value)
                 .Except(postTagEntities.Select(a => a.Id))
-                .Select(a => lastTagEntities.Single(b => b.Id == a))
+                .Select(a => lastTagEntities.Single(b => b.TagId == a))
                 .ToList()
                 .ForEach(a => repositoryOfPostTag.Delete(a));
-            return postTagEntities
+            var result = postTagEntities
                 .Select(a => a.Id)
                 .Except(lastTagEntities.Select(a => a.TagId.Value))
                 .Select(a => postTagEntities.Single(b => b.Id == a))
@@ -69,6 +73,7 @@ namespace Domain.Implementation.Services
                     Tag = a,
                 }))
                 .ToList();
+            return result;
         }
     }
 }

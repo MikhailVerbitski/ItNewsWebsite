@@ -43,3 +43,9 @@ window.DragAndDrop = {
         }
     }
 }
+window.Clear = {
+    InputContent: function (id) {
+        var input = document.getElementById(id);
+        input.value = "";
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
 using Domain.Contracts.Models.ViewModels.Post;
+using Search.Contracts.Models;
 
 namespace Infrastructure.AutomapperProfiles
 {
@@ -65,6 +66,15 @@ namespace Infrastructure.AutomapperProfiles
                 .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
                 .ForMember(a => a.Header, a => a.MapFrom(b => b.Header))
                 .ForAllOtherMembers(a => a.Ignore());
+
+            CreateMap<PostEntity, PostSearch>()
+                .ForMember(a => a.Id, a => a.MapFrom(b => b.Id))
+                .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
+                .ForMember(a => a.Header, a => a.MapFrom(b => b.Header));
+            CreateMap<PostSearch, PostEntity>()
+                .ForMember(a => a.Id, a => a.MapFrom(b => b.Id))
+                .ForMember(a => a.Content, a => a.MapFrom(b => b.Content))
+                .ForMember(a => a.Header, a => a.MapFrom(b => b.Header));
         }
     }
 }

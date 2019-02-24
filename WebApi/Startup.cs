@@ -22,6 +22,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using WebApi.Hubs;
 using Domain.Implementation.Services;
+using Search.Implementation;
 
 namespace WebApi
 {
@@ -96,6 +97,7 @@ namespace WebApi
             services.AddScoped<ServiceOfSection>();
             services.AddScoped<ServiceOfTag>();
             services.AddScoped<ServiceOfUser>();
+            services.AddScoped<ServiceOfSearch>();
 
             services.AddLocalization(a => a.ResourcesPath = "Resources");
             services.AddMvc();

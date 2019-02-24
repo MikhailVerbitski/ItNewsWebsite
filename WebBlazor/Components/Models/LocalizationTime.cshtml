@@ -1,0 +1,19 @@
+﻿@inject Services.ServiceOfLocalization serviceOfLocalization
+@using System.Globalization
+
+@((language == null) ? "" : $" {Time.ToString(format, new CultureInfo((language["Current culture name"])))}")
+
+@functions{
+    [Parameter] private DateTime Time { get; set; }
+    [Parameter] private string format { get; set; }
+    private Dictionary<string, string> language;
+
+    protected async override Task OnInitAsync()
+    {
+        if(format == null)
+        {
+            format = CultureInfo.CurrentCulture.DateTimeFormat.LongDatePattern;
+        }
+        language = await serviceOfLocalization.LanguageDictionary;
+    }
+}

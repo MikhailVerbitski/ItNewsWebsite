@@ -15,7 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBlazor", "WebBlazor\WebB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{791CEB49-4E64-40BB-A611-B706FF274DEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Contracts", "Domain.Contracts\Domain.Contracts.csproj", "{20086C1E-5585-4C7D-8B12-E66FFA77201E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Contracts", "Domain.Contracts\Domain.Contracts.csproj", "{20086C1E-5585-4C7D-8B12-E66FFA77201E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Search.Implementation", "Search.Implementation\Search.Implementation.csproj", "{3D824053-4FC7-4C0F-A68C-42ABA2E35FF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Search.Contracts", "Search.Contracts\Search.Contracts.csproj", "{3C7EAB6C-4A80-4737-A230-FAA97A133D4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,14 @@ Global
 		{20086C1E-5585-4C7D-8B12-E66FFA77201E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20086C1E-5585-4C7D-8B12-E66FFA77201E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20086C1E-5585-4C7D-8B12-E66FFA77201E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D824053-4FC7-4C0F-A68C-42ABA2E35FF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D824053-4FC7-4C0F-A68C-42ABA2E35FF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D824053-4FC7-4C0F-A68C-42ABA2E35FF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D824053-4FC7-4C0F-A68C-42ABA2E35FF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C7EAB6C-4A80-4737-A230-FAA97A133D4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C7EAB6C-4A80-4737-A230-FAA97A133D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C7EAB6C-4A80-4737-A230-FAA97A133D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C7EAB6C-4A80-4737-A230-FAA97A133D4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

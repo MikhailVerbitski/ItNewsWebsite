@@ -1,21 +1,22 @@
 ﻿@page "/Post/{Id:int}"
 @implements IDisposable
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 @using Domain.Contracts.Models.ViewModels.Post;
 @using Domain.Contracts.Models.ViewModels.Comment;
 @using Blazor.Extensions;
 
-@if (postViewModel == null)
+@if (post == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
     <div id="container-post">
-        <h1 style="text-align: center;">@postViewModel.Header</h1>
-        <h3><LocalizationSentence Sentence="@("Section")" />: <Tag tag="@postViewModel.Section" /></h3>
+        <h1 style="text-align: center;">@post.Header</h1>
+        <h3><LocalizationSentence Sentence="@("Section")" />: <Tag tag="@post.Section" /></h3>
         <br />
         <p class="post-content">
-            <Markdown Content="@postViewModel.Content" />
+            <Markdown Content="@post.Content" />
         </p>
         <br />
         <span><LocalizationSentence Sentence="@("Tags")" />:</span>
@@ -27,33 +28,45 @@ else
         <br />
         <br />
         <div class="grid-cols-two">
-            <UserMini User="@postViewModel.AuthorUserMiniViewModel" />
+            <UserMini User="@post.AuthorUserMiniViewModel" />
             <div>
                 <span><LocalizationSentence Sentence="@("Rating")" /></span>
-                <StarsRating PercentOfRating="@(postViewModel.Score * 20)" PostId="@(postViewModel.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !postViewModel.BelongsToUser)" />
+                <StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !post.BelongsToUser)" />
             </div>
         </div>
         <br />
+        <div class="grid-post-edit-delete">
+            <div></div>
+            <div><LocalizationTime Time="@post.Created" /></div>
+        </div>
+        <div class="grid-post-edit-delete">
+            @if ((post.BelongsToUser && (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)) || serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 3)
+            {
+                <div class="post-edit-delete">
+                    <font size="2"><a href="/CreatePost/@post.PostId"><LocalizationSentence Sentence="@("Edit")" /></a></font>
+                    <font size="2"><a onclick="@Delete"><LocalizationSentence Sentence="@("Delete")" /></a></font>
+                </div>
+            }
+        </div>
+        <hr />
         <br />
         <h3><LocalizationSentence Sentence="@("Comments")" /></h3>
         @if (serviceOfAuthorize.IsAuthorize && serviceOfAuthorize.DataAboutUser.Priority >= 1)
         {
             <div class="pure-form pure-form-stacked">
-                <label for="Content"><LocalizationSentence Sentence="@("Comment")" /></label>
                 <textarea id="Content" class="pure-input-1" name="Content" bind="@CommentContent" />
                 <button onclick="@SendMessage" id="SubmitComment" class="pure-button pure-button-primary">Send</button>
             </div>
         }
     </div>
     <br />
-    <hr />
-    <ListOfComments CommentType="@typeof(CommentViewModel)" post="@postViewModel"/>
+    <ListOfComments CommentType="@typeof(CommentViewModel)" post="@post" />
 }
 
 @functions{
     [Parameter] private int Id { get; set; }
     private string CurrentUserId { get; set; }
-    private PostViewModel postViewModel;
+    private PostViewModel post;
     private List<string> Tags;
     private string CommentContent { get; set; }
     private HubConnection connection;
@@ -65,11 +78,11 @@ else
     }
     async Task SendMessage()
     {
-        if(CommentContent != "")
+        if (CommentContent != "")
         {
             var comment = new CommentCreateEditViewModel()
             {
-                PostId = postViewModel.PostId,
+                PostId = post.PostId,
                 Content = CommentContent
             };
             CommentContent = string.Empty;
@@ -84,14 +97,19 @@ else
     }
     protected async override Task OnParametersSetAsync()
     {
-        postViewModel = await serviceOfRequest.PostJsonAsync<PostViewModel>($"/api/Post/Read", new
+        post = await serviceOfRequest.PostJsonAsync<PostViewModel>($"/api/Post/Read", new
         {
             type = "PostViewModel",
             count = 1,
             where = $"Id=={Id}"
         });
-        postViewModel.Comments = (postViewModel.Comments == null) ? new List<CommentViewModel>() : postViewModel.Comments.ToList();
-        Tags = postViewModel.Tags.Select(a => a.Name).ToList();
+        post.Comments = (post.Comments == null) ? new List<CommentViewModel>() : post.Comments.ToList();
+        Tags = post.Tags.Select(a => a.Name).ToList();
+    }
+    private async Task Delete()
+    {
+        await serviceOfRequest.GetAsync($"api/Post/Delete?postId={post.PostId}");
+        UriHelper.NavigateTo("/");
     }
     public void Dispose()
     {

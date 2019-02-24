@@ -1,5 +1,4 @@
 ﻿@using Domain.Contracts.Models.ViewModels.Post
-@using Domain.Contracts.Models
 
 <div class="grid-post-head">
     <a href="/Post/@post.PostId"><h3>@post.Header</h3></a>
@@ -9,7 +8,7 @@
 <p>@post.BriefDesctiption</p>
 <br />
 <div class="grid-comment-footer">
-    <p class="container-date">@DateConverter.GetTime(post.Created)</p>
+    <p class="container-date"><LocalizationTime Time="@post.Created" /></p>
     <div></div>
     @if ((post.BelongsToUser && (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)) || serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 3)
     {

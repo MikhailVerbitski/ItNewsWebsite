@@ -1,5 +1,4 @@
 ﻿@using Domain.Contracts.Models.ViewModels.Comment
-@using Domain.Contracts.Models
 
 <div class="grid-comment-head">
     <a href="/Post/@comment.PostId"><h3>@comment.PostHeader</h3></a>
@@ -14,7 +13,7 @@
 </div>
 <br />
 <div class="grid-comment-footer">
-    <p class="container-date">@DateConverter.GetTime(comment.Created)</p>
+    <p class="container-date"><LocalizationTime Time="@comment.Created" /></p>
     <div></div>
     <p>@comment.CountOfLikes</p>
 </div>
