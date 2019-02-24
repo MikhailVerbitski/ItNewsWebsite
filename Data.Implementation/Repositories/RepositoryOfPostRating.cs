@@ -1,4 +1,5 @@
 ﻿using Data.Contracts.Models.Entities;
+using Search.Implementation;
 using System;
 using System.Linq.Expressions;
 
@@ -6,12 +7,15 @@ namespace Data.Implementation.Repositories
 {
     public class RepositoryOfPostRating : DefaultRepository<PostRatingEntity>
     {
-        public RepositoryOfPostRating(ApplicationDbContext context) : base(context)
-        { }
+        private readonly ServiceOfSearch serviceOfSearch;
+        public RepositoryOfPostRating(ApplicationDbContext context, ServiceOfSearch serviceOfSearch) : base(context)
+        {
+            this.serviceOfSearch = serviceOfSearch;
+        }
 
         public override PostRatingEntity Create(PostRatingEntity entity)
         {
-            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context);
+            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
 
             var Post = entity.Post;
             if (Post == null)
@@ -28,7 +32,7 @@ namespace Data.Implementation.Repositories
 
         public override void Delete(PostRatingEntity entity)
         {
-            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context);
+            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
             
             var Post = entity.Post;
             if (Post == null)
@@ -45,10 +49,9 @@ namespace Data.Implementation.Repositories
 
         public override void Update(PostRatingEntity entity, params Expression<Func<PostRatingEntity, object>>[] properties)
         {
-            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context);
-            RepositoryOfPostRating repositoryOfPostRating = new RepositoryOfPostRating(context);
+            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
 
-            var lastPostRating = repositoryOfPostRating.Read(a => a.Id == entity.Id);
+            var lastPostRating = Read(a => a.Id == entity.Id);
             var Post = entity.Post;
             if (Post == null)
             {

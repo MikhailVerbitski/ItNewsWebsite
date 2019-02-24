@@ -8,6 +8,7 @@ using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
 using Microsoft.AspNetCore.Identity;
+using Search.Implementation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfRole repositoryOfRole;
 
         private readonly ServiceOfImage serviceOfImage;
+        private readonly ServiceOfSearch serviceOfSearch;
 
         public Dictionary<string, Func<string, string, UserClaim>> Climes { get; set; } = new Dictionary<string, Func<string, string, UserClaim>>(new[] {
             new KeyValuePair<string, Func<string, string, UserClaim>>("blocked", (u,v) => new UserClaim(){ UserId = u, ClaimValue = ((v == string.Empty) ? $"your account has been suspended due to: " : v), ClaimType = "blocked" })
@@ -38,25 +40,32 @@ namespace Domain.Implementation.Services
             ApplicationDbContext context,
             UserManager<ApplicationUserEntity> userManager,
             IMapper mapper,
-            ServiceOfImage serviceOfImage
+            ServiceOfImage serviceOfImage,
+            ServiceOfSearch serviceOfSearch
             )
         {
             this.mapper = mapper;
             this.userManager = userManager;
 
             repositoryOfIdentityUserRole = new RepositoryOfIdentityUserRole(context);
-            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
+            repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
             repositoryOfUserClaim = new RepositoryOfUserClaim(context);
-            repositoryOfPost = new RepositoryOfPost(context);
+            repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
             repositoryOfRole = new RepositoryOfRole(context);
 
             this.serviceOfImage = serviceOfImage;
+            this.serviceOfSearch = serviceOfSearch;
         }
 
         public IEnumerable<UserMiniViewModel> Search(string propetry)
         {
-            return GetUsers(a => a.FirstName.Contains(propetry) || a.LastName.Contains(propetry) || a.UserName.Contains(propetry));
+            var ids = serviceOfSearch.SearchUsers(propetry, 0, 10);
+            var result = ids
+                .Select(b => repositoryOfApplicationUser.Read(a => a.Id == b, a=> a.UserProfile))
+                .Select(a => GetUserMiniViewModel(a))
+                .ToList();
+            return result;
         }
         public IEnumerable<UserMiniViewModel> GetUsers(params Expression<Func<ApplicationUserEntity, bool>>[] whereProperties)
         {

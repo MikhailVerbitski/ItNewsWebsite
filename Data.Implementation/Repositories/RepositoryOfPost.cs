@@ -2,13 +2,17 @@
 using System.Linq;
 using System.Linq.Expressions;
 using Data.Contracts.Models.Entities;
+using Search.Implementation;
 
 namespace Data.Implementation.Repositories
 {
     public class RepositoryOfPost : DefaultRepository<PostEntity>
     {
-        public RepositoryOfPost(ApplicationDbContext context) : base(context)
-        { }
+        private readonly ServiceOfSearch serviceOfSearch;
+        public RepositoryOfPost(ApplicationDbContext context, ServiceOfSearch serviceOfSearch) : base(context)
+        {
+            this.serviceOfSearch = serviceOfSearch;
+        }
 
         public override PostEntity Create(PostEntity entity)
         {
@@ -28,7 +32,9 @@ namespace Data.Implementation.Repositories
             {
                 entity.Created = DateTime.Now;
             }
-            return base.Create(entity);
+            entity = base.Create(entity);
+            serviceOfSearch.Create<PostEntity>(entity);
+            return entity;
         }
 
         public override void Update(PostEntity entity, params Expression<Func<PostEntity, object>>[] properties)
@@ -51,20 +57,20 @@ namespace Data.Implementation.Repositories
                 entity.Section.CountOfUsage++;
                 repositoryOfSection.Update(entity.Section);
             }
-
             if(entity.Created.Millisecond == 0)
             {
                 entity.Created = DateTime.Now;
             }
-
+            serviceOfSearch.Update<PostEntity>(entity);
             base.Update(entity, properties);
         }
 
         public override void Delete(PostEntity entity)
         {
             RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
-            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
-            RepositoryOfPostRating repositoryOfPostRating = new RepositoryOfPostRating(context);
+            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
+            RepositoryOfPostRating repositoryOfPostRating = new RepositoryOfPostRating(context, serviceOfSearch);
+            RepositoryOfPostTag repositoryOfPostTag = new RepositoryOfPostTag(context);
             var section = entity.Section;
             if (section == null)
             {
@@ -95,6 +101,17 @@ namespace Data.Implementation.Repositories
             {
                 repositoryOfPostRating.Delete(item);
             }
+            var postTags = entity.Tags;
+            if(postTags == null)
+            {
+                postTags = repositoryOfPostTag.ReadMany(new Expression<Func<PostTagEntity, bool>>[] { a => a.PostId == entity.Id });
+            }
+            postTags = postTags.ToList();
+            foreach (var item in postTags)
+            {
+                repositoryOfPostTag.Delete(item);
+            }
+            serviceOfSearch.DeletePost(entity);
             base.Delete(entity);
         }
     }

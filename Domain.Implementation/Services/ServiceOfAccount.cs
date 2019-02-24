@@ -4,6 +4,7 @@ using Data.Implementation;
 using Data.Implementation.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Search.Implementation;
 using System;
 using System.Linq.Expressions;
 using System.Net;
@@ -31,7 +32,8 @@ namespace Domain.Implementation.Services
             RoleManager<RoleEntity> roleManager,
             IHostingEnvironment hostingEnvironment,
             IMapper mapper,
-            ServiceOfImage serviceOfImage
+            ServiceOfImage serviceOfImage,
+            ServiceOfSearch serviceOfSearch
             )
         {
             this.mapper = mapper;
@@ -39,8 +41,8 @@ namespace Domain.Implementation.Services
             this.roleManager = roleManager;
 
             repositoryOfRole = new RepositoryOfRole(context);
-            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            RepositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
+            RepositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
             repositoryOfIdentityUserRole = new RepositoryOfIdentityUserRole(context);
 
             this.serviceOfImage = serviceOfImage;

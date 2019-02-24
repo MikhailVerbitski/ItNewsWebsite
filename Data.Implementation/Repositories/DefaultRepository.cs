@@ -103,7 +103,6 @@ namespace Data.Implementation.Repositories
             entities.Remove(entity);
             context.SaveChanges();
         }
-
         private IQueryable<T> GetEntitiesWithIncludes(DbSet<T> entities, Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> dbQuery = entities;

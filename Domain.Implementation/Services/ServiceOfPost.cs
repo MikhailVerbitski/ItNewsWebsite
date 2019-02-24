@@ -47,9 +47,9 @@ namespace Domain.Implementation.Services
         {
             this.mapper = mapper;
 
-            repositoryOfPost = new RepositoryOfPost(context);
-            repositoryOfPostRating = new RepositoryOfPostRating(context);
-            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
+            repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
+            repositoryOfPostRating = new RepositoryOfPostRating(context, serviceOfSearch);
+            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
             repositoryOfSection = new RepositoryOfSection(context);
             repositoryOfImage = new RepositoryOfImage(context);
 
@@ -96,7 +96,6 @@ namespace Domain.Implementation.Services
                 Content = "# Content",
                 UserProfileId = applicationUserCurrent.UserProfileId
             });
-            serviceOfSearch.Create<PostEntity>(newPost);
             return newPost;
         }
         public async Task<PostUpdateViewModel> Create(string applicationUserIdCurrent)
@@ -147,7 +146,6 @@ namespace Domain.Implementation.Services
             postEntity.Created = lastPostEntity.Created;
             postEntity.Tags = serviceOfTag.TagsPostUpdate(postCreateEditViewModel.Tags, lastPostEntity.Tags, postCreateEditViewModel.PostId);
             repositoryOfPost.Update(postEntity);
-            serviceOfSearch.Update<PostEntity>(postEntity);
         }
         public async Task Delete(string applicationUserIdCurrent, int postId)
         {
@@ -160,7 +158,6 @@ namespace Domain.Implementation.Services
             if (await serviceOfUser.IsThereAccess(new[] { 3 }, applicationUserCurrent, post.UserProfile.ApplicationUserId, true))
             {
                 post.Images.ToList().ForEach(a => serviceOfImage.Delete(a.Path));
-                serviceOfSearch.DeletePost(post);
                 repositoryOfPost.Delete(post);
             }
             return;

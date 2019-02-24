@@ -117,8 +117,11 @@
     <button class="pure-button" onclick="@(async () =>
             {
                 await serviceOfRequest.GetAsync($"/api/User/Delete?id={User.UserProfileId}");
-                await serviceOfAuthorize.Logout();
-                UriHelper.NavigateTo("/Login");
+                if(serviceOfAuthorize.DataAboutUser.UserProfileId == User.UserProfileId)
+                {
+                    await serviceOfAuthorize.Logout();
+                    UriHelper.NavigateTo("/Login");
+                }
             })">
         <LocalizationSentence Sentence="@("Delete account")" />
     </button>

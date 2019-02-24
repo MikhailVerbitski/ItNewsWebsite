@@ -28,7 +28,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public JsonResult Search(string property)
         {
-            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
+            var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var posts = serviceOfPost.Search(userId, property);
             return Json(posts);
         }

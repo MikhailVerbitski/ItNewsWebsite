@@ -4,6 +4,7 @@ using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.User;
+using Search.Implementation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,15 +26,15 @@ namespace Domain.Implementation.Services
 
         private readonly Tuple<string, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>[] Config;
 
-        public ServiceOfComment(ApplicationDbContext context, IMapper mapper, ServiceOfUser serviceOfUser)
+        public ServiceOfComment(ApplicationDbContext context, IMapper mapper, ServiceOfUser serviceOfUser, ServiceOfSearch serviceOfSearch)
         {
             this.mapper = mapper;
 
-            repositoryOfPost = new RepositoryOfPost(context);
-            repositoryOfComment = new RepositoryOfComment(context);
-            repositoryOfCommentLike = new RepositoryOfCommentLike(context);
-            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
+            repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
+            repositoryOfCommentLike = new RepositoryOfCommentLike(context, serviceOfSearch);
+            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
+            repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
 
             this.serviceOfUser = serviceOfUser;
 

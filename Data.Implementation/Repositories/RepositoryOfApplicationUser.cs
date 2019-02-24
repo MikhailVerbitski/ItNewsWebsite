@@ -1,19 +1,24 @@
-﻿using Data.Contracts.Models.Entities;
+﻿using System;
+using System.Linq.Expressions;
+using Data.Contracts.Models.Entities;
+using Search.Implementation;
 
 namespace Data.Implementation.Repositories
 {
     public class RepositoryOfApplicationUser : DefaultRepository<ApplicationUserEntity>
     {
-
-        public RepositoryOfApplicationUser(ApplicationDbContext context) : base(context)
-        { }
+        private readonly ServiceOfSearch serviceOfSearch;
+        public RepositoryOfApplicationUser(ApplicationDbContext context, ServiceOfSearch serviceOfSearch) : base(context)
+        {
+            this.serviceOfSearch = serviceOfSearch;
+        }
 
         public override ApplicationUserEntity Create(ApplicationUserEntity entity)
         {
             entity.Created = System.DateTime.Now;
             var ApplicationUser = base.Create(entity);
-
-            RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            serviceOfSearch.Create<ApplicationUserEntity>(ApplicationUser);
+            RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
             var UserProfile = repositoryOfUserProfile.Read(a => a.Id == ApplicationUser.UserProfileId);
             if(UserProfile == null)
             {
@@ -25,13 +30,17 @@ namespace Data.Implementation.Repositories
 
             return ApplicationUser;
         }
-
+        public override void Update(ApplicationUserEntity entity, params Expression<Func<ApplicationUserEntity, object>>[] properties)
+        {
+            base.Update(entity, properties);
+            serviceOfSearch.Update<ApplicationUserEntity>(entity);
+        }
         public override void Delete(ApplicationUserEntity entity)
         {
-            var repositoryOfUserProfile = new RepositoryOfUserProfile(context);
+            var repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
             var userProfile = repositoryOfUserProfile.Read(a => a.Id == entity.UserProfileId);
+            serviceOfSearch.DeleteUser(entity);
             repositoryOfUserProfile.Delete(userProfile);
-            base.Delete(entity);
         }
     }
 }

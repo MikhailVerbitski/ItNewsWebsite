@@ -1,16 +1,20 @@
 ﻿using Data.Contracts.Models.Entities;
+using Search.Implementation;
 using System.Linq;
 
 namespace Data.Implementation.Repositories
 {
     public class RepositoryOfUserProfile : DefaultRepository<UserProfileEntity>
     {
-        public RepositoryOfUserProfile(ApplicationDbContext context) : base(context)
-        { }
+        private readonly ServiceOfSearch serviceOfSearch;
+        public RepositoryOfUserProfile(ApplicationDbContext context, ServiceOfSearch serviceOfSearch) : base(context)
+        {
+            this.serviceOfSearch = serviceOfSearch;
+        }
 
         public override void Delete(UserProfileEntity entity)
         {
-            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context);
+            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
             var posts = entity.Posts;
             if(posts == null)
             {

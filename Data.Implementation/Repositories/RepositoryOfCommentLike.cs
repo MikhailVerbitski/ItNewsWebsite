@@ -1,16 +1,20 @@
 ﻿using Data.Contracts.Models.Entities;
+using Search.Implementation;
 
 namespace Data.Implementation.Repositories
 {
     public class RepositoryOfCommentLike : DefaultRepository<CommentLikeEntity>
     {
-        public RepositoryOfCommentLike(ApplicationDbContext context) : base(context)
-        { }
+        private readonly ServiceOfSearch serviceOfSearch;
+        public RepositoryOfCommentLike(ApplicationDbContext context, ServiceOfSearch serviceOfSearch) : base(context)
+        {
+            this.serviceOfSearch = serviceOfSearch;
+        }
 
         public override CommentLikeEntity Create(CommentLikeEntity entity)
         {
-            RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
+            RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
+            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
             
             var comment = entity.Comment;
             if(comment == null)
@@ -28,8 +32,8 @@ namespace Data.Implementation.Repositories
         }
         public void Delete(CommentLikeEntity entity, bool forCommentDelete = false)
         {
-            RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context);
-            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context);
+            RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
+            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
 
             var comment = entity.Comment;
             if (comment == null)
