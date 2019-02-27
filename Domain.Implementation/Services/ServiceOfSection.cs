@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Data.Implementation;
 using Data.Implementation.Repositories;
 using Search.Implementation;
 using System.Collections.Generic;
@@ -10,16 +9,14 @@ namespace Domain.Implementation.Services
     public class ServiceOfSection
     {
         private readonly IMapper mapper;
-
         private readonly RepositoryOfSection repositoryOfSection;
         private readonly RepositoryOfPost repositoryOfPost;
 
-        public ServiceOfSection(ApplicationDbContext context, IMapper mapper, ServiceOfSearch serviceOfSearch)
+        public ServiceOfSection(IMapper mapper, ServiceOfSearch serviceOfSearch, RepositoryOfSection repositoryOfSection, RepositoryOfPost repositoryOfPost)
         {
             this.mapper = mapper;
-
-            repositoryOfSection = new RepositoryOfSection(context);
-            repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
+            this.repositoryOfSection = repositoryOfSection;
+            this.repositoryOfPost = repositoryOfPost;
         }
 
         public List<string> Get()

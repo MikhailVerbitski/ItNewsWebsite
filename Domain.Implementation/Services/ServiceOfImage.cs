@@ -1,5 +1,4 @@
-﻿using Data.Implementation;
-using Data.Implementation.Repositories;
+﻿using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
@@ -12,13 +11,12 @@ namespace Domain.Implementation.Services
         private readonly string SolutionPath;
         private readonly RepositoryOfImage repositoryOfImage;
 
-        public ServiceOfImage(ApplicationDbContext context, IHostingEnvironment hostingEnvironment)
+        public ServiceOfImage(IHostingEnvironment hostingEnvironment, RepositoryOfImage repositoryOfImage)
         {
+            this.repositoryOfImage = repositoryOfImage;
             var folders = hostingEnvironment.ContentRootPath.Split('\\');
             this.SolutionPath = string.Join('\\', folders.Take(folders.Length - 1));
             this.SolutionPath += @"\WebBlazor";
-
-            repositoryOfImage = new RepositoryOfImage(context);
         }
 
         public string LoadImage(string host, string applicationUserCurrent, UserImage image)

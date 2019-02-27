@@ -24,6 +24,7 @@ using WebApi.Hubs;
 using Domain.Implementation.Services;
 using Search.Implementation;
 using System.IO;
+using Data.Implementation.Repositories;
 
 namespace WebApi
 {
@@ -38,8 +39,6 @@ namespace WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLocalization(option => option.ResourcesPath = "Resources");
-
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUserEntity, RoleEntity>(a =>
@@ -89,8 +88,6 @@ namespace WebApi
                     WasmMediaTypeNames.Application.Wasm,
                 });
             });
-            services.AddSignalR();
-
             services.AddScoped<ServiceOfAccount>();
             services.AddScoped<ServiceOfComment>();
             services.AddScoped<ServiceOfImage>();
@@ -99,7 +96,21 @@ namespace WebApi
             services.AddScoped<ServiceOfTag>();
             services.AddScoped<ServiceOfUser>();
             services.AddScoped<ServiceOfSearch>();
-
+            services.AddScoped<RepositoryOfApplicationUser>();
+            services.AddScoped<RepositoryOfComment>();
+            services.AddScoped<RepositoryOfCommentLike>();
+            services.AddScoped<RepositoryOfIdentityUserRole>();
+            services.AddScoped<RepositoryOfImage>();
+            services.AddScoped<RepositoryOfImage>();
+            services.AddScoped<RepositoryOfPost>();
+            services.AddScoped<RepositoryOfPostRating>();
+            services.AddScoped<RepositoryOfPostTag>();
+            services.AddScoped<RepositoryOfRole>();
+            services.AddScoped<RepositoryOfSection>();
+            services.AddScoped<RepositoryOfTag>();
+            services.AddScoped<RepositoryOfUserClaim>();
+            services.AddScoped<RepositoryOfUserProfile>();
+            services.AddSignalR();
             services.AddLocalization(a => a.ResourcesPath = "Resources");
             services.AddMvc();
         }

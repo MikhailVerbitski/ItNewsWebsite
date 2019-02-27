@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
-using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.User;
@@ -15,29 +14,32 @@ namespace Domain.Implementation.Services
     public class ServiceOfComment
     {
         private readonly IMapper mapper;
-
         private readonly RepositoryOfPost repositoryOfPost;
         private readonly RepositoryOfComment repositoryOfComment;
         private readonly RepositoryOfCommentLike repositoryOfCommentLike;
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
-
         private readonly ServiceOfUser serviceOfUser;
-
         private readonly Tuple<string, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>[] Config;
 
-        public ServiceOfComment(ApplicationDbContext context, IMapper mapper, ServiceOfUser serviceOfUser, ServiceOfSearch serviceOfSearch)
+        public ServiceOfComment(
+            IMapper mapper, 
+            ServiceOfUser serviceOfUser, 
+            ServiceOfSearch serviceOfSearch,
+            RepositoryOfPost repositoryOfPost,
+            RepositoryOfComment repositoryOfComment,
+            RepositoryOfCommentLike repositoryOfCommentLike,
+            RepositoryOfApplicationUser repositoryOfApplicationUser,
+            RepositoryOfUserProfile repositoryOfUserProfile
+            )
         {
             this.mapper = mapper;
-
-            repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
-            repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
-            repositoryOfCommentLike = new RepositoryOfCommentLike(context, serviceOfSearch);
-            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
-            repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
-
+            this.repositoryOfPost = repositoryOfPost;
+            this.repositoryOfComment = repositoryOfComment;
+            this.repositoryOfCommentLike = repositoryOfCommentLike;
+            this.repositoryOfApplicationUser = repositoryOfApplicationUser;
+            this.repositoryOfUserProfile = repositoryOfUserProfile;
             this.serviceOfUser = serviceOfUser;
-
             Config = new[]
             {
                 new Tuple<string, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>(nameof(CommentViewModel), GetCommentViewModel),
@@ -58,7 +60,6 @@ namespace Domain.Implementation.Services
             }
             return null;
         }
-
         public IEnumerable<BaseCommentViewModel> GetMany(string type, string applicationUserId, int? skip, int? take, string applicationUserIdCurrent)
         {
             var user = repositoryOfApplicationUser.Read(a => a.Id == applicationUserId);
@@ -127,7 +128,6 @@ namespace Domain.Implementation.Services
             var commentViewModel = GetViewModelWithProperty(type, commentEntity, applicationUserIdCurrent);
             return commentViewModel;
         }
-
         private CommentViewModel GetCommentViewModel(CommentEntity commentEntity, ApplicationUserEntity applicationUserCurrent)
         {
             var commentViewModel = mapper.Map<CommentEntity, CommentViewModel>(commentEntity);
@@ -153,7 +153,6 @@ namespace Domain.Implementation.Services
             var commentViewModel = mapper.Map<CommentEntity, CommentCreateEditViewModel>(commentEntity);
             return commentViewModel;
         }
-
         public BaseCommentViewModel GetViewModelWithProperty(string type, CommentEntity commentEntity, string applicationUserIdCurrent) 
         {
             var applicationUser = (applicationUserIdCurrent != null) ? repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent, a => a.UserProfile) : null;
@@ -163,7 +162,6 @@ namespace Domain.Implementation.Services
         {
             return Config.Single(a => a.Item1 == type).Item2(commentEntity, applicationUserEntity);
         }
-
         public async Task<CommentViewModel> Update(string applicationUserIdCurrent, CommentCreateEditViewModel commentCreateEditViewModel)
         {
             var applicationUser = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);

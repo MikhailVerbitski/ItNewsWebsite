@@ -5,7 +5,6 @@ using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels;
 using Domain.Contracts.Models.ViewModels.Comment;
-using Domain.Contracts.Models.ViewModels.Post;
 using Domain.Contracts.Models.ViewModels.User;
 using Microsoft.AspNetCore.Identity;
 using Search.Implementation;
@@ -21,14 +20,12 @@ namespace Domain.Implementation.Services
     {
         private readonly IMapper mapper;
         private readonly UserManager<ApplicationUserEntity> userManager;
-
         private readonly RepositoryOfIdentityUserRole repositoryOfIdentityUserRole;
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfUserProfile repositoryOfUserProfile;
         private readonly RepositoryOfUserClaim repositoryOfUserClaim;
         private readonly RepositoryOfPost repositoryOfPost;
         private readonly RepositoryOfRole repositoryOfRole;
-
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfSearch serviceOfSearch;
 
@@ -41,19 +38,23 @@ namespace Domain.Implementation.Services
             UserManager<ApplicationUserEntity> userManager,
             IMapper mapper,
             ServiceOfImage serviceOfImage,
-            ServiceOfSearch serviceOfSearch
+            ServiceOfSearch serviceOfSearch,
+            RepositoryOfIdentityUserRole repositoryOfIdentityUserRole,
+            RepositoryOfApplicationUser repositoryOfApplicationUser,
+            RepositoryOfUserProfile repositoryOfUserProfile,
+            RepositoryOfUserClaim repositoryOfUserClaim,
+            RepositoryOfPost repositoryOfPost,
+            RepositoryOfRole repositoryOfRole
             )
         {
             this.mapper = mapper;
             this.userManager = userManager;
-
-            repositoryOfIdentityUserRole = new RepositoryOfIdentityUserRole(context);
-            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
-            repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
-            repositoryOfUserClaim = new RepositoryOfUserClaim(context);
-            repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
-            repositoryOfRole = new RepositoryOfRole(context);
-
+            this.repositoryOfIdentityUserRole = repositoryOfIdentityUserRole;
+            this.repositoryOfApplicationUser = repositoryOfApplicationUser;
+            this.repositoryOfUserProfile = repositoryOfUserProfile;
+            this.repositoryOfUserClaim = repositoryOfUserClaim;
+            this.repositoryOfPost = repositoryOfPost;
+            this.repositoryOfRole = repositoryOfRole;
             this.serviceOfImage = serviceOfImage;
             this.serviceOfSearch = serviceOfSearch;
         }

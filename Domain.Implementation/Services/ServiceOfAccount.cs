@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
-using Data.Implementation;
 using Data.Implementation.Repositories;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Search.Implementation;
 using System;
 using System.Linq.Expressions;
 using System.Net;
@@ -27,24 +24,23 @@ namespace Domain.Implementation.Services
         private readonly ServiceOfImage serviceOfImage;
 
         public ServiceOfAccount(
-            ApplicationDbContext context,
+            IMapper mapper,
             UserManager<ApplicationUserEntity> userManager,
             RoleManager<RoleEntity> roleManager,
-            IHostingEnvironment hostingEnvironment,
-            IMapper mapper,
-            ServiceOfImage serviceOfImage,
-            ServiceOfSearch serviceOfSearch
+            RepositoryOfRole repositoryOfRole,
+            RepositoryOfApplicationUser repositoryOfApplicationUser,
+            RepositoryOfUserProfile RepositoryOfUserProfile,
+            RepositoryOfIdentityUserRole repositoryOfIdentityUserRole,
+            ServiceOfImage serviceOfImage
             )
         {
             this.mapper = mapper;
             this.userManager = userManager;
             this.roleManager = roleManager;
-
-            repositoryOfRole = new RepositoryOfRole(context);
-            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
-            RepositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
-            repositoryOfIdentityUserRole = new RepositoryOfIdentityUserRole(context);
-
+            this.repositoryOfRole = repositoryOfRole;
+            this.repositoryOfApplicationUser = repositoryOfApplicationUser;
+            this.RepositoryOfUserProfile = RepositoryOfUserProfile;
+            this.repositoryOfIdentityUserRole = repositoryOfIdentityUserRole;
             this.serviceOfImage = serviceOfImage;
         }
 

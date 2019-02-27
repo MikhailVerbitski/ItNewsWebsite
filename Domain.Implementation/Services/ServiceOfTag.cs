@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
-using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Tag;
 using System.Collections.Generic;
@@ -14,11 +13,11 @@ namespace Domain.Implementation.Services
         private readonly RepositoryOfTag repositoryOfTag;
         private readonly RepositoryOfPostTag repositoryOfPostTag;
 
-        public ServiceOfTag(ApplicationDbContext context, IMapper mapper)
+        public ServiceOfTag(IMapper mapper, RepositoryOfTag repositoryOfTag, RepositoryOfPostTag repositoryOfPostTag)
         {
             this.mapper = mapper;
-            repositoryOfTag = new RepositoryOfTag(context);
-            repositoryOfPostTag = new RepositoryOfPostTag(context);
+            this.repositoryOfTag = repositoryOfTag;
+            this.repositoryOfPostTag = repositoryOfPostTag;
         }
 
         public List<TagViewModel> Get()

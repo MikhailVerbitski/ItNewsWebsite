@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Data.Contracts.Models.Entities;
-using Data.Implementation;
 using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
@@ -18,41 +17,40 @@ namespace Domain.Implementation.Services
     public class ServiceOfPost
     {
         private readonly IMapper mapper;
-
         private readonly RepositoryOfPost repositoryOfPost;
         private readonly RepositoryOfPostRating repositoryOfPostRating;
         private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
         private readonly RepositoryOfSection repositoryOfSection;
         private readonly RepositoryOfImage repositoryOfImage;
-
         private readonly ServiceOfComment serviceOfComment;
         private readonly ServiceOfAccount serviceOfAccount;
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfUser serviceOfUser;
         private readonly ServiceOfTag serviceOfTag;
         private readonly ServiceOfSearch serviceOfSearch;
-
         public Tuple<string, Func<PostEntity, ApplicationUserEntity, BasePostViewModel>>[] Config;
 
         public ServiceOfPost(
-            ApplicationDbContext context, 
             IMapper mapper,
             ServiceOfImage serviceOfImage,
             ServiceOfAccount serviceOfAccount,
             ServiceOfComment serviceOfComment,
             ServiceOfUser serviceOfUser,
             ServiceOfTag serviceOfTag,
-            ServiceOfSearch serviceOfSearch
+            ServiceOfSearch serviceOfSearch,
+            RepositoryOfPost repositoryOfPost,
+            RepositoryOfPostRating repositoryOfPostRating,
+            RepositoryOfApplicationUser repositoryOfApplicationUser,
+            RepositoryOfSection repositoryOfSection,
+            RepositoryOfImage repositoryOfImage
             )
         {
             this.mapper = mapper;
-
-            repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
-            repositoryOfPostRating = new RepositoryOfPostRating(context, serviceOfSearch);
-            repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
-            repositoryOfSection = new RepositoryOfSection(context);
-            repositoryOfImage = new RepositoryOfImage(context);
-
+            this.repositoryOfPost = repositoryOfPost;
+            this.repositoryOfPostRating = repositoryOfPostRating;
+            this.repositoryOfApplicationUser = repositoryOfApplicationUser;
+            this.repositoryOfSection = repositoryOfSection;
+            this.repositoryOfImage = repositoryOfImage;
             this.serviceOfImage = serviceOfImage;
             this.serviceOfAccount = serviceOfAccount;
             this.serviceOfComment = serviceOfComment;
