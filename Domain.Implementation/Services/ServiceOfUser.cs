@@ -58,9 +58,9 @@ namespace Domain.Implementation.Services
             this.serviceOfSearch = serviceOfSearch;
         }
 
-        public IEnumerable<UserMiniViewModel> Search(string propetry)
+        public IEnumerable<UserMiniViewModel> Search(string propetry, int? skip, int? take)
         {
-            var ids = serviceOfSearch.SearchUsers(propetry, 0, 10);
+            var ids = serviceOfSearch.SearchUsers(propetry, (skip != null) ? skip.Value : 0, (take != null) ? take.Value : 0);
             var result = ids
                 .Select(b => repositoryOfApplicationUser.Read(a => a.Id == b, a=> a.UserProfile))
                 .Select(a => GetUserMiniViewModel(a))

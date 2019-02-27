@@ -6,7 +6,7 @@
 <div id="grid-user-profile" class="content-head content">
     @if (User == null)
     {
-        <p><em>Loading...</em></p>
+        <Loading/>
     }
     else
     {
@@ -15,41 +15,40 @@
         </div>
         <div class="grid-scroll-user-posts">
             <h2><LocalizationSentence Sentence="@("Posts")" /></h2>
-            <span>
-                <font size="3"><LocalizationSentence Sentence="@("Sort by")" />: </font>
-                <a>
-                    <font size="2" color="@(Param.Contains("Time")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Time") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Time"; }; Param = string.Join(":", mas); } )">
-                        <LocalizationSentence Sentence="@("Time")" />
+            <span style="font-family:'Gagalin';">
+                <font size="5"><LocalizationSentence Sentence="@("Sort by")" />: </font>
+                <a class="cursor-pointer">
+                    <font size="4" color="@(Param.Contains("Fresh")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Fresh") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Fresh"; }; Param = string.Join(":", mas); } )">
+                        <LocalizationSentence Sentence="@("Fresh")" />
                     </font>
                 </a>
-                <a>
-                    <font size="2" color="@(Param.Contains("Top")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Top") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Top"; } Param = string.Join(":", mas); })">
-                        <LocalizationSentence Sentence="@("Rating")" />
+                <a class="cursor-pointer">
+                    <font size="4" color="@(Param.Contains("Best")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Best") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Best"; } Param = string.Join(":", mas); })">
+                        <LocalizationSentence Sentence="@("Best")" />
                     </font>
                 </a>
-
-                <a>
-                    <font size="2" color="@(Param.Contains(":r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">
+                <a class="cursor-pointer">
+                    <font size="4" color="@(Param.Contains(":r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">
                         <LocalizationSentence Sentence="@("Reverse")" />
                     </font>
                 </a>
             </span>
             @if (serviceOfAuthorize.DataAboutUser != null && (serviceOfAuthorize.DataAboutUser.Priority == 3 || serviceOfAuthorize.DataAboutUser.UserProfileId == Id))
             {
-                <span>
-                    <font size="3">Filter by: </font>
-                    <a>
-                        <font size="2" color="@(!Param.Contains(":f")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas.Contains("f")) { mas.Remove("f"); if (mas.Contains("fin")) { mas.Remove("fin"); } else { mas.Remove("notfin"); } Param = string.Join(":", mas); } })">
+                <span style="font-family:'Gagalin';">
+                    <font size="5">Filter by: </font>
+                    <a class="cursor-pointer">
+                        <font size="4" color="@(!Param.Contains(":f")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas.Contains("f")) { mas.Remove("f"); if (mas.Contains("fin")) { mas.Remove("fin"); } else { mas.Remove("notfin"); } Param = string.Join(":", mas); } })">
                             <LocalizationSentence Sentence="@("All")" />
                         </font>
                     </a>
-                    <a>
-                        <font size="2" color="@(Param.Contains(":fin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "fin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:fin"; } })">
+                    <a class="cursor-pointer">
+                        <font size="4" color="@(Param.Contains(":fin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "fin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:fin"; } })">
                             <LocalizationSentence Sentence="@("Finished")" />
                         </font>
                     </a>
-                    <a>
-                        <font size="2" color="@(Param.Contains(":notfin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "notfin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:notfin"; } })">
+                    <a class="cursor-pointer">
+                        <font size="4" color="@(Param.Contains(":notfin")?"red":"")" onclick="@(() => { var mas = Param.Split(':'); if (mas.Contains("f")) { mas[Array.IndexOf(mas, "f") + 1] = "notfin"; Param = string.Join(":", mas); } else { Param = $"{Param}:f:notfin"; } })">
                             <LocalizationSentence Sentence="@("Unfinished")" />
                         </font>
                     </a>
@@ -79,12 +78,12 @@
 
     protected override void OnInit()
     {
-        Param = $"Time:User-{Id}:f:fin";
+        Param = $"Fresh:User-{Id}:f:fin";
     }
     protected async override Task OnParametersSetAsync()
     {
         User = await serviceOfRequest.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?userProfileId={Id}");
         Id = User.UserProfileId;
-        Param = $"Time:User-{Id}:f:fin";
+        Param = $"Fresh:User-{Id}:f:fin";
     }
 }

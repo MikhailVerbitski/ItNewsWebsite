@@ -1,0 +1,6 @@
+@font-face {
+    font-family: 'Christmas ScriptC';
+    src: local('Christmas ScriptC'), local('ChristmasScriptC'), url('christmasscriptc.woff2') format('woff2'), url('christmasscriptc.woff') format('woff'), url('christmasscriptc.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}

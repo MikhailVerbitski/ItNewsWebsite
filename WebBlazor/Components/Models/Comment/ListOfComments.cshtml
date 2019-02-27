@@ -6,7 +6,7 @@
 
 @if (listOfComments == null)
 {
-    <p><em>Loading...</em></p>
+    <Loading />
 }
 else if (count == 0)
 {
@@ -45,7 +45,7 @@ else
     private string lastApplicationUserId;
     private int? lastPostId;
     private int count = 0;
-    private int takeCount = 3;
+    private int takeCount = 9;
     private bool allLoaded = false;
     private bool notFirstTime = false;
 
@@ -125,7 +125,7 @@ else
                 count--;
                 break;
         }
-        if(count <= takeCount)
+        if (count <= takeCount)
         {
             await LoadMore();
         }

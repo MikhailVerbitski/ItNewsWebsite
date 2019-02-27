@@ -1,29 +1,33 @@
 ﻿@page "/"
 @page "/{Param}"
 
-<span>
-    <font size="3"><LocalizationSentence Sentence="@("Sort by")" />: </font>
-    <a>
-        <font size="2" color="@(Param.Contains("Time")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Time") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Time"; }; Param = string.Join(":", mas); } )">
-            <LocalizationSentence Sentence="@("Time")" />
-        </font>
-    </a>
-    <a>
-        <font size="2" color="@(Param.Contains("Top")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Top") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Top"; } Param = string.Join(":", mas); })">
-            <LocalizationSentence Sentence="@("Rating")" />
-        </font>
-    </a>
-
-    <a>
-    <font size="2" color="@(Param.Contains("r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r","") : $"{Param}:r")">
-        <LocalizationSentence Sentence="@("Reverse")" />
-    </font>
-    </a>
-</span>
-<div id="container-posts">
+<div class="grid-posts">
+    <div class="content-body grid-fresh-best-top-line">
+        <a class="cursor-pointer">
+            <font size="6" color="@(Param.Contains("Fresh")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Fresh") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Fresh"; }; Param = string.Join(":", mas); } )">
+                <LocalizationSentence Sentence="@("Fresh")" />
+            </font>
+        </a>
+        <a class="cursor-pointer">
+            <font size="6" color="@(Param.Contains("Best")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Best") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Best"; } Param = string.Join(":", mas); })">
+                <LocalizationSentence Sentence="@("Best")" />
+            </font>
+        </a>
+        <a class="cursor-pointer">
+            <font size="6" color="@(Param.Contains("Hot")?"red":"")" onclick="@(() => { var mas = Param.Split(':').ToList(); if (mas[0] == "Hot") { if (mas.Contains("r")) { mas.Remove("r"); } else { mas.Add("r"); } } else { mas[0] = "Hot"; } Param = string.Join(":", mas); })">
+                <LocalizationSentence Sentence="@("Hot")" />
+            </font>
+        </a>
+        <div></div>
+        <a class="cursor-pointer">
+            <font size="6" color="@(Param.Contains(":r")?"red":"")" onclick="@(() => Param = (Param.Contains(":r")) ? Param.Replace(":r", "") : $"{Param}:r")">
+                <LocalizationSentence Sentence="@("Reverse")" />
+            </font>
+        </a>
+    </div>
     <ListOfPosts PostType="@(typeof(Domain.Contracts.Models.ViewModels.Post.PostCompactViewModel))" param="@Param" />
 </div>
 
 @functions {
-    [Parameter] private string Param { get; set; } = "Time:f:fin";
+    [Parameter] private string Param { get; set; } = "Fresh:f:fin";
 }

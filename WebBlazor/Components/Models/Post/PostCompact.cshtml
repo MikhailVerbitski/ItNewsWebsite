@@ -1,47 +1,44 @@
 ﻿@using Domain.Contracts.Models.ViewModels.Post
-@inject Services.ServiceOfLocalization serviceOfLocalization
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
-<div>
-    <div class="grid-post-head">
-        <a href="/Post/@post.PostId"><h2>@post.Header</h2></a>
-        <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !post.BelongsToUser)"/></span>
-        <div></div>
-        <span>
-            <LocalizationTime Time="@post.Created"/>
-        </span>
-    </div>
-    <br />
-    <span>@post.BriefDesctiption</span>
-</div>
-<br />
-<div class="grid-cols-two">
-    <UserMini User="@post.AuthorUserMiniViewModel" />
-    @if ((post.BelongsToUser && (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)) || serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 3)
-    {
-        <div class="post-edit-delete">
-            <font size="2"><a href="/CreatePost/@post.PostId"><LocalizationSentence Sentence="@("Edit")" /></a></font>
-            <font size="2"><a onclick="@Delete"><LocalizationSentence Sentence="@("Delete")" /></a></font>
+<div class="content-body grid-post-compact">
+    <div style="max-height:320px; overflow: hidden;">
+        <div class="grid-post-head">
+            <a href="/Post/@post.PostId"><h2>@post.Header</h2></a>
+            <div></div>
+            <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !post.BelongsToUser)" /></span>
         </div>
-    }
+        <div>
+            <img src="@post.FirstImage" style="width: 100%;" />
+            <br />
+            <span>@post.BriefDesctiption</span>
+        </div>
+    </div>
+    <div style="align-self: self-end;">
+        <UserMini User="@post.AuthorUserMiniViewModel" />
+        <br />
+        <div class="grid-cols-two">
+            <span>
+                <LocalizationTime Time="@post.Created" format="@("dd MMMM yyyy")"/>
+            </span>
+            @if ((post.BelongsToUser && (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)) || serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 3)
+            {
+                <div class="post-edit-delete">
+                    <font size="2"><a href="/CreatePost/@post.PostId"><LocalizationSentence Sentence="@("Edit")" /></a></font>
+                    <font size="2"><a onclick="@Delete"><LocalizationSentence Sentence="@("Delete")" /></a></font>
+                </div>
+            }
+        </div>
+    </div>
 </div>
-<br />
-<hr />
-<br />
-<br />
 
 @functions {
-    [Parameter] private PostCompactViewModel post { get; set; }
-    [Parameter] private Action<BasePostViewModel> deletePost { get; set; }
-    private Dictionary<string, string> language;
+[Parameter] private PostCompactViewModel post { get; set; }
+[Parameter] private Action<BasePostViewModel> deletePost { get; set; }
 
-    protected async override Task OnInitAsync()
-    {
-        language = await serviceOfLocalization.LanguageDictionary;
-    }
-    private async Task Delete()
-    {
-        await serviceOfRequest.GetAsync($"api/Post/Delete?postId={post.PostId}");
-        deletePost(post);
-    }
+private async Task Delete()
+{
+    await serviceOfRequest.GetAsync($"api/Post/Delete?postId={post.PostId}");
+    deletePost(post);
+}
 }

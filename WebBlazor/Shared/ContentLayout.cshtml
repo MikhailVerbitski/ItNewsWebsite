@@ -1,12 +1,8 @@
 ﻿@inherits BlazorLayoutComponent
-@using Domain.Contracts.Models
-@using Domain.Contracts.Models.ViewModels.Tag
-@using Domain.Contracts.Models.ViewModels.Post
 @layout MainLayout
-@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div class="grid-content">
-    <div class="content">
+    <div>
         <div class="side-bar">
             @if (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)
             {
@@ -14,62 +10,21 @@
                     <a href="/CreatePost" class="pure-button create-post-link"><font size="4"><LocalizationSentence Sentence="@("Create new post")" /></font></a>
                 </div>
             }
-            <div class="content-body">
-                <div id="keywords"></div>
-            </div>
-            <div class="content-body" style="padding: 20px;">
-                <a href="/@("Top:1:f:fin")"><h1 style="text-align:center;"><LocalizationSentence Sentence="@("Top posts")" /></h1></a>
-                <br />
-                @if (TheFirstFiveWithTheHighestRating != null)
-                {
-                    for (int i = 0; i < TheFirstFiveWithTheHighestRating.Count; i++)
-                    {
-                        var item = TheFirstFiveWithTheHighestRating[i];
-                        <div style="padding-right: 20px;">
-                            <div class="grid-pots-ration-mini">
-                                <a href="/Post/@item.PostId"><font size="@(5-i)">@item.Header</font></a>
-                                <span><StarsRating PercentOfRating="@(item.Score * 20)" PostId="@(item.PostId)" /></span>
-                            </div>
-                        </div>
-                        <hr />
-                    }
-                }
-            </div>
+            <TagCloud />
+            <ListPostForSidePanel Name="@("Hot")" />
+            <ListPostForSidePanel Name="@("Best")" />
+            <ListPostForSidePanel Name="@("Fresh")" />
         </div>
     </div>
-    <div class="content-body content" id="posts">
+    <div>
         @Body
     </div>
 </div>
 
-@functions{
-    private List<PostMiniViewModel> TheFirstFiveWithTheHighestRating;
-    private List<TagForCloud> tagsForCloud;
-
+@functions{      
     protected async override Task OnInitAsync()
     {
-        TheFirstFiveWithTheHighestRating = await serviceOfRequest.PostJsonAsync<List<PostMiniViewModel>>("api/Post/Read", new
-        {
-            type = "PostMiniViewModel",
-            count = 5,
-            orderBy = "-((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))",
-            where = "IsFinished==true"
-        });
-        var tags = await serviceOfRequest.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
-        tagsForCloud = tags.Select(a => new TagForCloud()
-        {
-            text = a.Name,
-            weight = a.CountOfUsage,
-            link = $"/Time:ByTag-{a.Id}"
-        })
-        .ToList();
-    }
-    protected async override Task OnAfterRenderAsync()
-    {
-        if(tagsForCloud != null)
-        {
-            var words = Microsoft.JSInterop.Json.Serialize(tagsForCloud);
-            await WebBlazor.JsInteropClasses.TagCloud.StartTagCanvas(words);
-        }
+        await serviceOfAuthorize.CreateHeader;
+        this.StateHasChanged();
     }
 }

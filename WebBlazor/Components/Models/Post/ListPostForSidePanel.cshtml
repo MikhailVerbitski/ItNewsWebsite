@@ -1,0 +1,48 @@
+﻿@using Domain.Contracts.Models.ViewModels.Post
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+
+@if (FreshPosts == null)
+{
+    <Loading />
+}
+else
+{
+    <div class="content-body">
+        <h1 style="font-family: 'Junegull';text-align: center;"><a href="@($"/{(Name != null ? Name : "Fresh")}:f:fin")"><LocalizationSentence Sentence="@Name" /></a></h1>
+        @foreach (var post in FreshPosts)
+        {
+            <div class="grid-pots-ration-mini">
+                <a href="/Post/@post.PostId"><font>@post.Header</font></a>
+                <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" /></span>
+            </div>
+            <hr />
+        }
+    </div>
+}
+
+@functions{
+    [Parameter] private string Name { get; set; }
+    private List<PostMiniViewModel> FreshPosts { get; set; }
+
+    private Dictionary<string, string> orderBy = new Dictionary<string, string>();
+
+    protected override void OnInit()
+    {
+        orderBy.Add("Best", "-((CountOfScore == 0) ? 0 : (SumOfScore / CountOfScore))");
+        orderBy.Add("Fresh", "Created.Millisecond");
+        orderBy.Add("Hot", $"Created.Date descending, PostRatings.Count() descending");
+    }
+    protected async override Task OnParametersSetAsync()
+    {
+        if (orderBy.Count > 0 && Name != null)
+        {
+            FreshPosts = await serviceOfRequest.PostJsonAsync<List<PostMiniViewModel>>("api/Post/Read", new
+            {
+                type = "PostMiniViewModel",
+                count = 5,
+                orderBy = orderBy[Name],
+                where = "IsFinished==true"
+            });
+        }
+    }
+}

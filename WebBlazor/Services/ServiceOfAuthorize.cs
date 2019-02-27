@@ -4,6 +4,7 @@ using Domain.Contracts.Models.ViewModels;
 using Domain.Contracts.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Blazor;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -27,7 +28,6 @@ namespace WebBlazor.Services
         {
             this.localStorage = localStorage;
             this.Http = Http;
-
             CreateHeader = Login();
         }
         public async Task<TokenViewModel> Login(LoginViewModel loginViewModel = null)
@@ -59,6 +59,14 @@ namespace WebBlazor.Services
                 UpdateAfterAuthorization?.Invoke();
             }
             return result;
+        }
+        private void Localization()
+        {
+            //var currentLocalization = Http.DefaultRequestHeaders.GetValues("accept-language");
+            //foreach (var item in currentLocalization)
+            //{
+            //    Console.WriteLine(item);
+            //}
         }
         public async Task UpdateUserData()
         {

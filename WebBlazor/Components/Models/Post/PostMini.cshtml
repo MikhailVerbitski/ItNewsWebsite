@@ -2,13 +2,13 @@
 
 <div class="grid-post-head">
     <a href="/Post/@post.PostId"><h3>@post.Header</h3></a>
-    <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !post.BelongsToUser)"/></span>
     <div></div>
+    <span><StarsRating PercentOfRating="@(post.Score * 20)" PostId="@(post.PostId)" CanChange="@(serviceOfAuthorize.DataAboutUser != null && !post.BelongsToUser)"/></span>
 </div>
 <p>@post.BriefDesctiption</p>
 <br />
 <div class="grid-comment-footer">
-    <p class="container-date"><LocalizationTime Time="@post.Created" /></p>
+    <p class="container-date"><LocalizationTime Time="@post.Created" format="@("dd MMMM yyyy")"/></p>
     <div></div>
     @if ((post.BelongsToUser && (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)) || serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 3)
     {

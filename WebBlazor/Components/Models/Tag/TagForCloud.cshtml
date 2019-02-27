@@ -1,0 +1,18 @@
+﻿@using Domain.Contracts.Models.ViewModels.Tag
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+
+@if (tag != null)
+{
+    <div class="cursor-pointer" style="padding:10px; font-family:'Comfortaa';" onclick="@(() => UriHelper.NavigateTo($"/Best:ByTag-{tag.Id}"))">
+        <span style="border-radius: 5px 0 0 5px; background-color:#375A7D; padding:4px;">
+            @tag.CountOfUsage
+        </span>
+        <span style="border-radius: 0 5px 5px 0; background-color: #FAB496; padding:4px;">
+            @tag.Name
+        </span>
+    </div>
+}
+
+@functions{
+    [Parameter] private TagViewModel tag { get; set; }
+}

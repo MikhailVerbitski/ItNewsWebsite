@@ -12,6 +12,7 @@ namespace Data.Contracts.Models.Entities
         public int? SectionId { get; set; }
 
         public long SumOfScore { get; set; }
+
         public int CountOfScore { get; set; }
 
         public bool IsFinished { get; set; }

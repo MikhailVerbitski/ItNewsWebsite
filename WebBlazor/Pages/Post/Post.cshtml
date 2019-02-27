@@ -7,11 +7,11 @@
 
 @if (post == null)
 {
-    <p><em>Loading...</em></p>
+    <Loading />
 }
 else
 {
-    <div id="container-post">
+    <div class="container-post" class="content-body">
         <h1 style="text-align: center;">@post.Header</h1>
         <h3><LocalizationSentence Sentence="@("Section")" />: <Tag tag="@post.Section" /></h3>
         <br />
@@ -37,7 +37,7 @@ else
         <br />
         <div class="grid-post-edit-delete">
             <div></div>
-            <div><LocalizationTime Time="@post.Created" /></div>
+            <div><LocalizationTime Time="@post.Created" format="@("dddd, dd MMMM yyyy, HH:mm")"/></div>
         </div>
         <div class="grid-post-edit-delete">
             @if ((post.BelongsToUser && (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)) || serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority >= 3)
@@ -58,9 +58,9 @@ else
                 <button onclick="@SendMessage" id="SubmitComment" class="pure-button pure-button-primary">Send</button>
             </div>
         }
+        <br />
+        <ListOfComments CommentType="@typeof(CommentViewModel)" post="@post" />
     </div>
-    <br />
-    <ListOfComments CommentType="@typeof(CommentViewModel)" post="@post" />
 }
 
 @functions{

@@ -23,9 +23,9 @@ namespace WebApi.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public JsonResult Search(string property)
+        public JsonResult Search(string property, int? skip, int? take)
         {
-            var users = serviceOfUser.Search(property);
+            var users = serviceOfUser.Search(property, skip, take);
             return Json(users);
         }
         [AllowAnonymous]

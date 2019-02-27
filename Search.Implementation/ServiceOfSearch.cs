@@ -40,6 +40,14 @@ namespace Search.Implementation
             var client = new ElasticClient(connectionSettings);
             return client;
         }
+        //public IIndexResponse Create<TResult>(object entity) where TResult : class
+        //{
+        //    var searchEntity = mapper.Map <TResult>(entity);
+        //    var client = clients.GetValueOrDefault(typeof(TResult))();
+        //    var indexResponse = client.IndexDocument(searchEntity);
+        //    return indexResponse;
+        //}
+
         public IIndexResponse Create<T>(T entity) where T: class
         {
             var searchEntityType = config.GetValueOrDefault(typeof(T));

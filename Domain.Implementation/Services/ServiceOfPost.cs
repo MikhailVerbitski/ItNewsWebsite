@@ -69,10 +69,10 @@ namespace Domain.Implementation.Services
             };
         }
 
-        public IEnumerable<PostCompactViewModel> Search(string applicationUserIdCurrent, string propetry)
+        public IEnumerable<PostCompactViewModel> Search(string applicationUserIdCurrent, string propetry, int? skip, int? take)
         {
             var applicationUserCurrent = repositoryOfApplicationUser.Read(a => a.Id == applicationUserIdCurrent);
-            var ids = serviceOfSearch.SearchPosts(propetry, 0, 10);
+            var ids = serviceOfSearch.SearchPosts(propetry, (skip != null) ? skip.Value : 0, (take!=null) ? take.Value : 0);
             var result = ids
                 .Select(b => repositoryOfPost.Read(a => a.Id == b,
                     a => a.Tags,
@@ -210,6 +210,9 @@ namespace Domain.Implementation.Services
             postViewModel.BelongsToUser = (applicationUserCurrent == null)
                 ? false
                 : applicationUserCurrent.UserProfileId == postEntity.UserProfileId;
+            postViewModel.FirstImage = (postEntity.Images == null)
+                ? repositoryOfImage.ReadMany(new Expression<Func<ImageEntity, bool>>[] { a => a.PostId == postEntity.Id }).FirstOrDefault()?.Path
+                : postEntity.Images.FirstOrDefault().Path;
             return postViewModel;
         }
         private PostViewModel GetPostViewModel(PostEntity postEntity, ApplicationUserEntity applicationUserCurrent)

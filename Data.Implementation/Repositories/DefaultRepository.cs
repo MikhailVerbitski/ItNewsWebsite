@@ -51,8 +51,8 @@ namespace Data.Implementation.Repositories
         public virtual IEnumerable<T> ReadMany(string where, string orderBy, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
-            dbQuery = (where != null && where != string.Empty) ? dbQuery.Where(where) : dbQuery;
             dbQuery = (orderBy != null && orderBy != string.Empty) ? dbQuery.OrderBy(orderBy) : dbQuery;
+            dbQuery = (where != null && where != string.Empty) ? dbQuery.Where(where) : dbQuery;
             return dbQuery;
         }
         public virtual void Update(T entity, params Expression<Func<T, object>>[] properties)

@@ -300,4 +300,16 @@
   <data name="Registration date" xml:space="preserve">
     <value>Дата регистрации</value>
   </data>
+  <data name="Best" xml:space="preserve">
+    <value>Лучшее</value>
+  </data>
+  <data name="Fresh" xml:space="preserve">
+    <value>Свежее</value>
+  </data>
+  <data name="Hot" xml:space="preserve">
+    <value>Горячее</value>
+  </data>
+  <data name="current language" xml:space="preserve">
+    <value>Русский</value>
+  </data>
 </root>

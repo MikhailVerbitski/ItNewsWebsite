@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Localization;
 using WebApi.Hubs;
 using Domain.Implementation.Services;
 using Search.Implementation;
+using System.IO;
 
 namespace WebApi
 {
@@ -123,8 +124,8 @@ namespace WebApi
             app.UseStaticFiles();
             var supportedCultures = new[]
             {
-                new CultureInfo("en-US"),
                 new CultureInfo("ru-RU"),
+                new CultureInfo("en-US"),
             };
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
@@ -132,7 +133,6 @@ namespace WebApi
                 SupportedCultures = supportedCultures,
                 SupportedUICultures = supportedCultures
             });
-
 
             var folders = hostingEnvironment.ContentRootPath.Split('\\');
             var SolutionPath = string.Join('\\', folders.Take(folders.Length - 1));

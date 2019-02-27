@@ -300,10 +300,19 @@
   <data name="Current culture name" xml:space="preserve">
     <value>en</value>
   </data>
-  <data name="String1" xml:space="preserve">
-    <value />
+  <data name="current language" xml:space="preserve">
+    <value>English</value>
   </data>
   <data name="Registration date" xml:space="preserve">
     <value>Registration date</value>
+  </data>
+  <data name="Best" xml:space="preserve">
+    <value>Best</value>
+  </data>
+  <data name="Fresh" xml:space="preserve">
+    <value>Fresh</value>
+  </data>
+  <data name="Hot" xml:space="preserve">
+    <value>Hot</value>
   </data>
 </root>

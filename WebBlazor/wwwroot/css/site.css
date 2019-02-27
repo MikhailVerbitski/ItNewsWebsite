@@ -1,31 +1,41 @@
 ﻿#navbar {
     display: grid;
-    grid-template-columns: auto 1fr auto auto auto;
+    grid-template-columns: auto auto 1fr auto auto;
     position: fixed;
-    top: 0; 
-    background-color: #EFE7CC;
+    top: 0;
+    background-color: #4E9B45;
     box-shadow: 0 0 10px black;
-    padding: 12px 8px;
+    padding: 12px 10px 12px 30px;
     z-index: 3;
-}
-
-.content {
-    opacity: 0.78;
 }
 
 .content-body {
     background-color: #F0F4F3;
-    box-shadow: 0 0 5px white;
     margin-bottom: 10px;
     width: 100%;
+    padding: 10px;
+}
+
+.content-account {
+    padding: 20px 30px;
+}
+
+.content-tags{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
+.container-post {
+    padding: 20px;
+    background-color: #F0F4F3;
+    word-break: break-all;
+}
+.container-post img {
+    max-width: 100%;
 }
 
 #mainBody {
-    margin: 0 10%;
-}
-
-#posts {
-
+    margin: 0 4%;
 }
 
 .userMiniImg {
@@ -59,18 +69,6 @@
 
 #SubmitComment{
     width: 100%;
-}
-
-#container-posts {
-    padding: 20px 30px 0 30px;
-}
-
-#container-post {
-    padding: 20px;
-    word-break: break-all;
-}
-#container-post img{
-    max-width: 100%;
 }
 
 .container-date {
@@ -136,7 +134,7 @@
 }
 
 .create-post-link {
-    width:100%;
+    width: 100%;
 }
 .grid-userMini p {
     margin-left: 6px;
@@ -146,10 +144,14 @@
 .logo {
     justify-self: start;
     display: block;
+    padding-bottom: 0;
+    color: #E23F35;
+    font-family: "Junegull";
 }
 
 .account-nav {
     justify-self: end;
+    font-family: "Junegull";
 }
 
 .side-bar{
@@ -181,10 +183,6 @@
     align-self: center;
 }
 
-.content-account {
-    padding: 20px 30px;
-}
-
 .user-page-button{
     width:100%;
     margin-bottom: 5px;
@@ -192,4 +190,8 @@
 
 .user-edit{
 
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }

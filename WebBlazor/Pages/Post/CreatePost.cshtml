@@ -9,9 +9,13 @@
 @using Domain.Contracts.Models;
 @using Markdig;
 
-@if (post != null)
+@if (post == null)
 {
-    <div id="container-post">
+    <Loading />
+}
+else
+{
+    <div class="container-post">
         <ValidationSummary Subject="@post" />
         <h1 style="text-align: center;">@(post.Header)</h1>
         <h3><LocalizationSentence Sentence="@("Section")" />: <Tag tag="@(post.Section)" /></h3>
@@ -28,8 +32,8 @@
         </ListViewTemplateWithIf>
     </div>
     <hr />
-    <h2 style="text-align: center; padding:20px;"><LocalizationSentence Sentence="@("Constructor")" /></h2>
-    <div id="createPost-top">
+    <div id="createPost-top" class="container-post">
+        <h2 style="text-align: center; padding:20px;"><LocalizationSentence Sentence="@("Constructor")" /></h2>
         <div class="pure-form pure-form-stacked">
             <label for="header"><LocalizationSentence Sentence="@("Header")" /></label>
             <input id="header" type="text" bind="@(post.Header)" />
@@ -151,7 +155,7 @@
             var postUpdate = new PostUpdateViewModel()
             {
                 BelongsToUser = post.BelongsToUser,
-                BriefDesctiption = Markdig.Markdown.ToPlainText(markdown: post.Content, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
+                BriefDesctiption = new string(Markdig.Markdown.ToPlainText(markdown: post.Content, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()).Take(200).ToArray()),
                 Content = Markdig.Markdown.ToHtml(markdown: post.Content, pipeline: new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()),
                 Header = post.Header,
                 Images = post.Images,

@@ -5,40 +5,49 @@
 @using Domain.Contracts.Models.ViewModels.Post
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
-<div id="container-posts">
-    <h2><LocalizationSentence Sentence="@message" /></h2>
-    <span>
-        <font size="3"><LocalizationSentence Sentence="@("Type")" />: </font>
-        <a><font size="2" color="@((typeOfData) ? "red" : "")" onclick="@(() => LoadData(true))"><LocalizationSentence Sentence="@("Posts")" /></font></a>
-        <a><font size="2" color="@((!typeOfData) ? "red" : "")" onclick="@(() => LoadData(false))"><LocalizationSentence Sentence="@("Users")" /></font></a>
-    </span>
+<div>
+    <div class="content-body" style="font-family:'Gagalin';">
+        <font size="5"><LocalizationSentence Sentence="@("Type")" />: </font>
+        <a class="cursor-pointer"><font size="4" color="@((typeOfData) ? "red" : "")" onclick="@(() => LoadData(true))"><LocalizationSentence Sentence="@("Posts")" /></font></a>
+        <a class="cursor-pointer"><font size="4" color="@((!typeOfData) ? "red" : "")" onclick="@(() => LoadData(false))"><LocalizationSentence Sentence="@("Users")" /></font></a>
+    </div>
     @if (typeOfData)
     {
-        if (Posts != null)
+        if (Posts == null)
         {
-            <ListOfPosts PostType="@(typeof(PostCompactViewModel))" listOfPosts="@Posts" />
+            <Loading />
+        }
+        else
+        {
+            <div class="grid-posts">
+                <ListOfPosts PostType="@(typeof(PostCompactViewModel))" listOfPosts="@Posts" />
+            </div>
         }
     }
     else
     {
-        if (Users != null)
+        if (Users == null)
+        {
+            <Loading />
+        }
+        else
         {
             <ListViewTemplate Items="@Users">
                 <ItemTemplate>
-                    <div class="grid-userMini-search">
+                    <div class="grid-userMini-search content-body">
                         <img src="@((context.Avatar == null) ? "/img/default-user-profile-image.png" : context.Avatar)" class="userMiniImg" asp-append-version="true" height="100" width="100" />
                         <div>
                             <p><a href="/UserPage/@(context.UserProfileId)"><font size="3">(<font color="@context.Role.Color">@context.Role.Name</font>) @context.FirstName @context.LastName</font></a></p>
                             <p><LocalizationSentence Sentence="@("Rating")" /> - @context.CountOfLikes</p>
                         </div>
                     </div>
-                    <br />
-                    <hr />
-                    <br />
-                    <br />
                 </ItemTemplate>
             </ListViewTemplate>
         }
+    }
+    @if(!allLoaded)
+    {
+        <button onclick="@LoadMore" class="pure-button grid-posts-loadMore" style="width: 100%"><LocalizationSentence Sentence="@("Load more")" /></button>
     }
 </div>
 
@@ -46,38 +55,41 @@
     [Parameter] private string property { get; set; } = "";
     private List<UserMiniViewModel> Users { get; set; }
     private List<PostCompactViewModel> Posts { get; set; }
-    private string message { get; set; }
+    private int TakeCount = 9;
     private bool typeOfData;
+    private bool allLoaded = false;
 
-    protected override void OnInit()
-    {
-        if (property == "")
-        {
-            message = "nothing found :(";
-        }
-    }
     protected async override Task OnParametersSetAsync()
     {
-        if (property != "")
-        {
-            message = "";
-            await LoadData(true);
-            if (property == "" && Users.Count == 0 && Posts.Count == 0)
-            {
-                message = "nothing found :(";
-            }
-        }
+        await LoadData(true);
     }
     private async Task LoadData(bool key)
     {
         typeOfData = key;
         if(typeOfData)
         {
-            Posts = await serviceOfRequest.GetJsonAsync<List<PostCompactViewModel>>($"/api/Post/Search?property={property}");
+            Posts = await serviceOfRequest.GetJsonAsync<List<PostCompactViewModel>>($"/api/Post/Search?property={property}&skip={0}&take={TakeCount}");
+            allLoaded = Posts.Count < TakeCount;
         }
         else
         {
-            Users = await serviceOfRequest.GetJsonAsync<List<UserMiniViewModel>>($"/api/User/Search?property={property}");
+            Users = await serviceOfRequest.GetJsonAsync<List<UserMiniViewModel>>($"/api/User/Search?property={property}&skip={0}&take={TakeCount}");
+            allLoaded = Users.Count < TakeCount;
+        }
+    }
+    private async Task LoadMore()
+    {
+        if (typeOfData)
+        {
+            var newPosts = await serviceOfRequest.GetJsonAsync<List<PostCompactViewModel>>($"/api/Post/Search?property={property}&skip={Posts.Count}&take={TakeCount}");
+            allLoaded = newPosts.Count < TakeCount;
+            Posts.AddRange(newPosts);
+        }
+        else
+        {
+            var newUsers = await serviceOfRequest.GetJsonAsync<List<UserMiniViewModel>>($"/api/User/Search?property={property}&skip={Users.Count}&take={TakeCount}");
+            allLoaded = newUsers.Count < TakeCount;
+            Users.AddRange(newUsers);
         }
     }
 }

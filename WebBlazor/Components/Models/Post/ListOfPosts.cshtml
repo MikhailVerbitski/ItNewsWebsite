@@ -3,7 +3,7 @@
 
 @if (listOfPosts == null)
 {
-    <p><em>Loading...</em></p>
+    <Loading/>
 }
 else if (count == 0)
 {
@@ -30,7 +30,7 @@ else
     }
     @if(!allLoaded && count >= takeCount)
     {
-        <button onclick="@LoadMore" class="pure-button" style="width: 100%"><LocalizationSentence Sentence="@("Load more")" /></button>
+        <button onclick="@LoadMore" class="pure-button grid-posts-loadMore" style="width: 100%"><LocalizationSentence Sentence="@("Load more")" /></button>
     }
 }
 
@@ -39,7 +39,7 @@ else
     [Parameter] private object listOfPosts { get; set; }
     [Parameter] private string param { get; set; }
     private int count = 0;
-    private int takeCount = 3;
+    private int takeCount = 9;
     private bool allLoaded = false;
     private bool notFirstTime = false;
     private KeyValuePair<string, Func<string[], PostReadRequestParams>>[] config;
@@ -47,7 +47,7 @@ else
     protected override void OnInit()
     {
         config = new[] {
-            new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Top", a => new PostReadRequestParams()
+            new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Best", a => new PostReadRequestParams()
             {
                 type =PostType.Name,
                 count = takeCount,
@@ -59,11 +59,23 @@ else
                 $"{(((a.Any(b => b.Contains("User")) || a.Contains("f")) && a.Any(b => b.Contains("ByTag"))) ? "and" : "")}" +
                 $"{(a.Any(b => b.Contains("ByTag")) ? $" Tags.Any(TagId=={a.Where(b => b.Contains("ByTag")).FirstOrDefault().Split('-')[1]})" : "")}" : null
             }),
-            new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Time", a => new PostReadRequestParams()
+            new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Fresh", a => new PostReadRequestParams()
             {
                 type = PostType.Name,
                 count = takeCount,
-                orderBy = $"{(a != null && a.Contains("r") ? "-" : "")}Created.Millisecond",
+                orderBy = $"{(a != null && a.Contains("r") ? "" : "-")}Created.Millisecond",
+                where = (a != null) ?
+                $"{(a.Contains("f") ? $"IsFinished=={a.Contains("fin")} " : "")}" +
+                $"{((a.Contains("f") && (a.Any(b => b.Contains("User")) || (a.Any(b => b.Contains("ByTag"))))) ? "and" : "")}" +
+                $" {(a.Any(b => b.Contains("User")) ? $"UserProfileId == {a.Where(b => b.Contains("User")).FirstOrDefault().Split('-')[1]}" : "")} " +
+                $"{(((a.Any(b => b.Contains("User")) || a.Contains("f")) && a.Any(b => b.Contains("ByTag"))) ? "and" : "")}" +
+                $"{(a.Any(b => b.Contains("ByTag")) ? $" Tags.Any(TagId=={a.Where(b => b.Contains("ByTag")).FirstOrDefault().Split('-')[1]})" : "")}" : null
+            }),
+            new KeyValuePair<string,Func<string[],PostReadRequestParams>>("Hot", a => new PostReadRequestParams()
+            {
+                type = PostType.Name,
+                count = takeCount,
+                orderBy = $"Created.Date {(a != null && a.Contains("r") ? "" : "descending")}, PostRatings.Count() {(a != null && a.Contains("r") ? "" : "descending")}",
                 where = (a != null) ?
                 $"{(a.Contains("f") ? $"IsFinished=={a.Contains("fin")} " : "")}" +
                 $"{((a.Contains("f") && (a.Any(b => b.Contains("User")) || (a.Any(b => b.Contains("ByTag"))))) ? "and" : "")}" +

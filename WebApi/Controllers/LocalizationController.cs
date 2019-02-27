@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace WebApi.Controllers
@@ -9,17 +9,21 @@ namespace WebApi.Controllers
     [Route("api/Localization/[action]")]
     public class LocalizationController : Controller
     {
-        private readonly IStringLocalizer<LocalizationController> localizer;
+        private IStringLocalizer localizer;
 
-        public LocalizationController(IStringLocalizer<LocalizationController> localizer)
+        public LocalizationController(IStringLocalizerFactory localizerFactory)
         {
-            this.localizer = localizer;
+            this.localizer = localizerFactory.Create(typeof(LocalizationController));
         }
 
         [HttpGet]
-        public JsonResult Get()
+        public JsonResult Get(string culture = null)
         {
-            var dictionary = new Dictionary<string, string>(localizer.GetAllStrings().Select(a => KeyValuePair.Create<string, string>(a.Name, a.Value)));
+            if(culture != null)
+            {
+                localizer = localizer.WithCulture(new CultureInfo(culture));
+            }
+            var dictionary = localizer.GetAllStrings().ToDictionary(x => x.Name, x => x.Value);
             return Json(dictionary);
         }
     }

@@ -1,11 +1,23 @@
 ﻿@inject JsInteropClasses.ServiceOfTheme serviceOfTheme
+@inject Services.ServiceOfLocalization serviceOfLocalization
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div class="pure-menu pure-menu-horizontal" id="navbar">
-    <div class="logo"><a href="/@("Time:f:fin")" style="margin-left:3vh; padding-bottom: 0;"><font size="5">ItNews</font></a></div>
-    <div onclick="@ChangeTheme"><img src="@serviceOfTheme.PahtIcon"/></div>
+    <div class="logo"><a href="/@("Fresh:f:fin")"><font size="6">ItNews</font></a></div>
+    <div><img onclick="@ChangeTheme" src="@serviceOfTheme.PahtIcon" class="cursor-pointer" /></div>
     <div class="account-nav">
         <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+                <select onchange="@LanguageChange">
+                    @if(languages != null)
+                    {
+                        @foreach (var item in languages)
+                        {
+                            <option>@item.Key</option>
+                        }
+                    }
+                </select>
+            </li>
             @if (serviceOfAuthorize.IsAuthorize)
             {
                 <li class="pure-menu-item">
@@ -32,14 +44,23 @@
 
 @functions{
     private string SearchWords { get; set; }
+    private List<KeyValuePair<string, string>> languages { get; set; }
 
     protected async override Task OnInitAsync()
     {
         serviceOfAuthorize.UpdateAfterAuthorization += (() => this.StateHasChanged());
         await serviceOfTheme.Init();
+        languages = serviceOfLocalization.Languages;
+        this.StateHasChanged();
     }
     private async Task ChangeTheme()
     {
         await serviceOfTheme.ChangeTheme();
+    }
+    private async Task LanguageChange(UIChangeEventArgs e)
+    {
+        var value = languages.FirstOrDefault(a => a.Key.Equals(e.Value)).Key;
+        await serviceOfLocalization.SetLanguage(value);
+        await JsInteropClasses.ReloadPage.Reload();
     }
 }

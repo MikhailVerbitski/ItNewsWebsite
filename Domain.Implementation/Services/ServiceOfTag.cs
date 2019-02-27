@@ -23,7 +23,7 @@ namespace Domain.Implementation.Services
 
         public List<TagViewModel> Get()
         {
-            var tagEntities = repositoryOfTag.ReadMany(null);
+            var tagEntities = repositoryOfTag.ReadMany(null).OrderBy(a => -a.CountOfUsage).Take(20);
             var tagViewModels = mapper.Map<IEnumerable<TagEntity>, IEnumerable<TagViewModel>>(tagEntities);
             return tagViewModels.ToList();
         }

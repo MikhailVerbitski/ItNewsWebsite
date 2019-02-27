@@ -26,10 +26,10 @@ namespace WebApi.Controllers
         }
         [AllowAnonymous]
         [HttpGet]
-        public JsonResult Search(string property)
+        public JsonResult Search(string property, int? skip, int? take)
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var posts = serviceOfPost.Search(userId, property);
+            var posts = serviceOfPost.Search(userId, property, skip, take);
             return Json(posts);
         }
         [HttpGet]
@@ -44,6 +44,18 @@ namespace WebApi.Controllers
         {
             var userId = User.Claims.SingleOrDefault(a => a.Type == "UserId").Value;
             post = await serviceOfPost.Create(userId, post);
+            return Json(post);
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public JsonResult Read([FromBody]PostReadRequestParams readRequest)
+        {
+            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
+            var post = serviceOfPost.Get(readRequest.type, currentUserId, readRequest.skip, readRequest.count, readRequest.where, readRequest.orderBy);
+            if (readRequest.count != null && readRequest.count == 1)
+            {
+                return Json(post.FirstOrDefault());
+            }
             return Json(post);
         }
         [HttpPost]
@@ -66,18 +78,6 @@ namespace WebApi.Controllers
             var rating = serviceOfPost.RatingPost(currentUserId, postId, score);
             return Json(rating);
         }
-        [AllowAnonymous]
-        [HttpPost]
-        public JsonResult Read([FromBody]PostReadRequestParams readRequest)
-        {
-            var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var post = serviceOfPost.Get(readRequest.type, currentUserId, readRequest.skip, readRequest.count, readRequest.where, readRequest.orderBy);
-            if(readRequest.count != null && readRequest.count == 1)
-            {
-                return Json(post.FirstOrDefault());
-            }
-            return Json(post);
-        }
         [HttpGet]
         public JsonResult GetListOfSelections()
         {
@@ -91,7 +91,6 @@ namespace WebApi.Controllers
             var listOfTags = serviceOfTag.Get();
             return Json(listOfTags);
         }
-
         [HttpPost]
         public JsonResult AddImage([FromBody] PostImage image)
         {

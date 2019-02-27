@@ -31,13 +31,13 @@
     .account {
         margin: 80px 10% 40px 10%;
     }
+    .grid-posts {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
 }
 @media only screen and (max-width: 720px){
     #mainBody {
         margin: 0 25px;
-    }
-    .side-bar{
-        display: none;
     }
     .grid-content{
         grid-template-columns: 1fr;
@@ -65,5 +65,8 @@
     #grid-user-profile {
         margin-top: 190px;
         grid-template-columns: auto;
+    }
+    .grid-posts {
+        grid-template-columns: 1fr;
     }
 }

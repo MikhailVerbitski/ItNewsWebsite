@@ -1,0 +1,25 @@
+﻿@using Domain.Contracts.Models.ViewModels.Tag
+
+@if (Tags == null)
+{
+    <Loading />
+}
+else
+{
+    <div class="content-tags content-body">
+        <ListViewTemplate Items="@Tags">
+            <ItemTemplate>
+                <TagForCloud tag="@context"/>
+            </ItemTemplate>
+        </ListViewTemplate>
+    </div>
+}
+
+@functions{
+    private List<TagViewModel> Tags;
+
+    protected async override Task OnInitAsync()
+    {
+        Tags  = await serviceOfRequest.GetJsonAsync<List<TagViewModel>>("api/Post/GetListOfTags");
+    }
+}

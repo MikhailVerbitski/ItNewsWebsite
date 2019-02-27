@@ -7,5 +7,7 @@ namespace Domain.Contracts.Models.ViewModels.Post
         public double Score { get; set; }
 
         public UserMiniViewModel AuthorUserMiniViewModel { get; set; }
+
+        public string FirstImage { get; set; }
     }
 }

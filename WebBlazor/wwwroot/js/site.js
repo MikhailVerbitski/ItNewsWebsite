@@ -15,7 +15,6 @@ window.Theme = {
             $("body").css("background-color", "#C1BBA8");
             $("#navbar").css("background-color", "#EFE7CC");
         } else {
-
             $("body").css("background-color", "#000000");
             $("#navbar").css("background-color", "#276273");
         }
@@ -47,5 +46,10 @@ window.Clear = {
     InputContent: function (id) {
         var input = document.getElementById(id);
         input.value = "";
+    }
+}
+window.reload = {
+    reloadPage: function () {
+        location.reload();
     }
 }
