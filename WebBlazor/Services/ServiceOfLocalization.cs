@@ -24,7 +24,7 @@ namespace WebBlazor.Services
         public async Task SetLanguage(string value)
         {
             await localStorage.SetItem("language", value);
-            await ChangeLanguage(value);
+            await JsInteropClasses.ReloadPage.Reload();
         }
         public async Task<Dictionary<string, string>> ChangeLanguage(string language = null)
         {

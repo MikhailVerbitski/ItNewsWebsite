@@ -50,8 +50,8 @@
     {
         serviceOfAuthorize.UpdateAfterAuthorization += (() => this.StateHasChanged());
         await serviceOfTheme.Init();
+        await serviceOfLocalization.LanguageDictionary;
         languages = serviceOfLocalization.Languages;
-        this.StateHasChanged();
     }
     private async Task ChangeTheme()
     {
@@ -61,6 +61,5 @@
     {
         var value = languages.FirstOrDefault(a => a.Key.Equals(e.Value)).Key;
         await serviceOfLocalization.SetLanguage(value);
-        await JsInteropClasses.ReloadPage.Reload();
     }
 }
