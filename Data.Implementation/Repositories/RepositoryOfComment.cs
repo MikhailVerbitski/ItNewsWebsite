@@ -1,4 +1,5 @@
-﻿using Data.Contracts.Models.Entities;
+﻿using Data.Contracts;
+using Data.Contracts.Models.Entities;
 using Search.Implementation;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,7 +20,7 @@ namespace Data.Implementation.Repositories
         }
         public override void Delete(CommentEntity entity)
         {
-            RepositoryOfCommentLike repositoryOfCommentLike = new RepositoryOfCommentLike(context, serviceOfSearch);
+            IRepository<CommentLikeEntity> repositoryOfCommentLike = new RepositoryOfCommentLike(context, serviceOfSearch);
             var commentLikes = entity.Likes;
             if(commentLikes == null)
             {
@@ -28,7 +29,7 @@ namespace Data.Implementation.Repositories
             commentLikes = commentLikes.ToList();
             foreach (var item in commentLikes)
             {
-                repositoryOfCommentLike.Delete(item, true);
+                repositoryOfCommentLike.Delete(item);
             }
             base.Delete(entity);
         }

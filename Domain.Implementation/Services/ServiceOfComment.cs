@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Data.Contracts;
 using Data.Contracts.Models.Entities;
-using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.User;
 using Search.Implementation;
@@ -14,11 +14,11 @@ namespace Domain.Implementation.Services
     public class ServiceOfComment
     {
         private readonly IMapper mapper;
-        private readonly RepositoryOfPost repositoryOfPost;
-        private readonly RepositoryOfComment repositoryOfComment;
-        private readonly RepositoryOfCommentLike repositoryOfCommentLike;
-        private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
-        private readonly RepositoryOfUserProfile repositoryOfUserProfile;
+        private readonly IRepository<PostEntity> repositoryOfPost;
+        private readonly IRepository<CommentEntity> repositoryOfComment;
+        private readonly IRepository<CommentLikeEntity> repositoryOfCommentLike;
+        private readonly IRepository<ApplicationUserEntity> repositoryOfApplicationUser;
+        private readonly IRepository<UserProfileEntity> repositoryOfUserProfile;
         private readonly ServiceOfUser serviceOfUser;
         private readonly Tuple<string, Func<CommentEntity, ApplicationUserEntity, BaseCommentViewModel>>[] Config;
 
@@ -26,11 +26,11 @@ namespace Domain.Implementation.Services
             IMapper mapper, 
             ServiceOfUser serviceOfUser, 
             ServiceOfSearch serviceOfSearch,
-            RepositoryOfPost repositoryOfPost,
-            RepositoryOfComment repositoryOfComment,
-            RepositoryOfCommentLike repositoryOfCommentLike,
-            RepositoryOfApplicationUser repositoryOfApplicationUser,
-            RepositoryOfUserProfile repositoryOfUserProfile
+            IRepository<PostEntity> repositoryOfPost,
+            IRepository<CommentEntity> repositoryOfComment,
+            IRepository<CommentLikeEntity> repositoryOfCommentLike,
+            IRepository<ApplicationUserEntity> repositoryOfApplicationUser,
+            IRepository<UserProfileEntity> repositoryOfUserProfile
             )
         {
             this.mapper = mapper;

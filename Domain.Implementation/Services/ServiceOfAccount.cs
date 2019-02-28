@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Data.Contracts;
 using Data.Contracts.Models.Entities;
-using Data.Implementation.Repositories;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq.Expressions;
@@ -15,22 +15,20 @@ namespace Domain.Implementation.Services
         private readonly IMapper mapper;
         private readonly UserManager<ApplicationUserEntity> userManager;
         private readonly RoleManager<RoleEntity> roleManager;
-
-        private readonly RepositoryOfRole repositoryOfRole;
-        private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
-        private readonly RepositoryOfUserProfile RepositoryOfUserProfile;
-        private readonly RepositoryOfIdentityUserRole repositoryOfIdentityUserRole;
-
+        private readonly IRepository<RoleEntity> repositoryOfRole;
+        private readonly IRepository<ApplicationUserEntity> repositoryOfApplicationUser;
+        private readonly IRepository<UserProfileEntity> RepositoryOfUserProfile;
+        private readonly IRepository<IdentityUserRole<string>> repositoryOfIdentityUserRole;
         private readonly ServiceOfImage serviceOfImage;
 
         public ServiceOfAccount(
             IMapper mapper,
             UserManager<ApplicationUserEntity> userManager,
             RoleManager<RoleEntity> roleManager,
-            RepositoryOfRole repositoryOfRole,
-            RepositoryOfApplicationUser repositoryOfApplicationUser,
-            RepositoryOfUserProfile RepositoryOfUserProfile,
-            RepositoryOfIdentityUserRole repositoryOfIdentityUserRole,
+            IRepository<RoleEntity> repositoryOfRole,
+            IRepository<ApplicationUserEntity> repositoryOfApplicationUser,
+            IRepository<UserProfileEntity> RepositoryOfUserProfile,
+            IRepository<IdentityUserRole<string>> repositoryOfIdentityUserRole,
             ServiceOfImage serviceOfImage
             )
         {

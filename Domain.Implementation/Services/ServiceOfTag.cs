@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Data.Contracts;
 using Data.Contracts.Models.Entities;
-using Data.Implementation.Repositories;
 using Domain.Contracts.Models.ViewModels.Tag;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +10,10 @@ namespace Domain.Implementation.Services
     public class ServiceOfTag
     {
         private readonly IMapper mapper;
-        private readonly RepositoryOfTag repositoryOfTag;
-        private readonly RepositoryOfPostTag repositoryOfPostTag;
+        private readonly IRepository<TagEntity> repositoryOfTag;
+        private readonly IRepository<PostTagEntity> repositoryOfPostTag;
 
-        public ServiceOfTag(IMapper mapper, RepositoryOfTag repositoryOfTag, RepositoryOfPostTag repositoryOfPostTag)
+        public ServiceOfTag(IMapper mapper, IRepository<TagEntity> repositoryOfTag, IRepository<PostTagEntity> repositoryOfPostTag)
         {
             this.mapper = mapper;
             this.repositoryOfTag = repositoryOfTag;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using Data.Contracts;
 using Data.Contracts.Models.Entities;
 using Search.Implementation;
 
@@ -15,10 +16,10 @@ namespace Data.Implementation.Repositories
 
         public override ApplicationUserEntity Create(ApplicationUserEntity entity)
         {
-            entity.Created = System.DateTime.Now;
+            entity.Created = DateTime.Now;
             var ApplicationUser = base.Create(entity);
             serviceOfSearch.Create<ApplicationUserEntity>(ApplicationUser);
-            RepositoryOfUserProfile repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
+            IRepository<UserProfileEntity> repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
             var UserProfile = repositoryOfUserProfile.Read(a => a.Id == ApplicationUser.UserProfileId);
             if(UserProfile == null)
             {

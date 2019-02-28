@@ -1,4 +1,5 @@
-﻿using Data.Contracts.Models.Entities;
+﻿using Data.Contracts;
+using Data.Contracts.Models.Entities;
 
 namespace Data.Implementation.Repositories
 {
@@ -9,7 +10,7 @@ namespace Data.Implementation.Repositories
 
         public override PostTagEntity Create(PostTagEntity entity)
         {
-            RepositoryOfTag repositoryOfTag = new RepositoryOfTag(context);
+            IRepository<TagEntity> repositoryOfTag = new RepositoryOfTag(context);
 
             var Tag = entity.Tag;
             if(Tag == null)
@@ -25,7 +26,7 @@ namespace Data.Implementation.Repositories
 
         public override void Delete(PostTagEntity entity)
         {
-            RepositoryOfTag repositoryOfTag = new RepositoryOfTag(context);
+            IRepository<TagEntity> repositoryOfTag = new RepositoryOfTag(context);
 
             var Tag = entity.Tag;
             if (Tag == null)

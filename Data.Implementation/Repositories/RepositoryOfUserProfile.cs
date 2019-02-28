@@ -1,4 +1,5 @@
-﻿using Data.Contracts.Models.Entities;
+﻿using Data.Contracts;
+using Data.Contracts.Models.Entities;
 using Search.Implementation;
 using System.Linq;
 
@@ -14,7 +15,7 @@ namespace Data.Implementation.Repositories
 
         public override void Delete(UserProfileEntity entity)
         {
-            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
+            IRepository<PostEntity> repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
             var posts = entity.Posts;
             if(posts == null)
             {

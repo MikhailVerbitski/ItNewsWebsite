@@ -6,6 +6,5 @@ namespace Data.Implementation.Repositories
     {
         public RepositoryOfTag(ApplicationDbContext context) : base(context)
         { }
-
     }
 }

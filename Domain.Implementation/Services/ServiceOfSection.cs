@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Data.Implementation.Repositories;
+using Data.Contracts;
+using Data.Contracts.Models.Entities;
 using Search.Implementation;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace Domain.Implementation.Services
     public class ServiceOfSection
     {
         private readonly IMapper mapper;
-        private readonly RepositoryOfSection repositoryOfSection;
-        private readonly RepositoryOfPost repositoryOfPost;
+        private readonly IRepository<SectionEntity> repositoryOfSection;
+        private readonly IRepository<PostEntity> repositoryOfPost;
 
-        public ServiceOfSection(IMapper mapper, ServiceOfSearch serviceOfSearch, RepositoryOfSection repositoryOfSection, RepositoryOfPost repositoryOfPost)
+        public ServiceOfSection(IMapper mapper, ServiceOfSearch serviceOfSearch, IRepository<SectionEntity> repositoryOfSection, IRepository<PostEntity> repositoryOfPost)
         {
             this.mapper = mapper;
             this.repositoryOfSection = repositoryOfSection;

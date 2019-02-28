@@ -1,4 +1,5 @@
-﻿using Data.Implementation.Repositories;
+﻿using Data.Contracts;
+using Data.Contracts.Models.Entities;
 using Domain.Contracts.Models;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
@@ -9,9 +10,9 @@ namespace Domain.Implementation.Services
     public class ServiceOfImage
     {
         private readonly string SolutionPath;
-        private readonly RepositoryOfImage repositoryOfImage;
+        private readonly IRepository<ImageEntity> repositoryOfImage;
 
-        public ServiceOfImage(IHostingEnvironment hostingEnvironment, RepositoryOfImage repositoryOfImage)
+        public ServiceOfImage(IHostingEnvironment hostingEnvironment, IRepository<ImageEntity> repositoryOfImage)
         {
             this.repositoryOfImage = repositoryOfImage;
             var folders = hostingEnvironment.ContentRootPath.Split('\\');

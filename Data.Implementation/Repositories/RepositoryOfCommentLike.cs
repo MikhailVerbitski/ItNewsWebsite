@@ -1,4 +1,5 @@
-﻿using Data.Contracts.Models.Entities;
+﻿using Data.Contracts;
+using Data.Contracts.Models.Entities;
 using Search.Implementation;
 
 namespace Data.Implementation.Repositories
@@ -13,8 +14,8 @@ namespace Data.Implementation.Repositories
 
         public override CommentLikeEntity Create(CommentLikeEntity entity)
         {
-            RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
-            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
+            IRepository<ApplicationUserEntity> repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
+            IRepository<CommentEntity> repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
             
             var comment = entity.Comment;
             if(comment == null)
@@ -30,27 +31,20 @@ namespace Data.Implementation.Repositories
 
             return base.Create(entity);
         }
-        public void Delete(CommentLikeEntity entity, bool forCommentDelete = false)
+        public override void Delete(CommentLikeEntity entity)
         {
-            RepositoryOfApplicationUser repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
-            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
-
+            IRepository<ApplicationUserEntity> repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
+            IRepository<CommentEntity> repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
             var comment = entity.Comment;
             if (comment == null)
             {
                 comment = repositoryOfComment.Read(a => a.Id == entity.CommentId);
             }
-
-            if (!forCommentDelete)
-            {
-                comment.CountOfLikes--;
-                repositoryOfComment.Update(comment);
-            }
-            
+            comment.CountOfLikes--;
+            repositoryOfComment.Update(comment);
             var ApplicationUserOfComment = repositoryOfApplicationUser.Read(a => a.UserProfileId == comment.UserProfileId);
             ApplicationUserOfComment.CountOfLikes--;
             repositoryOfApplicationUser.Update(ApplicationUserOfComment);
-
             base.Delete(entity);
         }
     }

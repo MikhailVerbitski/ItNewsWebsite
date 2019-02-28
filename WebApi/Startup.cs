@@ -25,6 +25,7 @@ using Domain.Implementation.Services;
 using Search.Implementation;
 using System.IO;
 using Data.Implementation.Repositories;
+using Data.Contracts;
 
 namespace WebApi
 {
@@ -96,20 +97,19 @@ namespace WebApi
             services.AddScoped<ServiceOfTag>();
             services.AddScoped<ServiceOfUser>();
             services.AddScoped<ServiceOfSearch>();
-            services.AddScoped<RepositoryOfApplicationUser>();
-            services.AddScoped<RepositoryOfComment>();
-            services.AddScoped<RepositoryOfCommentLike>();
-            services.AddScoped<RepositoryOfIdentityUserRole>();
-            services.AddScoped<RepositoryOfImage>();
-            services.AddScoped<RepositoryOfImage>();
-            services.AddScoped<RepositoryOfPost>();
-            services.AddScoped<RepositoryOfPostRating>();
-            services.AddScoped<RepositoryOfPostTag>();
-            services.AddScoped<RepositoryOfRole>();
-            services.AddScoped<RepositoryOfSection>();
-            services.AddScoped<RepositoryOfTag>();
-            services.AddScoped<RepositoryOfUserClaim>();
-            services.AddScoped<RepositoryOfUserProfile>();
+            services.AddScoped<IRepository<ApplicationUserEntity>, RepositoryOfApplicationUser>();
+            services.AddScoped<IRepository<CommentEntity>, RepositoryOfComment>();
+            services.AddScoped<IRepository<CommentLikeEntity>, RepositoryOfCommentLike>();
+            services.AddScoped<IRepository<IdentityUserRole<string>>, RepositoryOfIdentityUserRole>();
+            services.AddScoped<IRepository<ImageEntity>, RepositoryOfImage>();
+            services.AddScoped<IRepository<PostEntity>, RepositoryOfPost>();
+            services.AddScoped<IRepository<PostRatingEntity>, RepositoryOfPostRating>();
+            services.AddScoped<IRepository<PostTagEntity>, RepositoryOfPostTag>();
+            services.AddScoped<IRepository<RoleEntity>, RepositoryOfRole>();
+            services.AddScoped<IRepository<SectionEntity>, RepositoryOfSection>();
+            services.AddScoped<IRepository<TagEntity>, RepositoryOfTag>();
+            services.AddScoped<IRepository<IdentityUserClaim<string>>, RepositoryOfUserClaim>();
+            services.AddScoped<IRepository<UserProfileEntity>, RepositoryOfUserProfile>();
             services.AddSignalR();
             services.AddLocalization(a => a.ResourcesPath = "Resources");
             services.AddMvc();

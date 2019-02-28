@@ -1,4 +1,5 @@
-﻿using Data.Contracts.Models.Entities;
+﻿using Data.Contracts;
+using Data.Contracts.Models.Entities;
 using Search.Implementation;
 using System;
 using System.Linq.Expressions;
@@ -15,7 +16,7 @@ namespace Data.Implementation.Repositories
 
         public override PostRatingEntity Create(PostRatingEntity entity)
         {
-            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
+            IRepository<PostEntity> repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
 
             var Post = entity.Post;
             if (Post == null)
@@ -32,7 +33,7 @@ namespace Data.Implementation.Repositories
 
         public override void Delete(PostRatingEntity entity)
         {
-            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
+            IRepository<PostEntity> repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
             
             var Post = entity.Post;
             if (Post == null)
@@ -49,7 +50,7 @@ namespace Data.Implementation.Repositories
 
         public override void Update(PostRatingEntity entity, params Expression<Func<PostRatingEntity, object>>[] properties)
         {
-            RepositoryOfPost repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
+            IRepository<PostEntity> repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
 
             var lastPostRating = Read(a => a.Id == entity.Id);
             var Post = entity.Post;

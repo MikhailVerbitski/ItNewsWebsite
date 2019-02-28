@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Data.Contracts;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace Data.Implementation.Repositories
 {
-    public class DefaultRepository<T> where T : class
+    public class DefaultRepository<T> : IRepository<T> where T : class
     {
         protected ApplicationDbContext context;
         protected DbSet<T> entities;

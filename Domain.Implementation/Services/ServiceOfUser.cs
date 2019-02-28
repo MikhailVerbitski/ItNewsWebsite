@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using Data.Contracts;
 using Data.Contracts.Models.Entities;
 using Data.Implementation;
-using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels;
 using Domain.Contracts.Models.ViewModels.Comment;
@@ -20,12 +20,12 @@ namespace Domain.Implementation.Services
     {
         private readonly IMapper mapper;
         private readonly UserManager<ApplicationUserEntity> userManager;
-        private readonly RepositoryOfIdentityUserRole repositoryOfIdentityUserRole;
-        private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
-        private readonly RepositoryOfUserProfile repositoryOfUserProfile;
-        private readonly RepositoryOfUserClaim repositoryOfUserClaim;
-        private readonly RepositoryOfPost repositoryOfPost;
-        private readonly RepositoryOfRole repositoryOfRole;
+        private readonly IRepository<IdentityUserRole<string>> repositoryOfIdentityUserRole;
+        private readonly IRepository<ApplicationUserEntity> repositoryOfApplicationUser;
+        private readonly IRepository<UserProfileEntity> repositoryOfUserProfile;
+        private readonly IRepository<IdentityUserClaim<string>> repositoryOfUserClaim;
+        private readonly IRepository<PostEntity> repositoryOfPost;
+        private readonly IRepository<RoleEntity> repositoryOfRole;
         private readonly ServiceOfImage serviceOfImage;
         private readonly ServiceOfSearch serviceOfSearch;
 
@@ -39,12 +39,12 @@ namespace Domain.Implementation.Services
             IMapper mapper,
             ServiceOfImage serviceOfImage,
             ServiceOfSearch serviceOfSearch,
-            RepositoryOfIdentityUserRole repositoryOfIdentityUserRole,
-            RepositoryOfApplicationUser repositoryOfApplicationUser,
-            RepositoryOfUserProfile repositoryOfUserProfile,
-            RepositoryOfUserClaim repositoryOfUserClaim,
-            RepositoryOfPost repositoryOfPost,
-            RepositoryOfRole repositoryOfRole
+            IRepository<IdentityUserRole<string>> repositoryOfIdentityUserRole,
+            IRepository<ApplicationUserEntity> repositoryOfApplicationUser,
+            IRepository<UserProfileEntity> repositoryOfUserProfile,
+            IRepository<IdentityUserClaim<string>> repositoryOfUserClaim,
+            IRepository<PostEntity> repositoryOfPost,
+            IRepository<RoleEntity> repositoryOfRole
             )
         {
             this.mapper = mapper;

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Data.Contracts;
 using Data.Contracts.Models.Entities;
-using Data.Implementation.Repositories;
 using Domain.Contracts.Models;
 using Domain.Contracts.Models.ViewModels.Comment;
 using Domain.Contracts.Models.ViewModels.Post;
@@ -17,11 +17,11 @@ namespace Domain.Implementation.Services
     public class ServiceOfPost
     {
         private readonly IMapper mapper;
-        private readonly RepositoryOfPost repositoryOfPost;
-        private readonly RepositoryOfPostRating repositoryOfPostRating;
-        private readonly RepositoryOfApplicationUser repositoryOfApplicationUser;
-        private readonly RepositoryOfSection repositoryOfSection;
-        private readonly RepositoryOfImage repositoryOfImage;
+        private readonly IRepository<PostEntity> repositoryOfPost;
+        private readonly IRepository<PostRatingEntity> repositoryOfPostRating;
+        private readonly IRepository<ApplicationUserEntity> repositoryOfApplicationUser;
+        private readonly IRepository<SectionEntity> repositoryOfSection;
+        private readonly IRepository<ImageEntity> repositoryOfImage;
         private readonly ServiceOfComment serviceOfComment;
         private readonly ServiceOfAccount serviceOfAccount;
         private readonly ServiceOfImage serviceOfImage;
@@ -38,11 +38,11 @@ namespace Domain.Implementation.Services
             ServiceOfUser serviceOfUser,
             ServiceOfTag serviceOfTag,
             ServiceOfSearch serviceOfSearch,
-            RepositoryOfPost repositoryOfPost,
-            RepositoryOfPostRating repositoryOfPostRating,
-            RepositoryOfApplicationUser repositoryOfApplicationUser,
-            RepositoryOfSection repositoryOfSection,
-            RepositoryOfImage repositoryOfImage
+            IRepository<PostEntity> repositoryOfPost,
+            IRepository<PostRatingEntity> repositoryOfPostRating,
+            IRepository<ApplicationUserEntity> repositoryOfApplicationUser,
+            IRepository<SectionEntity> repositoryOfSection,
+            IRepository<ImageEntity> repositoryOfImage
             )
         {
             this.mapper = mapper;

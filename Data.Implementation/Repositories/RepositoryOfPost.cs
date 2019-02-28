@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Data.Contracts;
 using Data.Contracts.Models.Entities;
 using Search.Implementation;
 
@@ -16,7 +17,7 @@ namespace Data.Implementation.Repositories
 
         public override PostEntity Create(PostEntity entity)
         {
-            RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
+            IRepository<SectionEntity> repositoryOfSection = new RepositoryOfSection(context);
 
             var section = entity.Section;
             if(section == null)
@@ -40,7 +41,7 @@ namespace Data.Implementation.Repositories
         public override void Update(PostEntity entity, params Expression<Func<PostEntity, object>>[] properties)
         {
             var lastPost = this.Read(a => a.Id == entity.Id, a => a.Section);
-            RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
+            IRepository<SectionEntity> repositoryOfSection = new RepositoryOfSection(context);
             
             if(entity.Section == null)
             {
@@ -67,10 +68,10 @@ namespace Data.Implementation.Repositories
 
         public override void Delete(PostEntity entity)
         {
-            RepositoryOfSection repositoryOfSection = new RepositoryOfSection(context);
-            RepositoryOfComment repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
-            RepositoryOfPostRating repositoryOfPostRating = new RepositoryOfPostRating(context, serviceOfSearch);
-            RepositoryOfPostTag repositoryOfPostTag = new RepositoryOfPostTag(context);
+            IRepository<SectionEntity> repositoryOfSection = new RepositoryOfSection(context);
+            IRepository<CommentEntity> repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
+            IRepository<PostRatingEntity> repositoryOfPostRating = new RepositoryOfPostRating(context, serviceOfSearch);
+            IRepository<PostTagEntity> repositoryOfPostTag = new RepositoryOfPostTag(context);
             var section = entity.Section;
             if (section == null)
             {
