@@ -87,7 +87,7 @@ namespace Data.Implementation.Repositories
             var comments = entity.Comments;
             if(comments == null)
             {
-                comments = repositoryOfComment.ReadMany(new Expression<Func<CommentEntity, bool>>[] { a => a.PostId == entity.Id });
+                comments = repositoryOfComment.ReadMany(new Expression<Func<CommentEntity, bool>>[] { a => a.PostId == entity.Id }, null);
             }
             comments = comments.ToList();
             foreach (var item in comments)
@@ -97,7 +97,7 @@ namespace Data.Implementation.Repositories
             var postRatings = entity.PostRatings;
             if (postRatings == null)
             {
-                postRatings = repositoryOfPostRating.ReadMany(new Expression<Func<PostRatingEntity, bool>>[] { a => a.PostId == entity.Id });
+                postRatings = repositoryOfPostRating.ReadMany(new Expression<Func<PostRatingEntity, bool>>[] { a => a.PostId == entity.Id }, null);
             }
             postRatings = postRatings.ToList();
             foreach (var item in postRatings)
@@ -107,7 +107,7 @@ namespace Data.Implementation.Repositories
             var postTags = entity.Tags;
             if(postTags == null)
             {
-                postTags = repositoryOfPostTag.ReadMany(new Expression<Func<PostTagEntity, bool>>[] { a => a.PostId == entity.Id });
+                postTags = repositoryOfPostTag.ReadMany(new Expression<Func<PostTagEntity, bool>>[] { a => a.PostId == entity.Id }, null);
             }
             postTags = postTags.ToList();
             foreach (var item in postTags)

@@ -178,7 +178,7 @@ namespace Domain.Implementation.Services
         {
             var postViewModel = mapper.Map<PostEntity, PostUpdateViewModel>(postEntity);
             postViewModel.Tags = serviceOfTag.GetTagsForPost(postEntity);
-            postViewModel.Images = repositoryOfImage.ReadMany(new Expression<Func<ImageEntity, bool>>[] { a => a.PostId == postEntity.Id }).Select(a => a.Path).ToList();
+            postViewModel.Images = repositoryOfImage.ReadMany(new Expression<Func<ImageEntity, bool>>[] { a => a.PostId == postEntity.Id }, null).Select(a => a.Path).ToList();
             postViewModel.BelongsToUser = (applicationUserCurrent == null) 
                 ? false 
                 : applicationUserCurrent.UserProfileId == postEntity.UserProfileId;
@@ -202,7 +202,7 @@ namespace Domain.Implementation.Services
                 ? false
                 : applicationUserCurrent.UserProfileId == postEntity.UserProfileId;
             postViewModel.FirstImage = (postEntity.Images == null)
-                ? repositoryOfImage.ReadMany(new Expression<Func<ImageEntity, bool>>[] { a => a.PostId == postEntity.Id }).FirstOrDefault()?.Path
+                ? repositoryOfImage.ReadMany(new Expression<Func<ImageEntity, bool>>[] { a => a.PostId == postEntity.Id }, null).FirstOrDefault()?.Path
                 : postEntity.Images.FirstOrDefault().Path;
             return postViewModel;
         }

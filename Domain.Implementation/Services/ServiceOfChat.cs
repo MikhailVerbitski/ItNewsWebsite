@@ -34,13 +34,12 @@ namespace Domain.Implementation.Services
             this.repositoryOfUserChat = repositoryOfUserChat;
         }
 
-
-        public async Task<ChatRoomViewModel> Create(ChatRoomViewModel chatRoomViewModel, string applicationUserIdCurrent, string[] otherUserIds)
+        public async Task<ChatRoomViewModel> Create(string applicationUserIdCurrent, ChatRoomViewModel chatRoomViewModel)
         {
-            var users = new string[] { applicationUserIdCurrent }.Concat(otherUserIds);
+            var applicationUserIds = chatRoomViewModel.Users.Select(u => u.ApplicationUserId).Concat(new string[] { applicationUserIdCurrent }).ToList();
             var chatRoomEntity = mapper.Map<ChatRoomViewModel, ChatRoomEntity>(chatRoomViewModel);
             chatRoomEntity = repositoryOfChatRoom.Create(chatRoomEntity);
-            chatRoomEntity.UserChats = users.Select(a => {
+            chatRoomEntity.UserChats = applicationUserIds.Select(a => {
                 var user = repositoryOfUserProfile.Read(b => b.ApplicationUserId == a);
                 var UserChat = new UserChatEntity();
                 UserChat.ChatRoom = chatRoomEntity;
@@ -87,10 +86,11 @@ namespace Domain.Implementation.Services
         {
             IEnumerable<UserChatEntity> userChatEntities = repositoryOfUserChat.ReadMany(
                 new Expression<Func<UserChatEntity, bool>>[] { a => a.UserProfile.ApplicationUserId == applicationUserIdCurrent },
+                    null,
                     a => a.ChatRoom,
                     a => a.UserProfile);
             userChatEntities = (skip != null) ? userChatEntities.Skip(skip.Value) : userChatEntities;
-            userChatEntities = (take != null) ? userChatEntities = userChatEntities.Take(take.Value) : userChatEntities;
+            userChatEntities = (take != null) ? userChatEntities.Take(take.Value) : userChatEntities;
             var chatRoomViewModel = userChatEntities
                 .Select(a => mapper.Map<UserChatEntity, ChatRoomViewModel>(a))
                 .AsParallel()

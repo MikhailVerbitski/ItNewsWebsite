@@ -187,11 +187,13 @@ namespace Data.Implementation
             ChatRoom
                 .HasMany(a => a.UserChats)
                 .WithOne(a => a.ChatRoom)
-                .HasForeignKey(a => a.ChatRoomId);
+                .HasForeignKey(a => a.ChatRoomId)
+                .OnDelete(DeleteBehavior.Cascade);
             ChatRoom
                 .HasMany(a => a.MessageEntities)
                 .WithOne(a => a.ChatRoom)
-                .HasForeignKey(a => a.ChatRoomId);
+                .HasForeignKey(a => a.ChatRoomId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             UserProfile
                 .HasMany(a => a.UserChats)

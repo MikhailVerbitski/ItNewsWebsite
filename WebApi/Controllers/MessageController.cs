@@ -10,36 +10,36 @@ namespace WebApi.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "user, writer, admin")]
     [ApiController]
-    [Route("api/Chat/[action]")]
-    public class ChatController : Controller
+    [Route("api/Message/[action]")]
+    public class MessageController : Controller
     {
-        private readonly ServiceOfChat serviceOfChat;
+        private readonly ServiceOfMessage serviceOfMessage;
 
-        public ChatController(ServiceOfChat serviceOfChat)
+        public MessageController(ServiceOfMessage serviceOfMessage)
         {
-            this.serviceOfChat = serviceOfChat;
+            this.serviceOfMessage = serviceOfMessage;
         }
-        
+
         [HttpPost]
-        public JsonResult Read(int? skip, int? take)
+        public JsonResult Read(int? skip, int? take, int chatId)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var chats = serviceOfChat.Get(null, currentUserId, skip, take);
+            var chats = serviceOfMessage.Get(null, currentUserId, skip, take, chatId);
             return (chats.Count == 1) ? Json(chats.FirstOrDefault()) : Json(chats);
         }
         [HttpPost]
-        public async Task<JsonResult> Create(ChatRoomViewModel chatRoomViewModel)
+        public async Task<JsonResult> Create(MessageViewModel messageViewModel)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            chatRoomViewModel = await serviceOfChat.Create(currentUserId, chatRoomViewModel);
-            return Json(chatRoomViewModel);
+            messageViewModel = await serviceOfMessage.Create(currentUserId, messageViewModel);
+            return Json(messageViewModel);
         }
         [HttpPost]
-        public async Task<JsonResult> Update(ChatRoomViewModel chatRoomViewModel)
+        public async Task<JsonResult> Update(MessageViewModel messageViewModel)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            chatRoomViewModel = await serviceOfChat.Update(currentUserId, chatRoomViewModel);
-            return Json(chatRoomViewModel);
+            messageViewModel = await serviceOfMessage.Update(currentUserId, messageViewModel);
+            return Json(messageViewModel);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Data.Implementation.Repositories
             var posts = entity.Posts;
             if(posts == null)
             {
-                posts = repositoryOfPost.ReadMany(new System.Linq.Expressions.Expression<System.Func<PostEntity, bool>>[] { a => a.UserProfileId == entity.Id });
+                posts = repositoryOfPost.ReadMany(new System.Linq.Expressions.Expression<System.Func<PostEntity, bool>>[] { a => a.UserProfileId == entity.Id }, null);
             }
             posts = posts.ToList();
             if (posts != null)

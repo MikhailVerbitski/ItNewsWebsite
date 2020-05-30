@@ -10,12 +10,12 @@ namespace Data.Contracts.Models.Entities
 
         public int? ChatRoomId { get; set; }
 
-        public virtual UserProfileEntity UserProfile { get; set; }
-
-        public virtual ChatRoomEntity ChatRoom { get; set; }
-
         public string Content { get; set; }
 
         public virtual DateTime Created { get; set; }
+
+        public virtual UserProfileEntity UserProfile { get; set; }
+
+        public virtual ChatRoomEntity ChatRoom { get; set; }
     }
 }

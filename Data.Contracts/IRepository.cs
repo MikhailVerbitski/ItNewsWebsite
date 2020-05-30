@@ -10,8 +10,9 @@ namespace Data.Contracts
         T Create(T entity);
         T Read(Expression<Func<T, bool>> keySelector, params Expression<Func<T, object>>[] includes);
         T Read(string keySelector, params Expression<Func<T, object>>[] includes);
-        IEnumerable<T> ReadMany(Expression<Func<T, bool>>[] whereProperties, params Expression<Func<T, object>>[] includes);
+        IEnumerable<T> ReadMany(Expression<Func<T, bool>>[] whereProperties, Expression<Func<T, bool>>[] orderProperties, params Expression<Func<T, object>>[] includes);
         IEnumerable<T> ReadMany(string where, string orderBy, params Expression<Func<T, object>>[] includes);
+        IEnumerable<T> ReadMany();
         T Update(T entity, params Expression<Func<T, object>>[] properties);
         Task Delete(T entity);
     }

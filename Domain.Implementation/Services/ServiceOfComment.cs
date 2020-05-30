@@ -67,19 +67,19 @@ namespace Domain.Implementation.Services
         }
         public IEnumerable<BaseCommentViewModel> GetMany(string type, ApplicationUserEntity applicationUser, int? skip, int? take, string applicationUserIdCurrent)
         {
-            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.UserProfileId == applicationUser.UserProfileId });
+            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.UserProfileId == applicationUser.UserProfileId }, null);
             commentEntities = commentEntities.OrderBy(a => a.Created).Reverse();
             return GetMany(type, commentEntities, skip, take, applicationUserIdCurrent);
         }
         public IEnumerable<BaseCommentViewModel> GetMany(string type, int postId, int? skip, int? take, string applicationUserIdCurrent)
         {
-            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.PostId == postId });
+            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.PostId == postId }, null);
             commentEntities = commentEntities.OrderBy(a => a.Created).Reverse();
             return GetMany(type, commentEntities, skip, take, applicationUserIdCurrent);
         }
         public IEnumerable<BaseCommentViewModel> GetMany(string type, int postId, int? skip, int? take, ApplicationUserEntity applicationUserCurrent)
         {
-            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.PostId == postId });
+            var commentEntities = repositoryOfComment.ReadMany(new System.Linq.Expressions.Expression<Func<CommentEntity, bool>>[] { a => a.PostId == postId }, null);
             commentEntities = commentEntities.OrderBy(a => a.Created).Reverse();
             return GetMany(type, commentEntities, skip, take, applicationUserCurrent);
         }

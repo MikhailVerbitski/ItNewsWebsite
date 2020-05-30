@@ -71,7 +71,7 @@ namespace Domain.Implementation.Services
         public IEnumerable<UserMiniViewModel> GetUsers(params Expression<Func<ApplicationUserEntity, bool>>[] whereProperties)
         {
             return repositoryOfApplicationUser
-                .ReadMany(whereProperties)
+                .ReadMany(whereProperties, null)
                 .Select(a => GetUserMiniViewModel(a))
                 .ToList();
         }
@@ -122,7 +122,7 @@ namespace Domain.Implementation.Services
         }
         public List<UserClaim> GetUserClaim(string ApplicationUserId)
         {
-            return mapper.Map<IEnumerable< IdentityUserClaim<string>>, IEnumerable< UserClaim>>(repositoryOfUserClaim.ReadMany(new Expression<Func<IdentityUserClaim<string>, bool>>[] { a => a.UserId == ApplicationUserId })).ToList();
+            return mapper.Map<IEnumerable< IdentityUserClaim<string>>, IEnumerable< UserClaim>>(repositoryOfUserClaim.ReadMany(new Expression<Func<IdentityUserClaim<string>, bool>>[] { a => a.UserId == ApplicationUserId }, null)).ToList();
         }
         public void SetUserClime(string userId, string name, string value)
         {
@@ -191,7 +191,7 @@ namespace Domain.Implementation.Services
             {
                 return 0;
             }
-            var roles = repositoryOfRole.ReadMany(null).ToList();
+            var roles = repositoryOfRole.ReadMany().ToList();
             var IsBlocked = GetUserClaim(applicationUser.Id, "blocked");
             if (IsBlocked != null)
             {
@@ -219,13 +219,13 @@ namespace Domain.Implementation.Services
         }
         public async Task<UserRole> GetUserRole(ApplicationUserEntity applicationUser)
         {
-            var roles = repositoryOfRole.ReadMany(null).ToList();
+            var roles = repositoryOfRole.ReadMany().ToList();
             var role = (await userManager.GetRolesAsync(applicationUser)).Select(a => roles.Where(b => b.Name == a).FirstOrDefault()).FirstOrDefault();
             return mapper.Map<RoleEntity, UserRole>(role);
         }
         public List<UserRole> GetRoles()
         {
-            return mapper.Map<IEnumerable<RoleEntity>, IEnumerable<UserRole>>(repositoryOfRole.ReadMany(null)).ToList();
+            return mapper.Map<IEnumerable<RoleEntity>, IEnumerable<UserRole>>(repositoryOfRole.ReadMany()).ToList();
         }
         public async Task ChangeRole(ApplicationUserEntity applicationUser, UserRole newRole)
         {

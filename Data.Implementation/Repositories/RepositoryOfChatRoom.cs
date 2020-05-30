@@ -1,23 +1,12 @@
-﻿using Data.Contracts;
-using Data.Contracts.Models.Entities;
+﻿using Data.Contracts.Models.Entities;
 using System;
 
 namespace Data.Implementation.Repositories
 {
     public class RepositoryOfChatRoom : DefaultRepository<ChatRoomEntity>
     {
-        IRepository<UserChatEntity> repositoryOfUserChat;
-        IRepository<UserProfileEntity> repositoryOfUserProfile;
-
-        public RepositoryOfChatRoom(
-            ApplicationDbContext context, 
-            IRepository<UserChatEntity> repositoryOfUserChat,
-            IRepository<UserProfileEntity> repositoryOfUserProfile
-            ) : base(context)
-        {
-            this.repositoryOfUserChat = repositoryOfUserChat;
-            this.repositoryOfUserProfile = repositoryOfUserProfile;
-        }
+        public RepositoryOfChatRoom(ApplicationDbContext context) : base(context)
+        {}
 
         public ChatRoomEntity Create(ChatRoomEntity entity, string authorId, string[] users)
         {

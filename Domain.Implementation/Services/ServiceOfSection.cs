@@ -22,7 +22,7 @@ namespace Domain.Implementation.Services
 
         public List<string> Get()
         {
-            return repositoryOfSection.ReadMany(null).Select(a => a.Name).ToList();
+            return repositoryOfSection.ReadMany().Select(a => a.Name).ToList();
         }
     }
 }

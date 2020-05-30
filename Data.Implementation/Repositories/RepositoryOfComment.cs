@@ -25,12 +25,12 @@ namespace Data.Implementation.Repositories
             var commentLikes = entity.Likes;
             if(commentLikes == null)
             {
-                commentLikes = repositoryOfCommentLike.ReadMany(new Expression<System.Func<CommentLikeEntity, bool>>[] { a => a.CommentId == entity.Id });
+                commentLikes = repositoryOfCommentLike.ReadMany(new Expression<System.Func<CommentLikeEntity, bool>>[] { a => a.CommentId == entity.Id }, null);
             }
             commentLikes = commentLikes.ToList();
             foreach (var item in commentLikes)
             {
-                repositoryOfCommentLike.Delete(item);
+                await repositoryOfCommentLike.Delete(item);
             }
             await base.Delete(entity);
         }
