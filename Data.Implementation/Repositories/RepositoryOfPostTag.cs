@@ -1,5 +1,6 @@
 ﻿using Data.Contracts;
 using Data.Contracts.Models.Entities;
+using System.Threading.Tasks;
 
 namespace Data.Implementation.Repositories
 {
@@ -24,7 +25,7 @@ namespace Data.Implementation.Repositories
             return base.Create(entity);
         }
 
-        public override void Delete(PostTagEntity entity)
+        public override async Task Delete(PostTagEntity entity)
         {
             IRepository<TagEntity> repositoryOfTag = new RepositoryOfTag(context);
 
@@ -36,7 +37,7 @@ namespace Data.Implementation.Repositories
             Tag.CountOfUsage--;
             repositoryOfTag.Update(Tag);
 
-            base.Delete(entity);
+            await base.Delete(entity);
         }
     }
 }

@@ -3,6 +3,7 @@ using Data.Contracts.Models.Entities;
 using Search.Implementation;
 using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Data.Implementation.Repositories
 {
@@ -31,7 +32,7 @@ namespace Data.Implementation.Repositories
             return base.Create(entity);
         }
 
-        public override void Delete(PostRatingEntity entity)
+        public override async Task Delete(PostRatingEntity entity)
         {
             IRepository<PostEntity> repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
             
@@ -45,10 +46,10 @@ namespace Data.Implementation.Repositories
             Post.CountOfScore--;
             repositoryOfPost.Update(Post);
             
-            base.Delete(entity);
+            await base.Delete(entity);
         }
 
-        public override void Update(PostRatingEntity entity, params Expression<Func<PostRatingEntity, object>>[] properties)
+        public override PostRatingEntity Update(PostRatingEntity entity, params Expression<Func<PostRatingEntity, object>>[] properties)
         {
             IRepository<PostEntity> repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
 
@@ -63,7 +64,8 @@ namespace Data.Implementation.Repositories
             Post.SumOfScore += entity.Score;
             repositoryOfPost.Update(Post);
 
-            base.Update(entity, properties);
+            entity = base.Update(entity, properties);
+            return entity;
         }
     }
 }

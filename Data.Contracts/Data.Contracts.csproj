@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Models\Entities\ChatRoomEntity.cs~RFc7796.TMP" />
+    <None Remove="Models\Entities\MessageEntity.cs~RF1fda0d.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.1" />
   </ItemGroup>

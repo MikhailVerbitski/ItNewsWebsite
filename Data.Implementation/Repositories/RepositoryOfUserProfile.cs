@@ -2,6 +2,7 @@
 using Data.Contracts.Models.Entities;
 using Search.Implementation;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Data.Implementation.Repositories
 {
@@ -13,7 +14,7 @@ namespace Data.Implementation.Repositories
             this.serviceOfSearch = serviceOfSearch;
         }
 
-        public override void Delete(UserProfileEntity entity)
+        public override async Task Delete(UserProfileEntity entity)
         {
             IRepository<PostEntity> repositoryOfPost = new RepositoryOfPost(context, serviceOfSearch);
             var posts = entity.Posts;
@@ -29,8 +30,7 @@ namespace Data.Implementation.Repositories
                     repositoryOfPost.Delete(item);
                 }
             }
-
-            base.Delete(entity);
+            await base.Delete(entity);
         }
     }
 }

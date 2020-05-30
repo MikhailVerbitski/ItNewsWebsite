@@ -22,6 +22,10 @@ namespace Data.Implementation
         public DbSet<TagEntity> Tags { get; set; }
         public DbSet<UserProfileEntity> UserProfiles { get; set; }
 
+        public DbSet<MessageEntity> Messages { get; set; }
+        public DbSet<ChatRoomEntity> ChatRooms { get; set; }
+        public DbSet<UserChatEntity> UserChats { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<RoleEntity>().HasData(new RoleEntity[]
@@ -176,6 +180,30 @@ namespace Data.Implementation
             PostRating
                 .HasOne(a => a.UserProfile)
                 .WithMany(a => a.PostRatings);
+
+            /////////////////////////////////
+
+            var ChatRoom = builder.Entity<ChatRoomEntity>();
+            ChatRoom
+                .HasMany(a => a.UserChats)
+                .WithOne(a => a.ChatRoom)
+                .HasForeignKey(a => a.ChatRoomId);
+            ChatRoom
+                .HasMany(a => a.MessageEntities)
+                .WithOne(a => a.ChatRoom)
+                .HasForeignKey(a => a.ChatRoomId);
+
+            UserProfile
+                .HasMany(a => a.UserChats)
+                .WithOne(a => a.UserProfile)
+                .HasForeignKey(a => a.UserId);
+
+            var MessageEntity = builder.Entity<MessageEntity>();
+            MessageEntity
+                .HasOne(a => a.UserProfile);
+            MessageEntity
+                .HasOne(a => a.ChatRoom);
+
 
             base.OnModelCreating(builder);
         }

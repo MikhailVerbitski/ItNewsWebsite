@@ -3,6 +3,7 @@ using Data.Contracts.Models.Entities;
 using Search.Implementation;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Data.Implementation.Repositories
 {
@@ -18,7 +19,7 @@ namespace Data.Implementation.Repositories
             entity.Created = System.DateTime.Now;
             return base.Create(entity);
         }
-        public override void Delete(CommentEntity entity)
+        public override async Task Delete(CommentEntity entity)
         {
             IRepository<CommentLikeEntity> repositoryOfCommentLike = new RepositoryOfCommentLike(context, serviceOfSearch);
             var commentLikes = entity.Likes;
@@ -31,7 +32,7 @@ namespace Data.Implementation.Repositories
             {
                 repositoryOfCommentLike.Delete(item);
             }
-            base.Delete(entity);
+            await base.Delete(entity);
         }
     }
 }

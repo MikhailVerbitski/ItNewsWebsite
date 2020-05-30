@@ -3,7 +3,7 @@
     grid-template-columns: auto auto 1fr auto auto;
     position: fixed;
     top: 0;
-    background-color: #4E9B45;
+    background-color: #EFE7CC;
     box-shadow: 0 0 10px black;
     padding: 12px 10px 12px 30px;
     z-index: 3;
@@ -64,7 +64,7 @@
     margin: 0 0 10px 0;
 
     overflow: auto;
-    width: 100px;
+    width: 100%;
 }
 
 #SubmitComment{

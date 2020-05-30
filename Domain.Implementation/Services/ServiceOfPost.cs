@@ -158,7 +158,6 @@ namespace Domain.Implementation.Services
                 post.Images.ToList().ForEach(a => serviceOfImage.Delete(a.Path));
                 repositoryOfPost.Delete(post);
             }
-            return;
         }
         public IEnumerable<BasePostViewModel> Get(string type, string applicationUserIdCurrent, int? skip, int? take, string where, string orderBy)
         {
@@ -167,14 +166,8 @@ namespace Domain.Implementation.Services
                     a => a.Comments,
                     a => a.Section,
                     a => a.UserProfile);
-            if (skip != null)
-            {
-                postsEntities = postsEntities.Skip(skip.Value);
-            }
-            if (take != null)
-            {
-                postsEntities = postsEntities.Take(take.Value);
-            }
+            postsEntities = skip.HasValue ? postsEntities.Skip(skip.Value) : postsEntities;
+            postsEntities = take.HasValue ? postsEntities.Take(take.Value) : postsEntities;
             var postsViewModel = postsEntities
                 .Select(a => GetViewModelWithProperty(type, a, applicationUserIdCurrent))
                 .AsParallel()

@@ -1,6 +1,7 @@
 ﻿using Data.Contracts;
 using Data.Contracts.Models.Entities;
 using Search.Implementation;
+using System.Threading.Tasks;
 
 namespace Data.Implementation.Repositories
 {
@@ -31,7 +32,7 @@ namespace Data.Implementation.Repositories
 
             return base.Create(entity);
         }
-        public override void Delete(CommentLikeEntity entity)
+        public override async Task Delete(CommentLikeEntity entity)
         {
             IRepository<ApplicationUserEntity> repositoryOfApplicationUser = new RepositoryOfApplicationUser(context, serviceOfSearch);
             IRepository<CommentEntity> repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
@@ -45,7 +46,7 @@ namespace Data.Implementation.Repositories
             var ApplicationUserOfComment = repositoryOfApplicationUser.Read(a => a.UserProfileId == comment.UserProfileId);
             ApplicationUserOfComment.CountOfLikes--;
             repositoryOfApplicationUser.Update(ApplicationUserOfComment);
-            base.Delete(entity);
+            await base.Delete(entity);
         }
     }
 }

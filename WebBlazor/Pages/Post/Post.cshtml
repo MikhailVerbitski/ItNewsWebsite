@@ -73,7 +73,7 @@ else
 
     protected async override Task OnInitAsync()
     {
-        connection = new HubConnectionBuilder().WithUrl("http://localhost:53247/commentHub").Build();
+        connection = new HubConnectionBuilder().WithUrl("http://localhost:50266/commentHub").Build();
         await connection.StartAsync();
     }
     async Task SendMessage()

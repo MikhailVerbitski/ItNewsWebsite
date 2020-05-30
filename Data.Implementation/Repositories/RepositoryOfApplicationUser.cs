@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Data.Contracts;
 using Data.Contracts.Models.Entities;
 using Search.Implementation;
@@ -31,17 +32,18 @@ namespace Data.Implementation.Repositories
 
             return ApplicationUser;
         }
-        public override void Update(ApplicationUserEntity entity, params Expression<Func<ApplicationUserEntity, object>>[] properties)
+        public override ApplicationUserEntity Update(ApplicationUserEntity entity, params Expression<Func<ApplicationUserEntity, object>>[] properties)
         {
-            base.Update(entity, properties);
+            var applicationUserEntity = base.Update(entity, properties);
             serviceOfSearch.Update<ApplicationUserEntity>(entity);
+            return applicationUserEntity;
         }
-        public override void Delete(ApplicationUserEntity entity)
+        public override async Task Delete(ApplicationUserEntity entity)
         {
             var repositoryOfUserProfile = new RepositoryOfUserProfile(context, serviceOfSearch);
             var userProfile = repositoryOfUserProfile.Read(a => a.Id == entity.UserProfileId);
             serviceOfSearch.DeleteUser(entity);
-            repositoryOfUserProfile.Delete(userProfile);
+            await repositoryOfUserProfile.Delete(userProfile);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Data.Contracts;
 using Data.Contracts.Models.Entities;
 using Search.Implementation;
@@ -38,7 +39,7 @@ namespace Data.Implementation.Repositories
             return entity;
         }
 
-        public override void Update(PostEntity entity, params Expression<Func<PostEntity, object>>[] properties)
+        public override PostEntity Update(PostEntity entity, params Expression<Func<PostEntity, object>>[] properties)
         {
             var lastPost = this.Read(a => a.Id == entity.Id, a => a.Section);
             IRepository<SectionEntity> repositoryOfSection = new RepositoryOfSection(context);
@@ -63,10 +64,11 @@ namespace Data.Implementation.Repositories
                 entity.Created = DateTime.Now;
             }
             serviceOfSearch.Update<PostEntity>(entity);
-            base.Update(entity, properties);
+            entity = base.Update(entity, properties);
+            return entity;
         }
 
-        public override void Delete(PostEntity entity)
+        public override async Task Delete(PostEntity entity)
         {
             IRepository<SectionEntity> repositoryOfSection = new RepositoryOfSection(context);
             IRepository<CommentEntity> repositoryOfComment = new RepositoryOfComment(context, serviceOfSearch);
@@ -113,7 +115,7 @@ namespace Data.Implementation.Repositories
                 repositoryOfPostTag.Delete(item);
             }
             serviceOfSearch.DeletePost(entity);
-            base.Delete(entity);
+            await base.Delete(entity);
         }
     }
 }

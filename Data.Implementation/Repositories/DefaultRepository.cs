@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Data.Implementation.Repositories
 {
@@ -18,7 +19,7 @@ namespace Data.Implementation.Repositories
             this.context = context;
             entities = context.Set<T>();
         }
-
+        
         public virtual T Create(T entity)
         {
             entities.Add(entity);
@@ -56,7 +57,7 @@ namespace Data.Implementation.Repositories
             dbQuery = (where != null && where != string.Empty) ? dbQuery.Where(where) : dbQuery;
             return dbQuery;
         }
-        public virtual void Update(T entity, params Expression<Func<T, object>>[] properties)
+        public virtual T Update(T entity, params Expression<Func<T, object>>[] properties)
         {
             var property = typeof(T).GetProperties().SingleOrDefault(a => a.Name == "Id");
             if (property == null)
@@ -97,12 +98,13 @@ namespace Data.Implementation.Repositories
                 }
             }
             context.SaveChanges();
+            return entity;
         }
-        public virtual void Delete(T entity)
+        public virtual async Task Delete(T entity)
         {
             entities.Attach(entity);
             entities.Remove(entity);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
         private IQueryable<T> GetEntitiesWithIncludes(DbSet<T> entities, Expression<Func<T, object>>[] includes)
         {

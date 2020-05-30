@@ -60,6 +60,7 @@ namespace WebApi
                 a.AddProfile(new AutomapperTagProfile());
                 a.AddProfile(new AutomapperRoleProfile());
                 a.AddProfile(new AutomapperClimeProfile());
+                a.AddProfile(new AutomapperChatProfile());
             });
             IMapper mapper = mappingConfig.CreateMapper();
 
@@ -97,6 +98,9 @@ namespace WebApi
             services.AddScoped<ServiceOfTag>();
             services.AddScoped<ServiceOfUser>();
             services.AddScoped<ServiceOfSearch>();
+            services.AddScoped<ServiceOfChat>();
+            services.AddScoped<IRepository<ChatRoomEntity>, RepositoryOfChatRoom>();
+            services.AddScoped<IRepository<UserChatEntity>, DefaultRepository<UserChatEntity>>();
             services.AddScoped<IRepository<ApplicationUserEntity>, RepositoryOfApplicationUser>();
             services.AddScoped<IRepository<CommentEntity>, RepositoryOfComment>();
             services.AddScoped<IRepository<CommentLikeEntity>, RepositoryOfCommentLike>();
