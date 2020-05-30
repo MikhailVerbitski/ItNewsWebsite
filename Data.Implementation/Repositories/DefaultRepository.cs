@@ -70,7 +70,7 @@ namespace Data.Implementation.Repositories
         }
         public virtual IEnumerable<T> ReadMany()
         {
-            return ReadMany(new Expression<Func<T, bool>>[] { }, null, null);
+            return ReadMany(new Expression<Func<T, bool>>[] { }, null, new Expression<Func<T, object>>[] { });
         }
         public virtual T Update(T entity, params Expression<Func<T, object>>[] properties)
         {
