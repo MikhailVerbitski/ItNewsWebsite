@@ -148,3 +148,23 @@ grid-login-remember input{
     grid-column: 1/-1;
     font-family: 'Gagalin';
 }
+
+.grid_user_page {
+    display: grid;
+    grid-template-columns: 1fr 6fr;
+    grid-column-gap: 15px;
+    margin-top: 80px;
+    margin-bottom: 40px;
+}
+
+.grid_chat_messages {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-column-gap: 15px;
+}
+
+.grid_message_page {
+    display: grid;
+    grid-template-columns: 7fr 1fr;
+    grid-column-gap: 15px;
+}

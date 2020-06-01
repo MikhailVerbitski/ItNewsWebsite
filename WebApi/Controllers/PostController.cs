@@ -48,7 +48,7 @@ namespace WebApi.Controllers
         }
         [AllowAnonymous]
         [HttpPost]
-        public JsonResult Read([FromBody]PostReadRequestParams readRequest)
+        public JsonResult Read([FromBody]ReadRequestParams readRequest)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
             var post = serviceOfPost.Get(readRequest.type, currentUserId, readRequest.skip, readRequest.count, readRequest.where, readRequest.orderBy);

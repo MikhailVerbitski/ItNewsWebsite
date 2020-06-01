@@ -8,7 +8,7 @@ namespace Data.Implementation.Repositories
         public RepositoryOfMessage(ApplicationDbContext context) : base(context)
         { }
 
-        public MessageEntity Create(MessageEntity entity, string authorId, string[] users)
+        public override MessageEntity Create(MessageEntity entity)
         {
             entity.Created = DateTime.Now;
             entity = base.Create(entity);

@@ -1,6 +1,6 @@
 ﻿@inject Services.ServiceOfLocalization serviceOfLocalization
 
-@((language != null) ? (Sentence == "" || Sentence == null) ? "" : language[Sentence] : "")
+@((language != null) ? Sentence : "")
 
 @functions{
     [Parameter] private string Sentence { get; set; }
@@ -9,5 +9,6 @@
     protected async override Task OnInitAsync()
     {
         language = await serviceOfLocalization.LanguageDictionary;
+        Sentence = (Sentence == "" || Sentence == null) ? "" : language.ContainsKey(Sentence) ? language[Sentence] : $"localization fail: --{Sentence}--";
     }
 }

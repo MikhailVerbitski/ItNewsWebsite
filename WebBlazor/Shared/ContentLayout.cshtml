@@ -4,12 +4,7 @@
 <div class="grid-content">
     <div>
         <div class="side-bar">
-            @if (serviceOfAuthorize.DataAboutUser != null && serviceOfAuthorize.DataAboutUser.Priority > 1)
-            {
-                <div class="content-body">
-                    <a href="/CreatePost" class="pure-button create-post-link"><font size="4"><LocalizationSentence Sentence="@("Create new post")" /></font></a>
-                </div>
-            }
+            <UserPanel />
             <TagCloud />
             <ListPostForSidePanel Name="@("Hot")" />
             <ListPostForSidePanel Name="@("Best")" />

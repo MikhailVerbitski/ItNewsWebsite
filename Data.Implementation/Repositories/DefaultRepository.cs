@@ -61,6 +61,23 @@ namespace Data.Implementation.Repositories
             }
             return dbQuery;
         }
+        public virtual IEnumerable<T> ReadMany(
+            Expression<Func<T, bool>>[] whereProperties,
+            string orderKey,
+            Expression<Func<T, object>>[] includes
+            )
+        {
+            IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
+            if (whereProperties != null)
+            {
+                foreach (var item in whereProperties)
+                {
+                    dbQuery = dbQuery.Where(item);
+                }
+            }
+            dbQuery = (orderKey != null) ? dbQuery.OrderBy(orderKey) : dbQuery;
+            return dbQuery;
+        }
         public virtual IEnumerable<T> ReadMany(string where, string orderBy, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> dbQuery = GetEntitiesWithIncludes(entities, includes);
@@ -70,7 +87,7 @@ namespace Data.Implementation.Repositories
         }
         public virtual IEnumerable<T> ReadMany()
         {
-            return ReadMany(new Expression<Func<T, bool>>[] { }, null, new Expression<Func<T, object>>[] { });
+            return ReadMany(null, null);
         }
         public virtual T Update(T entity, params Expression<Func<T, object>>[] properties)
         {

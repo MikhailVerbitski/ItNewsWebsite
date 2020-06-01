@@ -1,4 +1,5 @@
-﻿using Domain.Contracts.Models.ViewModels.Message;
+﻿using Domain.Contracts.Models;
+using Domain.Contracts.Models.ViewModels.Message;
 using Domain.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -21,11 +22,11 @@ namespace WebApi.Controllers
         }
         
         [HttpPost]
-        public JsonResult Read(int? skip, int? take)
+        public JsonResult Read(ReadRequestParams readRequestParams)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var chats = serviceOfChat.Get(null, currentUserId, skip, take);
-            return (chats.Count == 1) ? Json(chats.FirstOrDefault()) : Json(chats);
+            var chats = serviceOfChat.Get(null, currentUserId, readRequestParams.skip, readRequestParams.count);
+            return Json(chats);
         }
         [HttpPost]
         public async Task<JsonResult> Create(ChatRoomViewModel chatRoomViewModel)

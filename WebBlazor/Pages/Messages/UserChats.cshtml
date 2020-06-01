@@ -1,0 +1,91 @@
+﻿@page "/Chats"
+@layout ContentLayout
+@using Domain.Contracts.Models.ViewModels.Message
+@using Domain.Contracts.Models
+@using Blazor.Extensions;
+
+<div class="grid_chat_messages">
+    <div>
+        @if (Chats == null)
+        {
+            <fotn>not ok</fotn>
+        }
+        else
+        {
+            @foreach (var chat in Chats)
+            {
+                <button class="content-body pure-button menu-button" onclick="@(() => OpenChat(chat))">
+                    <h1>@chat.Header</h1>
+                    <h2></h2>
+                </button>
+            }
+        }
+    </div>
+    <div>
+        @if (CurrentChat != null)
+        {
+            <div class="grid_message_page content-body">
+                <textarea id="Content" class="pure-input-1" name="Content" bind="@MessageContent" />
+                <button onclick="@SendMessage" id="SubmitComment" class="pure-button pure-button-primary"><LocalizationSentence Sentence="send"></LocalizationSentence></button>
+            </div>
+            <div>
+                    @CurrentChat.Messages.Count()
+                    @foreach (var message in CurrentChat.Messages)
+                    {
+                        <div class="content-body">
+                            @message.Content
+                        </div>
+                    }
+            </div>
+        }
+    </div>
+</div>
+
+
+
+@functions{
+    private List<ChatRoomViewModel> Chats { get; set; }
+    private ChatRoomViewModel CurrentChat { get; set; }
+
+    private string MessageContent { get; set; }
+    private HubConnection connection;
+    
+    protected async override Task OnParametersSetAsync()
+    {
+        connection = new HubConnectionBuilder().WithUrl($"{serviceOfAuthorize.Http.BaseAddress}/messageHub").Build();
+        connection.On<string>("createMessage", this.OnCreateMessage);
+        await connection.StartAsync();
+        var Params = new ReadRequestParams()
+        {
+            skip = 0,
+            count = 20
+        };
+        Chats = await serviceOfRequest.PostJsonAsync<List<ChatRoomViewModel>>("/api/Chat/Read", Params);
+    }
+    private Task OnCreateMessage(string messageJson)
+    {
+        Console.WriteLine("HI");
+        var message = Json.Deserialize<MessageViewModel>(messageJson);
+        (CurrentChat.Messages as List<MessageViewModel>).Insert(0, message);
+        this.StateHasChanged();
+        return Task.CompletedTask;
+    }
+    async Task SendMessage()
+    {
+        if (MessageContent != "")
+        {
+            var message = new MessageViewModel()
+            {
+                Content = MessageContent,
+                ChatId = CurrentChat.Id
+            };
+            MessageContent = string.Empty;
+            var newMessage = await serviceOfRequest.PostJsonAsync<MessageViewModel>("api/Message/Create", message);
+            await connection.InvokeAsync("Send", newMessage);
+        }
+    }
+    private async Task OpenChat(ChatRoomViewModel chat)
+    {
+        CurrentChat = chat;
+    }
+}

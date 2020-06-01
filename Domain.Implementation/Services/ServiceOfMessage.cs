@@ -14,19 +14,23 @@ namespace Domain.Implementation.Services
     {
         private readonly IMapper mapper;
         private readonly IRepository<MessageEntity> repositoryOfMessage;
+        private readonly IRepository<UserProfileEntity> repositoryOfUserProfile;
 
         public ServiceOfMessage(
             IMapper mapper,
+            IRepository<UserProfileEntity> repositoryOfUserProfile,
             IRepository<MessageEntity> repositoryOfMessage
             )
         {
             this.mapper = mapper;
+            this.repositoryOfUserProfile = repositoryOfUserProfile;
             this.repositoryOfMessage = repositoryOfMessage;
         }
 
         public async Task<MessageViewModel> Create(string applicationUserIdCurrent, MessageViewModel messageViewModel)
         {
             var messageEntity = mapper.Map<MessageViewModel, MessageEntity>(messageViewModel);
+            messageEntity.UserProfile = repositoryOfUserProfile.Read(b => b.ApplicationUserId == applicationUserIdCurrent);
             messageEntity = repositoryOfMessage.Create(messageEntity);
             messageViewModel = mapper.Map<MessageEntity, MessageViewModel>(messageEntity);
             return messageViewModel;
@@ -34,6 +38,7 @@ namespace Domain.Implementation.Services
         public async Task<MessageViewModel> Update(string applicationUserIdCurrent, MessageViewModel messageViewModel)
         {
             var messageEntity = mapper.Map<MessageViewModel, MessageEntity>(messageViewModel);
+            messageEntity.UserProfile = repositoryOfUserProfile.Read(b => b.ApplicationUserId == applicationUserIdCurrent);
             messageEntity = repositoryOfMessage.Update(messageEntity);
             messageViewModel = mapper.Map<MessageEntity, MessageViewModel>(messageEntity);
             return messageViewModel;
@@ -47,8 +52,9 @@ namespace Domain.Implementation.Services
         {
             IEnumerable<MessageEntity> messages = repositoryOfMessage.ReadMany(
                 new Expression<Func<MessageEntity, bool>>[] { a => a.ChatRoomId == chatId },
-                    null,
-                    a => a.UserProfile);
+                "Created",
+                new Expression<Func<MessageEntity, object>>[] { a => a.UserProfile })
+                .Reverse();
             messages = (skip != null) ? messages.Skip(skip.Value) : messages;
             messages = (take != null) ? messages.Take(take.Value) : messages;
             var messagesViewModel = messages

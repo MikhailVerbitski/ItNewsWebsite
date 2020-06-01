@@ -55,6 +55,7 @@ namespace WebApi
             var mappingConfig = new MapperConfiguration(a =>
             {
                 a.AddProfile(new AutomapperCommentProfile());
+                a.AddProfile(new AutomapperMessage());
                 a.AddProfile(new AutomapperPostProfile());
                 a.AddProfile(new AutomapperUserProfile());
                 a.AddProfile(new AutomapperTagProfile());
@@ -99,6 +100,8 @@ namespace WebApi
             services.AddScoped<ServiceOfUser>();
             services.AddScoped<ServiceOfSearch>();
             services.AddScoped<ServiceOfChat>();
+            services.AddScoped<ServiceOfMessage>();
+            services.AddScoped<IRepository<MessageEntity>, RepositoryOfMessage>();
             services.AddScoped<IRepository<ChatRoomEntity>, RepositoryOfChatRoom>();
             services.AddScoped<IRepository<UserChatEntity>, DefaultRepository<UserChatEntity>>();
             services.AddScoped<IRepository<ApplicationUserEntity>, RepositoryOfApplicationUser>();
@@ -169,6 +172,7 @@ namespace WebApi
                 //        .WithOrigins("http://localhost:51319");
             });
             app.UseSignalR(a => a.MapHub<CommentHub>("/commentHub"));
+            app.UseSignalR(a => a.MapHub<MessageHub>("/MessageHub"));
             app.UseAuthentication();
             app.UseMvc(routes =>
             {

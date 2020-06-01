@@ -131,7 +131,7 @@ else
         int id;
         if (Id != null && Int32.TryParse(Id, out id))
         {
-            var postRequest = new PostReadRequestParams()
+            var postRequest = new ReadRequestParams()
             {
                 type = "PostUpdateViewModel",
                 where = $"Id=={id}",

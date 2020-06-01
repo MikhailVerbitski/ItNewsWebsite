@@ -1,6 +1,6 @@
 ﻿namespace Domain.Contracts.Models
 {
-    public class PostReadRequestParams
+    public class ReadRequestParams
     {
         public string type { get; set; }
         public int? skip { get; set; }

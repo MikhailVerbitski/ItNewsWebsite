@@ -2,6 +2,7 @@
 using Data.Contracts;
 using Data.Contracts.Models.Entities;
 using Domain.Contracts.Models.ViewModels.Message;
+using Domain.Contracts.Models.ViewModels.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,12 @@ namespace Domain.Implementation.Services
         private readonly IRepository<UserChatEntity> repositoryOfUserChat;
         private readonly IRepository<UserProfileEntity> repositoryOfUserProfile;
         private readonly ServiceOfUser serviceOfUser;
-
+        private readonly ServiceOfMessage serviceOfMessage;
 
         public ServiceOfChat(
             IMapper mapper,
             ServiceOfUser serviceOfUser,
+            ServiceOfMessage serviceOfMessage,
             IRepository<UserProfileEntity> repositoryOfUserProfile,
             IRepository<ChatRoomEntity> repositoryOfChatRoom,
             IRepository<UserChatEntity> repositoryOfUserChat
@@ -29,6 +31,7 @@ namespace Domain.Implementation.Services
         {
             this.mapper = mapper;
             this.serviceOfUser = serviceOfUser;
+            this.serviceOfMessage = serviceOfMessage;
             this.repositoryOfChatRoom = repositoryOfChatRoom;
             this.repositoryOfUserProfile = repositoryOfUserProfile;
             this.repositoryOfUserChat = repositoryOfUserChat;
@@ -91,8 +94,17 @@ namespace Domain.Implementation.Services
                     a => a.UserProfile);
             userChatEntities = (skip != null) ? userChatEntities.Skip(skip.Value) : userChatEntities;
             userChatEntities = (take != null) ? userChatEntities.Take(take.Value) : userChatEntities;
+
+            var test = userChatEntities.ToList();
+
             var chatRoomViewModel = userChatEntities
-                .Select(a => mapper.Map<UserChatEntity, ChatRoomViewModel>(a))
+                .Select(a =>
+                {
+                    var chat = mapper.Map<UserChatEntity, ChatRoomViewModel>(a);
+                    chat.Messages = serviceOfMessage.Get(null, applicationUserIdCurrent, null, 20, chat.Id);
+                    chat.Users = serviceOfUser.GetUsers(new Expression<Func<ApplicationUserEntity, bool>>[] { b => a.ChatRoom.UserChats.Select(user => user.UserId).Any(id => id == b.UserProfileId) }); 
+                    return chat;
+                })
                 .AsParallel()
                 .ToList();
             return chatRoomViewModel;

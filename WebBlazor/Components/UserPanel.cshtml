@@ -1,0 +1,21 @@
+﻿@if (serviceOfAuthorize.DataAboutUser != null)
+{
+    <div class="content-body">
+        @if (serviceOfAuthorize.DataAboutUser.Priority > 1)
+        {
+            <a href="/CreatePost" class="pure-button menu-button"><font size="4"><LocalizationSentence Sentence="@("Create new post")" /></font></a>
+        }
+        <a class="pure-button menu-button" href="/UserPage/@serviceOfAuthorize.DataAboutUser.UserProfileId"><font size="4"><LocalizationSentence Sentence="@("My page")" /></font></a>
+        <a class="pure-button menu-button" href="/"><font size="4"><LocalizationSentence Sentence="@("News")" /></font></a>
+        <a class="pure-button menu-button" href="/Chats"><font size="4"><LocalizationSentence Sentence="@("Messages")" /></font></a>
+        <a class="pure-button menu-button" href="/UserPageSetting/@serviceOfAuthorize.DataAboutUser.UserProfileId"><font size="4"><LocalizationSentence Sentence="@("Settings")" /></font></a>
+    </div>
+}
+
+@functions{
+    protected async override Task OnInitAsync()
+    {
+        await serviceOfAuthorize.CreateHeader;
+        this.StateHasChanged();
+    }
+}
