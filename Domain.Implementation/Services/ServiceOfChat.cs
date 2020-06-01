@@ -94,14 +94,11 @@ namespace Domain.Implementation.Services
                     a => a.UserProfile);
             userChatEntities = (skip != null) ? userChatEntities.Skip(skip.Value) : userChatEntities;
             userChatEntities = (take != null) ? userChatEntities.Take(take.Value) : userChatEntities;
-
-            var test = userChatEntities.ToList();
-
             var chatRoomViewModel = userChatEntities
                 .Select(a =>
                 {
                     var chat = mapper.Map<UserChatEntity, ChatRoomViewModel>(a);
-                    chat.Messages = serviceOfMessage.Get(null, applicationUserIdCurrent, null, 20, chat.Id);
+                    // chat.Messages = serviceOfMessage.Get(null, applicationUserIdCurrent, null, 10, chat.Id);
                     chat.Users = serviceOfUser.GetUsers(new Expression<Func<ApplicationUserEntity, bool>>[] { b => a.ChatRoom.UserChats.Select(user => user.UserId).Any(id => id == b.UserProfileId) }); 
                     return chat;
                 })

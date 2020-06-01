@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Contracts.Models.ViewModels.User;
+using System;
 
 namespace Domain.Contracts.Models.ViewModels.Message
 {
@@ -8,5 +9,6 @@ namespace Domain.Contracts.Models.ViewModels.Message
         public int ChatId { get; set; }
         public string Content { get; set; }
         public DateTime Created { get; set; }
+        public UserMiniViewModel Author { get; set; }
     }
 }

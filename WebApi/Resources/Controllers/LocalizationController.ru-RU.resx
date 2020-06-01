@@ -312,4 +312,16 @@
   <data name="current language" xml:space="preserve">
     <value>Русский</value>
   </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Сообщения</value>
+  </data>
+  <data name="My page" xml:space="preserve">
+    <value>Моя страница</value>
+  </data>
+  <data name="News" xml:space="preserve">
+    <value>Новости</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
 </root>

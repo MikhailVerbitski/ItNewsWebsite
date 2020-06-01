@@ -168,3 +168,15 @@ grid-login-remember input{
     grid-template-columns: 7fr 1fr;
     grid-column-gap: 15px;
 }
+
+.grid_chat_button {
+    display: grid;
+    grid-template-columns: 2fr 9fr;
+    grid-column-gap: 15px;
+}
+
+.grid_user_data {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 15px;
+}

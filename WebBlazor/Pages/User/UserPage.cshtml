@@ -1,17 +1,46 @@
 ﻿@page "/UserPage/{Id:int}"
 @layout ContentLayout
+@using Domain.Contracts.Models.ViewModels.User
 @using Domain.Contracts.Models.ViewModels.Post
 
+@if (User != null)
+{
+<div class="content-body">
+    <div class="grid_user_data">
+        <div>
+            <img src="@((User.Avatar == null) ? "/img/default-user-profile-image.png" : User.Avatar)" asp-append-version="true" height="150" width="150" />
+        </div>
+        <div class="grid_user_data">
+            <font size="5"><LocalizationSentence Sentence="@("First Name")" />:</font>
+            <font size="5">@User.FirstName</font>
+
+            <font size="5"><LocalizationSentence Sentence="@("Last Name")" />:</font>
+            <font size="5">@User.LastName</font>
+
+            <font size="5" color="@User.Role.Color"><LocalizationSentence Sentence="@("Role")" />:</font>
+            <font size="5" color="@User.Role.Color">@User.Role.Name</font>
+
+            <font size="5"><LocalizationSentence Sentence="@("Count of likes")" />:</font>
+            <font size="5">@User.CountOfLikes</font>
+        </div>
+    </div>
+</div>
+}
 <div class="grid-posts">
     <ListOfPosts PostType="@(typeof(PostCompactViewModel))" param="@Param" />
 </div>
 
 @functions{
     [Parameter] private int Id { get; set; }
+    private UserViewModel User { get; set; }
     private string Param { get; set; }
 
     protected override void OnInit()
     {
         Param = $"Fresh:User-{Id}:f:fin";
+    }
+    protected async override Task OnParametersSetAsync()
+    {
+        User = await serviceOfRequest.GetJsonAsync<UserViewModel>($"/api/User/GetUserViewModel?userProfileId={Id}");
     }
 }

@@ -39,8 +39,7 @@
 }
 
 .userMiniImg {
-    grid-row-start: 1;
-    grid-row-end: 3;
+
 }
 
 .post-content {
@@ -204,4 +203,21 @@
     padding: 4px;
     width: 100%;
     margin: 4px;
+}
+
+.chat_image_container {
+    background-color: inherit;
+    overflow: hidden;
+    margin-top: 25%;
+    height: 50px;
+    border-radius: 50%;
+    overflow-x: hidden;
+}
+
+.chat_image {
+    border-radius: 50%;
+    height: 60px;
+    width: auto;
+    margin-left: -50%;
+    margin-top: -10%;
 }

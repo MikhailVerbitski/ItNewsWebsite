@@ -1,8 +1,10 @@
-﻿using Domain.Contracts.Models.ViewModels.Message;
+﻿using Domain.Contracts.Models;
+using Domain.Contracts.Models.ViewModels.Message;
 using Domain.Implementation.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,11 +23,11 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public JsonResult Read(int? skip, int? take, int chatId)
+        public JsonResult Read(ReadRequestParams readRequestParams)
         {
             var currentUserId = User.Claims.SingleOrDefault(a => a.Type == "UserId")?.Value;
-            var chats = serviceOfMessage.Get(null, currentUserId, skip, take, chatId);
-            return (chats.Count == 1) ? Json(chats.FirstOrDefault()) : Json(chats);
+            var messages = serviceOfMessage.Get(null, currentUserId, readRequestParams.skip, readRequestParams.count, Convert.ToInt32(readRequestParams.where));
+            return Json(messages);
         }
         [HttpPost]
         public async Task<JsonResult> Create(MessageViewModel messageViewModel)

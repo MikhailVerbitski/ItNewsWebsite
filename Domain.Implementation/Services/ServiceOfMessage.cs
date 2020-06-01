@@ -13,16 +13,19 @@ namespace Domain.Implementation.Services
     public class ServiceOfMessage
     {
         private readonly IMapper mapper;
+        private readonly ServiceOfUser serviceOfUser;
         private readonly IRepository<MessageEntity> repositoryOfMessage;
         private readonly IRepository<UserProfileEntity> repositoryOfUserProfile;
 
         public ServiceOfMessage(
             IMapper mapper,
+            ServiceOfUser serviceOfUser,
             IRepository<UserProfileEntity> repositoryOfUserProfile,
             IRepository<MessageEntity> repositoryOfMessage
             )
         {
             this.mapper = mapper;
+            this.serviceOfUser = serviceOfUser;
             this.repositoryOfUserProfile = repositoryOfUserProfile;
             this.repositoryOfMessage = repositoryOfMessage;
         }
@@ -58,7 +61,12 @@ namespace Domain.Implementation.Services
             messages = (skip != null) ? messages.Skip(skip.Value) : messages;
             messages = (take != null) ? messages.Take(take.Value) : messages;
             var messagesViewModel = messages
-                .Select(a => mapper.Map<MessageEntity, MessageViewModel>(a))
+                .Select(messageEntity =>
+                {
+                    var message = mapper.Map<MessageEntity, MessageViewModel>(messageEntity);
+                    message.Author = serviceOfUser.GetUsers(a => a.UserProfileId == messageEntity.UserProfileId).First();
+                    return message;
+                })
                 .AsParallel()
                 .ToList();
             return messagesViewModel;

@@ -315,4 +315,16 @@
   <data name="Hot" xml:space="preserve">
     <value>Hot</value>
   </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Messages</value>
+  </data>
+  <data name="My page" xml:space="preserve">
+    <value>My page</value>
+  </data>
+  <data name="News" xml:space="preserve">
+    <value>News</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
 </root>

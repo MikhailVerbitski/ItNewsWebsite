@@ -8,15 +8,19 @@
     <div>
         @if (Chats == null)
         {
-            <fotn>not ok</fotn>
+            <Loading />
         }
         else
         {
             @foreach (var chat in Chats)
             {
                 <button class="content-body pure-button menu-button" onclick="@(() => OpenChat(chat))">
-                    <h1>@chat.Header</h1>
-                    <h2></h2>
+                    <div>
+                        <div class="grid_chat_button">
+                            <div class="chat_image_container"><img src="@chat.Users.First().Avatar" class="chat_image"></div>
+                            <h3>@chat.Users.Select(a => a.FirstName).Aggregate((a, b) => $"{a}, {b}")</h3>
+                        </div>
+                    </div>
                 </button>
             }
         }
@@ -25,17 +29,40 @@
         @if (CurrentChat != null)
         {
             <div class="grid_message_page content-body">
-                <textarea id="Content" class="pure-input-1" name="Content" bind="@MessageContent" />
-                <button onclick="@SendMessage" id="SubmitComment" class="pure-button pure-button-primary"><LocalizationSentence Sentence="send"></LocalizationSentence></button>
+                <textarea id="Content" class="pure-input-1" name="Content" bind="@MessageContent" style="height: 80px;"/>
+                <button onclick="@SendMessage" id="SubmitComment" class="pure-button pure-button-primary"><LocalizationSentence Sentence="Send"></LocalizationSentence></button>
             </div>
             <div>
-                    @CurrentChat.Messages.Count()
+                @if (CurrentChat.Messages != null)
+                {
                     @foreach (var message in CurrentChat.Messages)
                     {
                         <div class="content-body">
-                            @message.Content
+                            <div class="grid-userMini">
+                                <img src="@((message.Author.Avatar == null) ? "/img/default-user-profile-image.png" : message.Author.Avatar)" class="userMiniImg" asp-append-version="true" height="50" width="50" />
+                                <div>
+                                    <div style="font-size: 11px; text-align: right">
+                                        <LocalizationTime Time="@message.Created" format="@("dd MMMM yyyy")" />
+                                    </div>
+                                    <div>
+                                        <font size="4" style="margin-top: -6px; margin-left:2px;">
+                                            @message.Content
+                                        </font>
+                                    </div>
+                                </div>
+                            </div>
+                            <p><a href="/UserPage/@(message.Author.UserProfileId)"><font style="font-size:12px;">(<font color="@message.Author.Role.Color" style="font-size=9px;">@message.Author.Role.Name</font>) @message.Author.FirstName @message.Author.LastName</font></a></p>
                         </div>
                     }
+                    @if (MessagesEnded)
+                    {
+                        <button onclick="@LoadMore" class="pure-button" style="width: 100%"><LocalizationSentence Sentence="@("Load more")" /></button>
+                    }
+                }
+                else
+                {
+                    <Loading />
+                }
             </div>
         }
     </div>
@@ -49,7 +76,8 @@
 
     private string MessageContent { get; set; }
     private HubConnection connection;
-    
+    private bool MessagesEnded = true;
+
     protected async override Task OnParametersSetAsync()
     {
         connection = new HubConnectionBuilder().WithUrl($"{serviceOfAuthorize.Http.BaseAddress}/messageHub").Build();
@@ -87,5 +115,19 @@
     private async Task OpenChat(ChatRoomViewModel chat)
     {
         CurrentChat = chat;
+        await LoadMore();
+    }
+    private async Task LoadMore()
+    {
+        CurrentChat.Messages = CurrentChat.Messages == null ? new List<MessageViewModel>() : CurrentChat.Messages;
+        var newRangeMessageViewModel = await serviceOfRequest.PostJsonAsync<List<MessageViewModel>>("/api/Message/Read", new ReadRequestParams()
+        {
+            skip = (CurrentChat.Messages as List<MessageViewModel>).Count,
+            count = 16,
+            where = CurrentChat.Id.ToString()
+        });
+        MessagesEnded = (newRangeMessageViewModel as List<MessageViewModel>).Count != 0;
+        (CurrentChat.Messages as List<MessageViewModel>).AddRange(newRangeMessageViewModel);
+        this.StateHasChanged();
     }
 }
